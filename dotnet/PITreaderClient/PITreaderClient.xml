@@ -1,0 +1,2049 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PITreaderClient</name>
+    </assembly>
+    <members>
+        <member name="T:Pilz.PITreader.Client.ApiEndpointMonitor`1">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.#ctor(Pilz.PITreader.Client.PITreaderClient,System.String,System.Func{`0,System.Boolean},System.Func{`0,System.Threading.Tasks.Task},System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+            <param name="endpoint"></param>
+            <param name="changeTrigger"></param>
+            <param name="changeHandler"></param>
+            <param name="queryInterval"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.Dispose(System.Boolean)">
+            <summary>
+            Implementation of the dispose functionality.
+            The disposing parameter should be false when called from a finalizer, and true when called from the IDisposable.Dispose method. In other words, it is true when deterministically called and false when non-deterministically called.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.ApiEndpoints">
+            <summary>
+            REST API endpoints of PITreader devices.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.Status">
+            <summary>
+            Status endpoint
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.StatusAuthentication">
+            <summary>
+            Authentication status endpoint
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.Config">
+            <summary>
+            Configuration endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigBlocklist">
+            <summary>
+            Blocklist endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCoding">
+            <summary>
+            Coding endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserData">
+            <summary>
+            User data configuration endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserDataReset">
+            <summary>
+            User data configuration reset endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserDataParameter">
+            <summary>
+            User data configuration parameter endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserDataVersion">
+            <summary>
+            User data configuration version endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.Led">
+            <summary>
+            Led endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.Transponder">
+            <summary>
+            Transponder data endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserData">
+            <summary>
+            Transponder user data endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserDataClear">
+            <summary>
+            Transponder user data clear endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserDataRead">
+            <summary>
+            Transponder user data read endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserDataWrite">
+            <summary>
+            Transponder user data write endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserDataClearGroup">
+            <summary>
+            Transponder user data clear group data endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderUserDataAddGroupValues">
+            <summary>
+            Transponder user data add group values endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderTeachIn">
+            <summary>
+            Transponder teach-in endpoint.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceStatus(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Read general device information (e.g. device name, order number, serial number, firmware version, hardware version, software version)
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceConfiguration(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns the device settings of a PITreader.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetDeviceConfiguration(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.ConfigRequest)">
+            <summary>
+            Changes device settings of a PITreader.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="config"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetBasicCoding(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns information about the basic coding settings on a device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetBasicCoding(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.BasicCodingRequest)">
+            <summary>
+            Sets or updates the basic coding on a device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="coding"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetAuthenticationStatus(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns the authentication status of the current transponder.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetTransponderData(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns general data of a transpodner currently authenticated.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.TeachInTransponder(Pilz.PITreader.Client.PITreaderClient,System.String)">
+            <summary>
+            Performs a teach-in of the current transponder to the basic coding of the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="teachInId">The teach-in id of the transponder as returned by <see cref="M:Pilz.PITreader.Client.ApiEndpoints.GetTransponderData(Pilz.PITreader.Client.PITreaderClient)"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetLed(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns the current LED status (GET request to /api/led)
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns>The current LED status.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetLed(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.LedRequest)">
+            <summary>
+            Changes LED settings.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="settings"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetExternalAuth(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.SecurityId,Pilz.PITreader.Client.Model.Permission)">
+            <summary>
+            Sets the permission for the current transponder key in external mode.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="securityId">The security id for which the permission should be set.</param>
+            <param name="permission">The permission to be set for the specified security id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetExternalAuth(Pilz.PITreader.Client.PITreaderClient,System.String,Pilz.PITreader.Client.Model.Permission)">
+            <summary>
+            Sets the permission for the current transponder key in external mode.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="securityId">The security id for which the permission should be set.</param>
+            <param name="permission">The permission to be set for the specified security id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetUserDataConfig(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns the current user data configuration of the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetBlocklist(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns all block list entries currently configured in the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.UpdateBlocklist(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.CrudAction,Pilz.PITreader.Client.Model.BlocklistEntry)">
+            <summary>
+            Adds, deletes or updates a blocklist entry on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="action">Action to be performed.</param>
+            <param name="entry">Data of the blocklist entry.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.ApiUtilities">
+            <summary>
+            Utility functions for PITreader API requests and responses.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiUtilities.HexStringToByteArray(System.String)">
+            <summary>
+            Converts a string of hexadecimal numbers (with even length) to a byte array.
+            </summary>
+            <param name="hexString">A string of hexadecimal numbers.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiUtilities.GetThumbprintSha2(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Returns the SHA2 thumbprint for the certificate.
+            </summary>
+            <param name="certificate"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiUtilities.GetThumbprintSha1(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Returns the SHA1 thumbprint for the certificate (<seealso cref="P:System.Security.Cryptography.X509Certificates.X509Certificate2.Thumbprint"/>).
+            </summary>
+            <param name="certificate"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Pilz.PITreader.Client.BlocklistManager">
+            <summary>
+            Class to manage (sync) blocklist entries of a device.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.#ctor(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Creates a new instance of the class.
+            </summary>
+            <param name="client">Reference to PITreaderClient object</param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.GetEntriesAsync">
+            <summary>
+            Returns all blocklist entries currently stored on the device.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.SyncFromCsvAsync(System.String)">
+            <summary>
+            Sync entries on the device with entries contained in the specified CSV file.
+            </summary>
+            <param name="csvFilePath">Path to CSV file.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.CertificateValidationDelegate">
+            <summary>
+            Delegate for certificate validation.
+            </summary>
+            <param name="message">HTTP request message.</param>
+            <param name="certificate">Certificate recieved from the device.</param>
+            <param name="chain">Chain of intermediate certificates received from the device</param>
+            <param name="pollicyErrors">SSL policy errors.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.CertificateValidators">
+            <summary>
+            Container for predefined certificate validation strategies.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.CertificateValidators.AcceptAll">
+            <summary>
+            Accept all certificates (insecure).
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.CertificateValidators.AcceptThumbprintSha2">
+            <summary>
+            Accept only the certificates with the specified SHA2 thumbprint.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.ExternalAuthService">
+            <summary>
+            Service for externally authenticating transponder keys inserted into a PITreader device.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ExternalAuthService.#ctor(Pilz.PITreader.Client.PITreaderClient,System.Func{Pilz.PITreader.Client.Model.SecurityId,Pilz.PITreader.Client.Model.Permission},System.Int32)">
+            <summary>
+            Creates a new instance of the class.
+            </summary>
+            <param name="client">Reference to PITreaderClient object.</param>
+            <param name="evaluator">Function to resolve a security id (input parameter) to a permission.</param>
+            <param name="queryInterval">Interval in milliseconds to check for transponder waiting for authentication.</param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ExternalAuthService.#ctor(Pilz.PITreader.Client.PITreaderClient,System.Func{Pilz.PITreader.Client.Model.SecurityId,System.Threading.Tasks.Task{Pilz.PITreader.Client.Model.Permission}},System.Int32)">
+            <summary>
+            Creates a new instance of the class.
+            </summary>
+            <param name="client">Reference to PITreaderClient object.</param>
+            <param name="asyncEvaluator">Function to resolve a security id (input parameter) to a permission.</param>
+            <param name="queryInterval">Interval in milliseconds to check for transponder waiting for authentication.</param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ExternalAuthService.Dispose(System.Boolean)">
+            <summary>
+            Implementation of the dispose functionality.
+            The disposing parameter should be false when called from a finalizer, and true when called from the IDisposable.Dispose method. In other words, it is true when deterministically called and false when non-deterministically called.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ExternalAuthService.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ApiResponse`1">
+            <summary>
+            Response object returned on API requests.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.Success">
+            <summary>
+            The request was executed successfully.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.Retryable">
+            <summary>
+            Request can be retried.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.ResponseCode">
+            <summary>
+            Response code returned by the PITreader.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.Data">
+            <summary>
+            The Data element is filled with the response on successfull requests.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.ErrorData">
+            <summary>
+            The ErrorData element is filled with the response on not successfull requests.
+            It is always of type GenericResponse.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Ok(`0)">
+            <summary>
+            Creates a new ApiResponse{T} instance on successful requests.
+            </summary>
+            <param name="data">Response data object</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Error(System.Net.HttpStatusCode,System.Boolean,Pilz.PITreader.Client.Model.GenericResponse)">
+            <summary>
+            Creates a new ApiResponse{T} instance on errors.
+            </summary>
+            <param name="statusCode">HTTP Status code of response.</param>
+            <param name="retry">Possibility to retry request.</param>
+            <param name="data">Response data object</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Error(System.String,System.Boolean,System.Nullable{Pilz.PITreader.Client.Model.ResponseCode})">
+            <summary>
+            Creates a new ApiResponse{T} instance on errors.
+            </summary>
+            <param name="message">Message text.</param>
+            <param name="retry">Possibility to retry request.</param>
+            <param name="code">Response code.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.AuthenticationFailureReason">
+            <summary>
+            Failure reasons of the authentication process running for transponders of the PITreader.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.None">
+            <summary>
+            No error
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.NoTransponder">
+            <summary>
+            No transponder key inserted
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.Permission_0">
+            <summary>
+            Permission "0"
+            The transponder key has no permissions for device groups.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.TimeLimitation">
+            <summary>
+            The validity of the transponder key is outside the validity period.
+            (Start date/end date)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.Blocklist">
+            <summary>
+            The transponder key is included in the block list.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.ExternalModeWating">
+            <summary>
+            No permission has been stored for the security-ID yet. ("External" authentication mode)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.IoPortLock">
+            <summary>
+            Authentication is locked by the 24 V I/O port.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.SingleAuthLock">
+            <summary>
+            The "Single authentication" authentication type is configured and authentication is locked by another registered transponder key.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.FourEyesFirstKey">
+            <summary>
+            The "4 Eyes Principle" authentication type is configured and the second transponder key was not authenticated yes.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.AuthenticationMode">
+            <summary>
+            Device's authentication mode
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationMode.ExternalAuthentication">
+            <summary>
+            External
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationMode.TransponderData">
+            <summary>
+            Transponder data
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.AuthenticationStatus">
+            <summary>
+            Status of authentication process
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationStatus.NoTransponder">
+            <summary>
+            No transponder key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationStatus.Completed">
+            <summary>
+            Process completed
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationStatus.Waiting">
+            <summary>
+            Waiting for external authentication
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.AuthenticationStatusResponse">
+            <summary>
+            Current information on a transponder key’s authentication status
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.Authenticated">
+            <summary>
+            Authentication status of the transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.Permission">
+            <summary>
+            Authenticated permission
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.AuthenticationStatus">
+            <summary>
+            Status of authentication process
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.FailureReason">
+            <summary>
+            Reason for failed authentication
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.SecurityId">
+            <summary>
+            Security ID
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.OrderNumber">
+            <summary>
+            Order number of the transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.SerialNumber">
+            <summary>
+            Serial number of the transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.UserData">
+            <summary>
+            User data
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.BasicCodingRequest">
+            <summary>
+            Request to set or update the basic coding of a device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.BasicCodingRequest.Identifier">
+            <summary>
+            Coding indentifier.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.BasicCodingRequest.Comment">
+            <summary>
+            Comment
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.BlocklistCrudRequest">
+            <summary>
+            Request to create, update or delete a blocklist entry.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.BlocklistEntry">
+            <summary>
+            An entry in the blocklist.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.BlocklistEntry.Id">
+            <summary>
+            Security ID
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.BlocklistEntry.Comment">
+            <summary>
+            Comment stored with the security id.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.BlocklistResponse">
+            <summary>
+            Response with the list of blocklist entries stored on the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.BlocklistResponse.Items">
+            <summary>
+            List of blocklist entries stored on the device.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CodingResponse">
+            <summary>
+            Status of a coding on a device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CodingResponse.Activated">
+            <summary>
+            Device is coded.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CodingResponse.Checksum">
+            <summary>
+            Checksum of the coding.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CodingResponse.Comment">
+            <summary>
+            Comment stored with the coding.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ConfigRequest">
+            <summary>
+            Request to update the device configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.Location">
+            <summary>
+            Location information of the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.DeviceGroup">
+            <summary>
+            Device group for authentication mode "TransponderData"
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.EvaluateTimeLimitation">
+            <summary>
+            Setting to enable/disable evaluation of start-/end dates on transponder keys.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.TimeZone">
+            <summary>
+            Timezone for the evaluation of start-/end dates.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.RealTimeClock">
+            <summary>
+            Updates the real time clock on the device.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ConfigResponse">
+            <summary>
+            Current device configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.HostName">
+            <summary>
+            Hostname/device name
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.Location">
+            <summary>
+            Devices’s location description
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.Domain">
+            <summary>
+            Domain name for HTTPS certificates
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.IpAddress">
+            <summary>
+            Device's IP address
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SubnetMask">
+            <summary>
+            Device’s subnet mask
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.DefaultGateway">
+            <summary>
+            Standard Gateway's IP address
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.HttpPort">
+            <summary>
+            HTTP port number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.HttpEnabled">
+            <summary>
+            HTTP protocol enabled
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.HttpsPort">
+            <summary>
+            HTTPS port number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SntpEnabled">
+            <summary>
+            Status of SNTP client on the device
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SntpServer">
+            <summary>
+            IP address of configured SNTP server.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SntpPort">
+            <summary>
+            Port number of configured SNTP server.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SntpRefreshRate">
+            <summary>
+            SNTP refresh interval in minutes.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.ModbusTcpEnabled">
+            <summary>
+            Activation state of the Modbus/TCP slave (server) in the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.ModbusTcpPort">
+            <summary>
+            Port number of the Modbus/TCP slave (server) in the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.AuthenticationMode">
+            <summary>
+            Device's authentication mode
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.DeviceGroup">
+            <summary>
+            Device group for authentication mode "TransponderData"
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.IoPortFunction">
+            <summary>
+            Mode of 24 V I/O port
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.IoPortPermission">
+            <summary>
+            Permission for the 24 V I/O port when configured as an output.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.EvaluateTimeLimitation">
+            <summary>
+            Indicates whether start date ("Valid from") and end date ("Valid until") of transponder keys are evaluated.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.TimeZone">
+            <summary>
+            Name of time zone for evaluation of start and end dates.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.LogPersonalData">
+            <summary>
+            Recording of personal indentifiable information (PII) in diagnostic list and diagnostic log
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.AuthenticationType">
+            <summary>
+            Active authentication type
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CrudAction">
+            <summary>
+            Action for <see cref="T:Pilz.PITreader.Client.Model.GenericCrudRequest`2"/>
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CrudAction.Create">
+            <summary>
+            Create a new item.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CrudAction.Edit">
+            <summary>
+            Edit an existing item.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CrudAction.Delete">
+            <summary>
+            Delete an existing item.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest">
+            <summary>
+            Sets the permission for a transponder key in authentication mode "External"
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.SecurityId">
+            <summary>
+            Security ID, for which external authentication is to be defined
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.Permission">
+            <summary>
+            Permission that is to be set for the stated transponder key
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.GenericCrudRequest`2">
+            <summary>
+            Request to create, update or delete an item in a list stored on the device.
+            </summary>
+            <typeparam name="TKey">Type of the id parameter (integer or <see cref="T:Pilz.PITreader.Client.Model.SecurityId"/>)</typeparam>
+            <typeparam name="TData">Type of the data entry.</typeparam>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericCrudRequest`2.Id">
+            <summary>
+            The id represention the item.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericCrudRequest`2.Action">
+            <summary>
+            The action to be performed.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericCrudRequest`2.Data">
+            <summary>
+            Data for the item.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.GenericResponse">
+            <summary>
+            Response to POST requests or on entry.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Success">
+            <summary>
+            Status of request execution.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Message">
+            <summary>
+            Message key returned by the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Data">
+            <summary>
+            Data returned by the device.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.GenericResponse.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.IoPortFunction">
+            <summary>
+            Mode of 24 V I/O port
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortFunction.None">
+            <summary>
+            No function
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortFunction.Output_AuthenticationStatus">
+            <summary>
+            Authentication status (output)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortFunction.Input_LockAuthentication">
+            <summary>
+            Lock authentication (input)
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.IoPortMode">
+            <summary>
+            Configuration of 24 V I/O port
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortMode.Input">
+            <summary>
+            The 24 V I/O port is configured as an input.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortMode.Output">
+            <summary>
+            The 24 V I/O port is configured as an output.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.IoPortValue">
+            <summary>
+            Signal present at the 24 V I/O port
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortValue.Low">
+            <summary>
+            Low signal (0 V)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.IoPortValue.High">
+            <summary>
+            High signal (24 V)
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.LedColour">
+            <summary>
+            Color of device's LED
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedColour.Off">
+            <summary>
+            Switched off
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedColour.Blue">
+            <summary>
+            Blue
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedColour.Yellow">
+            <summary>
+            Yellow
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedColour.Red">
+            <summary>
+            Red
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedColour.Green">
+            <summary>
+            Green
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.LedFlashMode">
+            <summary>
+            Flash mode of the device's LED
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedFlashMode.Static">
+            <summary>
+            Static LED mode
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.LedFlashMode.Blinking">
+            <summary>
+            Flash mode (1 Hz)
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.LedOverwriteSettings">
+            <summary>
+            Settings for overwriting the internal LED control logic.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedOverwriteSettings.Colour">
+            <summary>
+            Colour to be applied to the device's LED.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedOverwriteSettings.FlashMode">
+            <summary>
+            Flash mode to be applied to the device's LED.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedOverwriteSettings.Acticated">
+            <summary>
+            Setting to enable overwrite of internal LED logic.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.LedRequest">
+            <summary>
+            Request to change LED settings.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedRequest.Colour">
+            <summary>
+            Sets the colour of the LED.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedRequest.FlashMode">
+            <summary>
+            Sets the flash mode (static or blinking) of the LED.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedRequest.Activated">
+            <summary>
+            If true, these settings override the internal logic for the LED colour of the device.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.LedResponse">
+            <summary>
+            Current LED state and overwrite settings
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedResponse.Colour">
+            <summary>
+            Current LED colour
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedResponse.FlashMode">
+            <summary>
+            Current LED flash mode
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.LedResponse.Overwrite">
+            <summary>
+            Current LED overwrite settings
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.MeResponse">
+            <summary>
+            Information about the user who is currently logged in
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.MeResponse.Id">
+            <summary>
+            ID of the user who is currently logged in
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.MeResponse.Name">
+            <summary>
+            Name of the user who is currently logged in
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.MeResponse.Level">
+            <summary>
+            Access permission (role) of the user who is currently logged in
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.MeResponse.Type">
+            <summary>
+            API user type
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.Permission">
+            <summary>
+            Encoded permission value of a transponder
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_0">
+            <summary>Permission 0</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_1">
+            <summary>Permission 1</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_2">
+            <summary>Permission 2</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_3">
+            <summary>Permission 3</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_4">
+            <summary>Permission 4</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_5">
+            <summary>Permission 5</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_6">
+            <summary>Permission 6</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_7">
+            <summary>Permission 7</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_8">
+            <summary>Permission 8</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_9">
+            <summary>Permission 9</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_10">
+            <summary>Permission 10</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_11">
+            <summary>Permission 11</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_12">
+            <summary>Permission 12</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_13">
+            <summary>Permission 13</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_14">
+            <summary>Permission 14</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_15">
+            <summary>Permission 15</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_16">
+            <summary>Permission 16</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_17">
+            <summary>Permission 17</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_18">
+            <summary>Permission 18</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_19">
+            <summary>Permission 19</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_20">
+            <summary>Permission 20</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_21">
+            <summary>Permission 21</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_22">
+            <summary>Permission 22</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_23">
+            <summary>Permission 23</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_24">
+            <summary>Permission 24</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_25">
+            <summary>Permission 25</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_26">
+            <summary>Permission 26</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_27">
+            <summary>Permission 27</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_28">
+            <summary>Permission 28</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_29">
+            <summary>Permission 29</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_30">
+            <summary>Permission 30</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_31">
+            <summary>Permission 31</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_32">
+            <summary>Permission 32</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_33">
+            <summary>Permission 33</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_34">
+            <summary>Permission 34</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_35">
+            <summary>Permission 35</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_36">
+            <summary>Permission 36</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_37">
+            <summary>Permission 37</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_38">
+            <summary>Permission 38</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_39">
+            <summary>Permission 39</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_40">
+            <summary>Permission 40</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_41">
+            <summary>Permission 41</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_42">
+            <summary>Permission 42</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_43">
+            <summary>Permission 43</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_44">
+            <summary>Permission 44</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_45">
+            <summary>Permission 45</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_46">
+            <summary>Permission 46</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_47">
+            <summary>Permission 47</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_48">
+            <summary>Permission 48</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_49">
+            <summary>Permission 49</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_50">
+            <summary>Permission 50</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_51">
+            <summary>Permission 51</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_52">
+            <summary>Permission 52</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_53">
+            <summary>Permission 53</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_54">
+            <summary>Permission 54</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_55">
+            <summary>Permission 55</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_56">
+            <summary>Permission 56</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_57">
+            <summary>Permission 57</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_58">
+            <summary>Permission 58</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_59">
+            <summary>Permission 59</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_60">
+            <summary>Permission 60</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_61">
+            <summary>Permission 61</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_62">
+            <summary>Permission 62</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_63">
+            <summary>Permission 63</summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.Permission.Permission_64">
+            <summary>Permission 64</summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ResponseCode">
+            <summary>
+            Response code of a request to the device.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Unknown">
+            <summary>
+            Unkown or invalid response code.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Ok">
+            <summary>
+            Request executed successfull.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.BadRequest">
+            <summary>
+            Invalid data was submitted in the request.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Forbidden">
+            <summary>
+            Access to the API endpoint or one of the parameters in the request is not allowed for the current user.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.DeviceError">
+            <summary>
+            Internal error of the device (restart the device and try again).
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.SecurityId">
+            <summary>
+            Security ID of a PITreader transponder.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.#ctor(System.String)">
+            <summary>
+            Create a security id from specified string of hexadecimal values.
+            </summary>
+            <param name="hexString">String of hexadecimal values.</param>
+            <exception cref="T:System.ArgumentNullException">Empty of null value provided as hex string</exception>
+            <exception cref="T:System.ArgumentException">Invalid hexadecimal string</exception>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.SecurityId.HexString">
+            <summary>
+            String of 8 hexadecimal numbers (16 characters) representing the Security ID.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.SecurityId.Value">
+            <summary>
+            Numeric value (64 bit unsigned integer) of Security ID
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.Parse(System.String)">
+            <summary>
+            Creates a Security ID based on the provided value.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">Empty of null value provided as hex string</exception>
+            <exception cref="T:System.ArgumentException">Invalid hexadecimal string</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.op_Implicit(Pilz.PITreader.Client.Model.SecurityId)~System.String">
+            <summary>
+            Converts a Security ID to a string.
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.op_Implicit(System.String)~Pilz.PITreader.Client.Model.SecurityId">
+            <summary>
+            Converts a string to a Security ID.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.op_Equality(Pilz.PITreader.Client.Model.SecurityId,System.String)">
+            <summary>
+            Compares a Security ID with a string representing a Security ID and checks for equivalent values.
+            </summary>
+            <param name="id"></param>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.op_Inequality(Pilz.PITreader.Client.Model.SecurityId,System.String)">
+            <summary>
+            Compares a Security ID with a string representing a Security ID and checks for non-equivalent values.
+            </summary>
+            <param name="id"></param>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.Equals(System.Object)">
+            <summary>
+            Determines whether the specified object is equal to the current object.
+            </summary>
+            <param name="obj">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.Equals(Pilz.PITreader.Client.Model.SecurityId)">
+            <summary>
+            Determines whether the specified object is equal to the current object.
+            </summary>
+            <param name="other">The object to compare with the current object.</param>
+            <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.GetHashCode">
+            <summary>
+             Serves as the default hash function.
+            </summary>
+            <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.SingleAuthResponse">
+            <summary>
+            Response showing whether an authentication lock is set via the "Single authentication" authentication type and what the security ID of the locking transponder key is.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.SingleAuthResponse.SeurityId">
+            <summary>
+            Security ID of the locking transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.SingleAuthResponse.SingleAuthLocked">
+            <summary>
+            <c>true</c>, if the authentication locked by a transponder key
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusResponse">
+            <summary>
+            Current status information on the status and properties of the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.HostName">
+            <summary>
+            Hostname/device name
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.IpAddress">
+            <summary>
+            Device's IP address
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.OrderNumber">
+            <summary>
+            Device's order number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.ProductType">
+            <summary>
+            Device's product name
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.SerialNumber">
+            <summary>
+            Device’s serial number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.MacAddress">
+            <summary>
+            Device's MAC address
+            Format: 00:00:00:00:00:00
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.SeuStatus">
+            <summary>
+            Status of the connection between PIT m4SEU and PITreader
+            </summary>
+            <value><c>true</c>: There is an active connection between a PIT m4SEU and the PITreader, otherwise: <c>false</c>.</value>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.Coded">
+            <summary>
+            Status of the basic coding on the PITreader
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.CodedOem">
+            <summary>
+            Status of the OEM coding on the PITreader
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.TransponderAuthenticated">
+            <summary>
+            Authentication status of the transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.FirmwareVersion">
+            <summary>
+            Device's firmware version
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.HardwareVersion">
+            <summary>
+            PITreader's hardware version
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.HarwareVariant">
+            <summary>
+            PITreader's hardware type
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.RealTimeClock">
+            <summary>
+            Device’s current date and time
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.Released">
+            <summary>
+            True: it is officially released firmware.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.IoPortMode">
+            <summary>
+            Configuration of 24 V I/O port
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.IoPortValue">
+            <summary>
+            Signal present at the 24 V I/O port
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderDataContainer">
+            <summary>
+            Container for all data stored on a transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderDataContainer.StaticData">
+            <summary>
+            Data in standard layout stored on the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderDataContainer.UserData">
+            <summary>
+            Data in user data area stored on the transponder.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderRequest">
+            <summary>
+            Data to be written to a transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderRequest.Permissions">
+            <summary>
+            Array of permissions (32 values, one for each device group).
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderRequest.TimeLimitationStart">
+            <summary>
+            Start date for evaluation of start/end dates of the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderRequest.TimeLimitationEnd">
+            <summary>
+            End date for evaluation of start/end dates of the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderRequest.CodingLock">
+            <summary>
+            If <c>true</c>, data on that transponder is only readable on PITreader devices with a matching coding.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderResponse">
+            <summary>
+            Data stored on a transponder key.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderResponse.TeachInId">
+            <summary>
+            UID for teach-in of the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderResponse.SecurityId">
+            <summary>
+            Security ID of the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderResponse.LockedPermissions">
+            <summary>
+            <c>true</c>, if permissions are locked and can not be edited, anymore.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataConfigResponse">
+            <summary>
+            Contains complete user data configuration of a device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataConfigResponse.Version">
+            <summary>
+            Version number stored with the configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataConfigResponse.Comment">
+            <summary>
+            Comment stored with the configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataConfigResponse.Parameters">
+            <summary>
+            List of configured user data parameters.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataGroupRequest">
+            <summary>
+            User data stored for a distinct device group or default values.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataGroupRequest.DeviceGroup">
+            <summary>
+            Device group or <c>null</c> for default values.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataGroupRequest.Values">
+            <summary>
+            List of values stored for the device group.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataGroupResponse">
+            <summary>
+            User data stored for a distinct device group or default values.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataGroupResponse.DeviceGroup">
+            <summary>
+            Device group or <c>null</c> for default values.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataGroupResponse.Values">
+            <summary>
+            List of values stored for the device group.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataParamaterDefintionResponse">
+            <summary>
+            User data configuration stored on a transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParamaterDefintionResponse.Version">
+            <summary>
+            Version number stored for the user data configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParamaterDefintionResponse.Parameters">
+            <summary>
+            User data parameters stored on the transponder (name field is always empty).
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataParameter">
+            <summary>
+            User data parameter configuration.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParameter.Id">
+            <summary>
+            Paramater-ID
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParameter.Name">
+            <summary>
+            Name of the paramater (only for configuration stored on a device)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParameter.Type">
+            <summary>
+            Data type of the parameter.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataParameter.Size">
+            <summary>
+            Max. size for the paramater (only for STRING types).
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataResponse">
+            <summary>
+            User data stored on a transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataResponse.ParameterDefintion">
+            <summary>
+            Configuration (parameter definitions) stored on the transponder.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataResponse.Groups">
+            <summary>
+            User data stored on the transponder.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataType">
+            <summary>
+            Data type for user data parameters
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.STRING">
+            <summary>
+            A string of characters
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT8U">
+            <summary>
+            Unsigned 8-bit number (range 0 to 255)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT8S">
+            <summary>
+            Signed 8-bit number (range -128 to 127)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT16U">
+            <summary>
+            Unsigned 16-bit number (range 0 to 65535)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT16S">
+            <summary>
+            Signed 16-bit number (range -32768 to 32767)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT32U">
+            <summary>
+            Unsigned 32-bit number (range 0 to 4294967295)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.INT32S">
+            <summary>
+            Signed 32-bit number (range -2147483648 to 2147483647)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.DATETIME">
+            <summary>
+            Date/time string formatted according to RFC 3339 (%yyyy-%MM-%dd'T'%HH:%mm:%ss'Z')
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserDataType.PERMISSION">
+            <summary>
+            Permission (32 bit code word)
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataValue">
+            <summary>
+            User data value
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataValue.Id">
+            <summary>
+            Perameter-ID
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataValue.NumericValue">
+            <summary>
+            Numeric value of the parameter (optional)
+            Note: The data field is only available when a numeric value is concerned(type ID 10 … 15 or 30).
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataValue.StringValue">
+            <summary>
+            String values of the parameter (optional)
+            Note: The data field is only available when a parameter with type-ID 1 (STRING) or type-ID 20 (DATETIME) is concerned.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataValueRequest">
+            <summary>
+            User data value
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataValueRequest.Type">
+            <summary>
+            Data type of the parameter.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataValueRequest.Size">
+            <summary>
+            Max. size for the paramater (only for STRING types).
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserDataVersionRequest">
+            <summary>
+            Request to update version and comment of user data stored on a device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataVersionRequest.Version">
+            <summary>
+            Version number.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.UserDataVersionRequest.Comment">
+            <summary>
+            Comment.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.UserType">
+            <summary>
+            API user type
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserType.User">
+            <summary>
+            User (session based authentication using login form)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.UserType.ApiClient">
+            <summary>
+            API client with API token
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.AuthenticationType">
+            <summary>
+            Authentication type
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.AuthenticationType.Basic">
+            <summary>
+            "Basic" authentication type (no special function)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.AuthenticationType.SingleAuthentication">
+            <summary>
+            "Single authentication" authentication type
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.AuthenticationType.FourEyesPrinciple">
+            <summary>
+            4-eyes-principle
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderClient">
+            <summary>
+            REST API Client for Pilz PITreader device.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.DefaultIp">
+            <summary>
+            Default IP address of PITreader devices.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.DefaultPortNumber">
+            <summary>
+            Default port number for HTTPS connections to PITreader devices.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.String,System.UInt16,Pilz.PITreader.Client.CertificateValidationDelegate)">
+            <summary>
+            Create a new client instance.
+            </summary>
+            <param name="hostnameOrIp">Hostname or IP address of device.</param>
+            <param name="portNumber">Portnumber for webserver (https)</param>
+            <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderClient.ApiToken">
+            <summary>
+            Gets or sets the API token for connections to the PITreader device.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.GetDeviceCertificateAsync(System.String,System.UInt16)">
+            <summary>
+            Returns the certificate of a PITreader device.
+            </summary>
+            <param name="hostnameOrIp">Hotname or ip address of the PITreader device.</param>
+            <param name="portNumber">Port number for HTTPS connections to the PITreader device.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.GetAsync``1(System.String)">
+            <summary>
+            Executes an HTTP GET request to the given endpoint.
+            </summary>
+            <typeparam name="TResponse">Type of the response data object.</typeparam>
+            <param name="url">Endpoint</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.PostAsync``2(System.String,``1)">
+            <summary>
+            Executes an HTTP POST request to the given endpoint.
+            </summary>
+            <typeparam name="TResponse">Type of the response data object.</typeparam>
+            <typeparam name="TRequest">Type of the request data object.</typeparam>
+            <param name="url">Endpoint</param>
+            <param name="data">Request data</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.PostAsync``1(System.String)">
+            <summary>
+            Executes an HTTP POST request to the given endpoint.
+            </summary>
+            <typeparam name="TResponse">Type of the response data object.</typeparam>
+            <param name="url">Endpoint</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.Dispose(System.Boolean)">
+            <summary>
+            Implementation of the dispose functionality.
+            The disposing parameter should be false when called from a finalizer, and true when called from the IDisposable.Dispose method. In other words, it is true when deterministically called and false when non-deterministically called.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderJsonSerializer">
+            <summary>
+            JSON serializer for PITreaderClient model entities.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderJsonSerializer.Serialize``1(``0)">
+            <summary>
+            Converts the value of a type specified by a generic type parameter into a JSON string.
+            </summary>
+            <typeparam name="TValue">The type of the value to serialize.</typeparam>
+            <param name="value">The value to convert.</param>
+            <returns> A JSON string representation of the value.</returns>
+            <exception cref="T:System.NotSupportedException">There is no compatible System.Text.Json.Serialization.JsonConverter for TValue or its serializable members.</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderJsonSerializer.Deserialize``1(System.String)">
+            <summary>
+            Parses the text representing a single JSON value into an instance of the type specified by a generic type parameter.
+            </summary>
+            <typeparam name="TValue">The target type of the JSON value.</typeparam>
+            <param name="json">The JSON text to parse.</param>
+            <returns>A TValue representation of the JSON value.</returns>
+            <exception cref="T:System.ArgumentNullException">json is null.</exception>
+            <exception cref="T:System.Text.Json.JsonException">The JSON is invalid. -or- TValue is not compatible with the JSON. -or- There is remaining data in the string beyond a single JSON value.</exception>
+            <exception cref="T:System.NotSupportedException">There is no compatible System.Text.Json.Serialization.JsonConverter for TValue or its serializable members.</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderJsonSerializer.ReadFromJsonAsync``1(System.Net.Http.HttpContent,System.Threading.CancellationToken)">
+            <summary>
+            Read the HTTP content and return the value resulting from deserialize the content as JSON in an asynchronous operation.
+            </summary>
+            <typeparam name="T">The target type to deserialize to.</typeparam>
+            <param name="content">The content to read from.</param>
+            <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+            <returns>The task object representing the asynchronous operation.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter">
+            <summary>
+            Converts between <see cref="T:Pilz.PITreader.Client.Model.CrudAction"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc cref="M:System.Text.Json.Serialization.JsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)"/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter.Write(System.Text.Json.Utf8JsonWriter,Pilz.PITreader.Client.Model.CrudAction,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonNullableDateTimeConverter">
+            <summary>
+            Converts between <see cref="T:System.Nullable`1"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Serialization.JsonNullableDateTimeConverter.Rfc3339Format">
+            <summary>
+            Date-/time-format defined in RFC 3339 as used by the PITreader API.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonNullableDateTimeConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Reads and converts the JSON to type CrudAction.
+            </summary>
+            <param name="reader">The reader.</param>
+            <param name="typeToConvert">The type to convert.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+            <returns>The converted value.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonNullableDateTimeConverter.Write(System.Text.Json.Utf8JsonWriter,System.Nullable{System.DateTime},System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonSecurityIdConverter">
+            <summary>
+            Converts between <see cref="T:Pilz.PITreader.Client.Model.SecurityId"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonSecurityIdConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Reads and converts the JSON to type CrudAction.
+            </summary>
+            <param name="reader">The reader.</param>
+            <param name="typeToConvert">The type to convert.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+            <returns>The converted value.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonSecurityIdConverter.Write(System.Text.Json.Utf8JsonWriter,Pilz.PITreader.Client.Model.SecurityId,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonVersionConverter">
+            <summary>
+            Converts between <see cref="T:System.Version"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonVersionConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Reads and converts the JSON to type CrudAction.
+            </summary>
+            <param name="reader">The reader.</param>
+            <param name="typeToConvert">The type to convert.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+            <returns>The converted value.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonVersionConverter.Write(System.Text.Json.Utf8JsonWriter,System.Version,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.TransponderManager">
+            <summary>
+            Manager for transponder data
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.TransponderManager.#ctor(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Creates a new TransponderManager object instance.
+            </summary>
+            <param name="client">Reference to a PITreaderClient object.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.TransponderManager.GetTransponderDataAsync">
+            <summary>
+            Queries complete data set from a transponder.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.TransponderManager.WriteDataToTransponderAsync(Pilz.PITreader.Client.Model.TransponderDataContainer)">
+            <summary>
+            
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.TransponderManager.ExportToFile(Pilz.PITreader.Client.Model.TransponderDataContainer,System.String)">
+            <summary>
+            Exports the current user data configuration to a file in JSON format.
+            </summary>
+            <param name="data"></param>
+            <param name="path">Path to the file.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.TransponderManager.ImportFromFile(System.String)">
+            <summary>
+            Exports the current user data configuration to a file in JSON format.
+            </summary>
+            <param name="path">Path to the file.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.UserDataConfigManager">
+            <summary>
+            Manager for user data configuration.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.#ctor(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Creates a new UserDataConfigManager object instance.
+            </summary>
+            <param name="client">Reference to a PITreaderClient object.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.ApplyConfigurationAsync(System.UInt16,System.String,System.Collections.Generic.IEnumerable{Pilz.PITreader.Client.Model.UserDataParameter})">
+            <summary>
+            Applies the user data configuration to the device.
+            </summary>
+            <param name="version">Version number, must be larger than 0 if a comment is provided</param>
+            <param name="comment">Comment for the version</param>
+            <param name="parameters">List of parameters</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException">version == 0, but a comment is provided</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.MigrateConfigurationAsync(System.Nullable{System.UInt16},System.String,System.Collections.Generic.IEnumerable{Pilz.PITreader.Client.Model.UserDataParameter},System.Boolean)">
+            <summary>
+            Migrates user data configuration on the device with keeping the order.
+            </summary>
+            <param name="version">Version number, must be larger than 0 if a comment is provided</param>
+            <param name="comment">Comment for the version</param>
+            <param name="parameters">List of parameters</param>
+            <param name="dontDeleteParamaters">if <c>true</c>, no parameters are deleted on the device.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException">version == 0, but a comment is provided</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.GetConfigurationAsync">
+            <summary>
+            Returns the user data configuration from the device.
+            </summary>
+            <returns>The user data configuration from the device.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.ApplyConfigurationAsync(Pilz.PITreader.Client.Model.UserDataParamaterDefintionResponse)">
+            <summary>
+            Applies the user data configuration to the device.
+            </summary>
+            <param name="userDataConfig"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.AreConfigurationsMatching(System.Collections.Generic.IList{Pilz.PITreader.Client.Model.UserDataParameter},Pilz.PITreader.Client.Model.UserDataParamaterDefintionResponse)">
+            <summary>
+            
+            </summary>
+            <param name="deviceParameters"></param>
+            <param name="transponderParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.UserDataConfigManager.ExportToFile(System.String)">
+            <summary>
+            Exports the current user data configuration to a file in JSON format.
+            </summary>
+            <param name="path">Path to the file.</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
