@@ -292,6 +292,35 @@
             </summary>
             <param name="csvFilePath">Path to CSV file.</param>
         </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.UpdateBlockListAsync(Pilz.PITreader.Client.Model.CrudAction,Pilz.PITreader.Client.Model.BlocklistEntry)">
+            <summary>
+            Modify block list
+            </summary>
+            <param name="action">see <see cref="T:Pilz.PITreader.Client.Model.CrudAction"/></param>
+            <param name="entry">the <see cref="T:Pilz.PITreader.Client.Model.BlocklistEntry"/> to modify</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.AddEntryAsync(Pilz.PITreader.Client.Model.BlocklistEntry)">
+            <summary>
+            Adds an entry to the block list
+            </summary>
+            <param name="blocklistEntry">see <see cref="T:Pilz.PITreader.Client.Model.BlocklistEntry"/> to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.UpdateEntryAsync(Pilz.PITreader.Client.Model.BlocklistEntry)">
+            <summary>
+            Update block list entry
+            </summary>
+            <param name="blocklistEntry">the <see cref="T:Pilz.PITreader.Client.Model.BlocklistEntry"/> to modify</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.DeleteEntryAsync(Pilz.PITreader.Client.Model.BlocklistEntry)">
+            <summary>
+            Delete entry from block list
+            </summary>
+            <param name="blocklistEntry">the <see cref="T:Pilz.PITreader.Client.Model.BlocklistEntry"/> to delete</param>
+            <returns></returns>
+        </member>
         <member name="T:Pilz.PITreader.Client.CertificateValidationDelegate">
             <summary>
             Delegate for certificate validation.

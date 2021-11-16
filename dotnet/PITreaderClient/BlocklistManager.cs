@@ -74,21 +74,67 @@ namespace Pilz.PITreader.Client
             foreach (var entry in online.Where(o => !imported.Any(i => i.Id == o.Id)).ToList())
             {
                 // to be deleted
-                var result = await this.client.UpdateBlocklist(CrudAction.Delete, entry);
+                var result = await DeleteEntryAsync(entry);
                 online.Remove(entry);
             }
 
             foreach (var entry in imported.Where(i => !online.Any(o => i.Id == o.Id)).ToList())
             {
                 // to be added
-                var result = await this.client.UpdateBlocklist(CrudAction.Create, entry);
+                var result = await AddEntryAsync(entry);
             }
 
             foreach (var entry in imported.Where(i => online.FirstOrDefault(o => i.Id == o.Id)?.Comment != i.Comment))
             {
                 // to be updated
-                var result = await this.client.UpdateBlocklist(CrudAction.Edit, entry);
+                var result = await UpdateEntryAsync(entry);
             }
+        }
+
+        /// <summary>
+        /// Modify block list
+        /// </summary>
+        /// <param name="action">see <see cref="CrudAction"/></param>
+        /// <param name="entry">the <see cref="BlocklistEntry"/> to modify</param>
+        /// <returns></returns>
+        protected async Task<ApiResponse<GenericResponse>> UpdateBlockListAsync(CrudAction action, BlocklistEntry entry)
+        {
+            var response = await client.UpdateBlocklist(action, entry);
+            if (!response.Success)
+            {
+                throw new Exception($"Error updating blocklist: {response.ErrorData.Message}");
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Adds an entry to the block list
+        /// </summary>
+        /// <param name="blocklistEntry">see <see cref="BlocklistEntry"/> to add</param>
+        /// <returns></returns>
+        public async Task<ApiResponse<GenericResponse>> AddEntryAsync(BlocklistEntry blocklistEntry)
+        {
+            return await UpdateBlockListAsync(CrudAction.Create, blocklistEntry);
+        }
+
+        /// <summary>
+        /// Update block list entry
+        /// </summary>
+        /// <param name="blocklistEntry">the <see cref="BlocklistEntry"/> to modify</param>
+        /// <returns></returns>
+        public async Task<ApiResponse<GenericResponse>> UpdateEntryAsync(BlocklistEntry blocklistEntry)
+        {
+            return await UpdateBlockListAsync(CrudAction.Edit, blocklistEntry);
+        }
+
+        /// <summary>
+        /// Delete entry from block list
+        /// </summary>
+        /// <param name="blocklistEntry">the <see cref="BlocklistEntry"/> to delete</param>
+        /// <returns></returns>
+        public async Task<ApiResponse<GenericResponse>> DeleteEntryAsync(BlocklistEntry blocklistEntry)
+        {
+            return await UpdateBlockListAsync(CrudAction.Delete, blocklistEntry);
         }
     }
 }

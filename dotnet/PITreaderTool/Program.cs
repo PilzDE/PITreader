@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace PITreaderTool
 {
-    class Program
+    internal class Program
     {
-        class BaseOptions
+        private class BaseOptions
         {
             [Option('h', Default = "192.168.0.12", HelpText = "Hostname or ip address of PITreader")]
             public string Host { get; set; }
@@ -26,44 +26,58 @@ namespace PITreaderTool
             public string ApiToken { get; set; }
         }
 
+        [Verb("blocklist", HelpText = "Blocklist tasks")]
+        private class BlocklistOptions : BaseOptions
+        {
+            [Option('s', "show", Required = false, Default = false, HelpText = "Show current block list entries.")]
+            public bool Show { get; set; }
+
+            [Option('a', "add", SetName = "blAddOpt", Required = false, Default = "", HelpText = "Add entry to block list.")]
+            public string NewEntry { get; set; }
+
+            [Option('d', "delete", SetName = "blDelOpt", Required = false, Default = "", HelpText = "Delete entry from block list.")]
+            public string Entry2Delete { get; set; }
+
+            [Option('u', "update", SetName = "blUpdOpt", Required = false, Default = "", HelpText = "Update comment of entry in block list.")]
+            public string Entry2Update { get; set; }
+
+            [Option('c', "comment", Required = false, Default = "")]
+            public string Comment { get; set; }
+        }
+
         [Verb("udc", HelpText = "User data configuration tasks")]
-        class UdcOptions : BaseOptions
+        private class UdcOptions : BaseOptions
         {
             [Option(SetName = "import", HelpText = "Import user data configuration from JSON file.")]
             public string ImportPath { get; set; }
-
 
             [Option(SetName = "export", HelpText = "Export user data configuration to JSON file.")]
             public string ExportPath { get; set; }
         }
 
         [Verb("xpndr", HelpText = "Transponder data tasks")]
-        class XpndrOptions : BaseOptions
+        private class XpndrOptions : BaseOptions
         {
             [Option("export", SetName = "export", HelpText = "Export transponder data to JSON file.")]
             public bool Export { get; set; }
 
-
             [Option("write", SetName = "write", HelpText = "Import data from JSON file to a transponder key.")]
             public bool Write { get; set; }
 
-
             [Option("update-udc", SetName = "write", Default = false, HelpText = "If set, user data configuration is updated from the given transponder template.")]
             public bool UpdateUdc { get; set; }
-
 
             [Option("loop", SetName = "write", Default = false, HelpText = "If set, app will loop and write data to every inserted transponder.")]
             public bool Loop { get; set; }
 
             [Value(0, Required = true, MetaName = "path", HelpText = "Path to JSON file.")]
             public string Path { get; set; }
-
         }
 
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             // PITreaderTool.exe [--host=192.168.12.0|-h=192.168.12.0] [--port=443|-p=443] --accept-all|--thumbprint=<sha2 hex> [api token] COMMAND OPTIONS
-            // 
+            //
             // Commands
             //  udc export <path to json>                   Exports user data configuration of device to JSON file.
             //  udc import <path to json>                   Imports user data configuration from JSON file into device.
@@ -79,10 +93,11 @@ namespace PITreaderTool
             //  auth --csv <path to csv>|--json <path to json>
             //Console.WriteLine("Hello World!");
 
-            return Parser.Default.ParseArguments<UdcOptions, XpndrOptions>(args)
+            return Parser.Default.ParseArguments<UdcOptions, XpndrOptions, BlocklistOptions>(args)
                 .MapResult(
                   (UdcOptions opts) => { return 0; },
                   (XpndrOptions opts) => CommandXpndrAsync(opts).Result,
+                  (BlocklistOptions opts) => CommandBlocklistAsync(opts).Result,
                   errs => 1);
         }
 
@@ -97,6 +112,70 @@ namespace PITreaderTool
             };
 
             return client;
+        }
+
+        private static async Task<int> CommandBlocklistAsync(BlocklistOptions blocklistOptions)
+        {
+            try
+            {
+                bool workDone = false;
+
+                var client = CreateClient(blocklistOptions);
+                var mgr = new BlocklistManager(client);
+
+                if (!string.IsNullOrWhiteSpace(blocklistOptions.NewEntry))
+                {
+                    Console.WriteLine($"Adding block list entry {blocklistOptions.NewEntry}...");
+
+                    var entry = new BlocklistEntry();
+                    entry.Id = SecurityId.Parse(blocklistOptions.NewEntry);
+                    entry.Comment = blocklistOptions.Comment;
+                    await mgr.AddEntryAsync(entry);
+                    Console.WriteLine("done.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(blocklistOptions.Entry2Update))
+                {
+                    Console.WriteLine($"Updating block list entry {blocklistOptions.Entry2Update}...");
+
+                    var entry = new BlocklistEntry();
+                    entry.Id = SecurityId.Parse(blocklistOptions.Entry2Update);
+                    entry.Comment = blocklistOptions.Comment;
+                    await mgr.UpdateEntryAsync(entry);
+                    workDone = true;
+                    Console.WriteLine("done.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(blocklistOptions.Entry2Delete))
+                {
+                    Console.WriteLine($"Deleting block list entry {blocklistOptions.Entry2Delete}...");
+
+                    var entry = new BlocklistEntry();
+                    entry.Id = SecurityId.Parse(blocklistOptions.Entry2Delete);
+                    await mgr.DeleteEntryAsync(entry);
+                    workDone = true;
+                    Console.WriteLine("done.");
+                }
+
+                if (blocklistOptions.Show || !workDone)
+                {
+                    Console.Write("Requesting block list... ");
+                    var entries = await mgr.GetEntriesAsync();
+                    Console.WriteLine("done.");
+                    foreach (var entry in entries)
+                    {
+                        Console.WriteLine($"ID:\t{entry.Id}\tComment: {entry.Comment}");
+                    }
+                    Console.WriteLine($"{entries.Count} block list entries received.");
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return -1;
         }
 
         private static async Task<int> CommandXpndrAsync(XpndrOptions options)
@@ -125,7 +204,7 @@ namespace PITreaderTool
                     }
                     else
                     {
-                        if (!UserDataConfigManager.AreConfigurationsMatching(udc.Data.Parameters, data.UserData.ParameterDefintion) 
+                        if (!UserDataConfigManager.AreConfigurationsMatching(udc.Data.Parameters, data.UserData.ParameterDefintion)
                             || udc.Data.Version != data.UserData.ParameterDefintion.Version)
                         {
                             if ((await udcManager.ApplyConfigurationAsync(data.UserData.ParameterDefintion)).Success)
@@ -155,7 +234,7 @@ namespace PITreaderTool
                         {
                             teachInId = r.TeachInId;
                             if (string.IsNullOrWhiteSpace(teachInId) || string.IsNullOrWhiteSpace(teachInId.Replace("0", string.Empty))) return Task.CompletedTask;
-                            
+
                             var t = manager.WriteDataToTransponderAsync(data);
                             return t.ContinueWith(z => Console.WriteLine(z.Result ? ("Updated data on tranponder, Security ID: " + r.SecurityId) : ("ERROR: failed to update data on tranponder, Security ID: " + r.SecurityId)));
                         },

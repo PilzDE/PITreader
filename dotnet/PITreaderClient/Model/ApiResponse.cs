@@ -9,7 +9,7 @@ namespace Pilz.PITreader.Client.Model
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class ApiResponse<T> where T: class
+    public class ApiResponse<T> where T : class
     {
         /// <summary>
         /// The request was executed successfully.
@@ -74,7 +74,7 @@ namespace Pilz.PITreader.Client.Model
             {
                 Success = false,
                 Retryable = retry,
-                ResponseCode = Enum.IsDefined(typeof(ResponseCode), statusCode) ? (ResponseCode)statusCode : ResponseCode.Unknown,
+                ResponseCode = Enum.IsDefined(typeof(ResponseCode), ((int)statusCode)) ? (ResponseCode)statusCode : ResponseCode.Unknown,
                 ErrorData = data
             };
         }
