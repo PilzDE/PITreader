@@ -6,18 +6,18 @@
     <members>
         <member name="T:Pilz.PITreader.Client.ApiEndpointMonitor`1">
             <summary>
-            
+            Wrapper to monitor an API endpoint periodically for changes.
             </summary>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.#ctor(Pilz.PITreader.Client.PITreaderClient,System.String,System.Func{`0,System.Boolean},System.Func{`0,System.Threading.Tasks.Task},System.Int32)">
             <summary>
-            
+            Create a new instance of the class.
             </summary>
-            <param name="client"></param>
-            <param name="endpoint"></param>
-            <param name="changeTrigger"></param>
-            <param name="changeHandler"></param>
-            <param name="queryInterval"></param>
+            <param name="client">API client</param>
+            <param name="endpoint">Endpoint to be monitored.</param>
+            <param name="changeTrigger">Callback for change detection (returns true if change occured).</param>
+            <param name="changeHandler">Callback executed when a change was detected.</param>
+            <param name="queryInterval">Query interval.</param>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.Dispose(System.Boolean)">
             <summary>

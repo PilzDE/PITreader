@@ -1,14 +1,11 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pilz.PITreader.Client
 {
     /// <summary>
-    /// 
+    /// Wrapper to monitor an API endpoint periodically for changes.
     /// </summary>
     public class ApiEndpointMonitor<TResponse> : IDisposable where TResponse : class
     {
@@ -21,13 +18,13 @@ namespace Pilz.PITreader.Client
         private int activeJobCount = 0;
 
         /// <summary>
-        /// 
+        /// Create a new instance of the class.
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="endpoint"></param>
-        /// <param name="changeTrigger"></param>
-        /// <param name="changeHandler"></param>
-        /// <param name="queryInterval"></param>
+        /// <param name="client">API client</param>
+        /// <param name="endpoint">Endpoint to be monitored.</param>
+        /// <param name="changeTrigger">Callback for change detection (returns true if change occured).</param>
+        /// <param name="changeHandler">Callback executed when a change was detected.</param>
+        /// <param name="queryInterval">Query interval.</param>
         public ApiEndpointMonitor(PITreaderClient client, string endpoint, Func<TResponse, bool> changeTrigger, Func<TResponse, Task> changeHandler, int queryInterval = 500)
         {
             if (string.IsNullOrEmpty(endpoint))

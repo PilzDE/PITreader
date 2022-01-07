@@ -2,7 +2,7 @@
   "profiles": {
     "PITreaderTool": {
       "commandName": "Project",
-      "commandLineArgs": "xpndr --accept-all --api-token dn1kX+0MaNBc1iVsd2d3Zw== --export transponder.json"
+      "commandLineArgs": "xpndr --accept-all --api-token dn1kX+0MaNBc1iVsd2d3Zw== write --update-udc --loop transponder.json"
     }
   }
 }

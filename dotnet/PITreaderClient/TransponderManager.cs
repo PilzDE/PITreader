@@ -107,10 +107,7 @@ namespace Pilz.PITreader.Client
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
                         
-            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions 
-            { 
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            });
+            string json = PITreaderJsonSerializer.Serialize(data);
             using (var file = File.Open(path, FileMode.Create, FileAccess.Write))
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(json);

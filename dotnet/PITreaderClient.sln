@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PITreaderClient", "PITreaderClient\PITreaderClient.csproj", "{41FE7F52-A974-4496-875C-38A7795E5842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PITreaderTool", "PITreaderTool\PITreaderTool.csproj", "{5A4A9EBF-5BA5-44AE-A50D-167A15A7B2F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PITreaderTool", "PITreaderTool\PITreaderTool.csproj", "{5A4A9EBF-5BA5-44AE-A50D-167A15A7B2F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PITreaderConfigUI", "PITreaderConfigUI\PITreaderConfigUI.csproj", "{145D2C44-DB66-4D9D-8771-591070B0BB2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5A4A9EBF-5BA5-44AE-A50D-167A15A7B2F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A4A9EBF-5BA5-44AE-A50D-167A15A7B2F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A4A9EBF-5BA5-44AE-A50D-167A15A7B2F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{145D2C44-DB66-4D9D-8771-591070B0BB2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{145D2C44-DB66-4D9D-8771-591070B0BB2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{145D2C44-DB66-4D9D-8771-591070B0BB2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{145D2C44-DB66-4D9D-8771-591070B0BB2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
