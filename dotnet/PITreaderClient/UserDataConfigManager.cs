@@ -69,7 +69,7 @@ namespace Pilz.PITreader.Client
         /// <param name="dontDeleteParamaters">if <c>true</c>, no parameters are deleted on the device.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentException">version == 0, but a comment is provided</exception>
-        public async Task<ApiResponse<GenericResponse>> MigrateConfigurationAsync(ushort? version, string comment, IEnumerable<UserDataParameter> parameters, bool dontDeleteParamaters = false)
+        public async Task<ApiResponse<GenericResponse>> MigrateConfigurationAsync(ushort? version, string comment, IEnumerable<UserDataParameter> parameters, bool dontDeleteParameters = false)
         {
             var config = await this.GetConfigurationAsync();
             if (version < 1 && !string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Version must be >= 1", nameof(version));

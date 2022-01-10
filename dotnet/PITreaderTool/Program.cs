@@ -1,9 +1,13 @@
 ﻿using Pilz.PITreader.Client;
 using Pilz.PITreader.Client.Model;
 using Pilz.PITreader.Tool.Commands;
-using System;
+using System.Linq;
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Threading.Tasks;
+using System.CommandLine.Builder;
+using System;
+using System.CommandLine.Invocation;
 
 namespace Pilz.PITreader.Tool
 {
@@ -28,26 +32,59 @@ namespace Pilz.PITreader.Tool
             //  auth --csv <path to csv>|--json <path to json>
             //Console.WriteLine("Hello World!");
 
-            var hostOption = new Option<string>(new[] { "--host", "-h" }, getDefaultValue: () => "192.168.0.12");
-            var portOption = new Option<ushort>(new[] { "--port", "-p" }, getDefaultValue: () => 443);
-            var acceptAllOption = new Option<bool>("--accept-all", () => false);
-            var thumbprintOption = new Option<string>("--thumbprint", "sha2 hex thumbprint of certificate");
-            var apiTokenArgument = new Argument<string>("api token");
+            var hostOption = new Option<string>(new[] { "--host", "-h" }, getDefaultValue: () => "192.168.0.12", "IP address or hostname of PITreader device");
+            var portOption = new Option<ushort>(new[] { "--port", "-p" }, getDefaultValue: () => 443, "HTTPS port number of PITreader device");
+            var acceptAllOption = new Option<bool>("--accept-all", () => false, "If set, certificates of the PITreader device are not validated");
+            var thumbprintOption = new Option<string>("--thumbprint", "Sha2 hex thumbprint of certificate of PITreader device");
 
-            var clientBinder = new PITreaderClientBinder(hostOption, portOption, acceptAllOption, thumbprintOption, apiTokenArgument);
+            var apiTokenArgument = new Argument<string>("api token", "API token (see Configuration -> API Clients) for REST API of PITreader device");
 
-            var rootCommand = new RootCommand();
-            rootCommand.AddOption(hostOption);
-            rootCommand.AddOption(portOption);
-            rootCommand.AddOption(acceptAllOption);
-            rootCommand.AddOption(thumbprintOption);
+            var clientBinder = new ConnectionPropertiesBinder(hostOption, portOption, acceptAllOption, thumbprintOption, apiTokenArgument);
+
+            var rootCommand = new RootCommand("Tool to automate tasks using the REST API of PITreader devices");
+            rootCommand.AddGlobalOption(hostOption);
+            rootCommand.AddGlobalOption(portOption);
+            rootCommand.AddGlobalOption(acceptAllOption);
+            rootCommand.AddGlobalOption(thumbprintOption);
             rootCommand.AddArgument(apiTokenArgument);
 
             rootCommand.AddCommand(new TransponderCommand(clientBinder));
             rootCommand.AddCommand(new BlocklistCommand(clientBinder));
             rootCommand.AddCommand(new UserDataConfigurationCommand(clientBinder));
 
-            return rootCommand.Invoke(args);
+            rootCommand.AddValidator(commandResult =>
+            {
+                if (!commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(acceptAllOption.Name))
+                    && !commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(thumbprintOption.Name)))
+                {
+                    return $"Either option '{acceptAllOption.Name}' or '{thumbprintOption.Name}' needs to be used.";
+                }
+
+                return default(string);
+            });
+
+            return new CommandLineBuilder(rootCommand)
+                .UseDefaults()
+                .UseHelp()
+                .UseExceptionHandler(HandleException)
+                .Build()
+                .Invoke(args);
+        }
+
+        internal static void HandleException(Exception exception, InvocationContext context)
+        {
+            try
+            {
+                if (!(exception is OperationCanceledException))
+                {
+                    context.Console.WriteError(exception.Message);
+                }
+                context.ExitCode = 1;
+            }
+            catch
+            {
+                // pass
+            }
         }
     }
 }

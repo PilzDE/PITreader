@@ -55,6 +55,8 @@ namespace Pilz.PITreader.Client
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+
+            client.Timeout = TimeSpan.FromSeconds(5);
         }
 
         /// <summary>

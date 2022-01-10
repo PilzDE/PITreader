@@ -33,15 +33,15 @@ namespace Pilz.PITreader.Client
         public async Task<TransponderDataContainer> GetTransponderDataAsync()
         {
             var dataResponse = await this.client.GetTransponderData();
-            if (!dataResponse.Success) throw new InvalidOperationException();
+            if (!dataResponse.Success) throw new InvalidOperationException(dataResponse.ErrorData?.Message);
 
             if (dataResponse.Data.SecurityId == null) return null;
 
             var genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataRead);
-            if (!genericResponse.Success) throw new InvalidOperationException();
+            if (!genericResponse.Success) throw new InvalidOperationException(genericResponse.ErrorData?.Message);
 
             var userDataResponse = await this.client.GetAsync<UserDataResponse>(ApiEndpoints.TransponderUserData);
-            if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError) throw new InvalidOperationException();
+            if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError) throw new InvalidOperationException(userDataResponse.ErrorData?.Message);
 
             return new TransponderDataContainer
             {

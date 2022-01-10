@@ -8,27 +8,28 @@ namespace Pilz.PITreader.Tool.Commands
     internal class BlocklistCommand : Command
     {
         /*
-         
             //  bl export <path to csv>
             //  bl import <path to csv>
-         
          */
-        public BlocklistCommand(IValueDescriptor<PITreaderClient> clientBinder)
-            : base ("bl")
+        public BlocklistCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+            : base ("bl", "Import of blocklists")
         {
             var csvPathArgument = new Argument<string>("path to csv");    
 
-            var importCommand = new Command("import");            
+            var importCommand = new Command("import", "Import blocklist from a csv file into a device");
             importCommand.AddArgument(csvPathArgument);
 
-            System.CommandLine.Handler.SetHandler(importCommand, (PITreaderClient c, string s) => this.HandleImport(c, s), clientBinder, csvPathArgument);
+            System.CommandLine.Handler.SetHandler(importCommand, (ConnectionProperties c, string s) => this.HandleImport(c, s), connectionPropertiesBinder, csvPathArgument);
             this.AddCommand(importCommand);
         }
 
-        private async Task HandleImport(PITreaderClient client, string pathToCsv)
+        private async Task HandleImport(ConnectionProperties properties, string pathToCsv)
         {
-            var manager = new BlocklistManager(client);
-            await manager.SyncFromCsvAsync(pathToCsv);
+            using (var client = properties.CreateClient())
+            {
+                var manager = new BlocklistManager(client);
+                await manager.SyncFromCsvAsync(pathToCsv);
+            }
         }
     }
 }
