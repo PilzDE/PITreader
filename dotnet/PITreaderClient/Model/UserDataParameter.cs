@@ -11,7 +11,7 @@ namespace Pilz.PITreader.Client.Model
         /// Paramater-ID
         /// </summary>
         [JsonPropertyName("id")]
-        public ushort Id { get; set; } 
+        public ushort Id { get; set; }
 
         /// <summary>
         /// Name of the paramater (only for configuration stored on a device)

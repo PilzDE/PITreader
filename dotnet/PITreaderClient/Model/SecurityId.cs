@@ -76,7 +76,7 @@ namespace Pilz.PITreader.Client.Model
         /// <param name="s"></param>
         /// <returns></returns>
         public static bool operator !=(SecurityId id, string s) => (Object.Equals(null, id) ? !string.IsNullOrEmpty(s) : !string.Equals(id.HexString, s, StringComparison.InvariantCultureIgnoreCase));
-       
+
         /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>

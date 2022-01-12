@@ -1,5 +1,4 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {
@@ -24,7 +24,7 @@ namespace Pilz.PITreader.Client
         /// Default port number for HTTPS connections to PITreader devices.
         /// </summary>
         public const ushort DefaultPortNumber = 443;
-        
+
         private readonly HttpClient client;
 
         private readonly HttpClientHandler handler;
@@ -62,8 +62,8 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Gets or sets the API token for connections to the PITreader device.
         /// </summary>
-        public string ApiToken 
-        { 
+        public string ApiToken
+        {
             get { return this.apiToken; }
             set
             {
@@ -112,7 +112,7 @@ namespace Pilz.PITreader.Client
         /// <typeparam name="TResponse">Type of the response data object.</typeparam>
         /// <param name="url">Endpoint</param>
         /// <returns></returns>
-        public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string url) where TResponse: class
+        public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string url) where TResponse : class
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             return await this.ExecuteRequest<TResponse>(request);
@@ -126,7 +126,7 @@ namespace Pilz.PITreader.Client
         /// <param name="url">Endpoint</param>
         /// <param name="data">Request data</param>
         /// <returns></returns>
-        public async Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest data) where TResponse: class
+        public async Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest data) where TResponse : class
         {
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             if (data != null)
@@ -172,7 +172,7 @@ namespace Pilz.PITreader.Client
                         // HTTP 404 is returned with a default HTML error page -> no JSON
                         return ApiResponse<T>.Error(response.StatusCode, ((int)response.StatusCode) % 100 != 4, await response.Content.ReadFromJsonAsync<GenericResponse>());
                     }
-                    
+
                     return ApiResponse<T>.Error("Endpoint not found", false);
                 }
             }

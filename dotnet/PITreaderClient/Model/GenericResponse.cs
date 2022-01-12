@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
 {

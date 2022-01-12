@@ -1,8 +1,8 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client.Serialization
 {

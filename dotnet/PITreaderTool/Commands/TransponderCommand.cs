@@ -1,9 +1,9 @@
-﻿using Pilz.PITreader.Client;
-using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Tool.Commands
 {
@@ -16,15 +16,14 @@ namespace Pilz.PITreader.Tool.Commands
             //                                                          if --loop is set the operation runs forever and updates transponder when inserted.
          */
         public TransponderCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
-            : base ("xpndr", "Export and writing of transponder content")
+            : base("xpndr", "Export and writing of transponder content")
         {
             var jsonPathArg = new Argument<string>("path to json");
-            
+
             var xpndrExportCommand = new Command("export", "Export content of a transponder to file");
             xpndrExportCommand.AddArgument(jsonPathArg);
             System.CommandLine.Handler.SetHandler(xpndrExportCommand, (ConnectionProperties c, string s) => this.HandleExport(c, s), connectionPropertiesBinder, jsonPathArg);
             this.AddCommand(xpndrExportCommand);
-                       
 
             var xpndrWriteCommand = new Command("write", "Write data from file (see export) to transponders");
             var updateUdcOption = new Option<bool>("--update-udc", () => false, "if set the user data configuration in the device is updated, if necessary.");
@@ -42,7 +41,7 @@ namespace Pilz.PITreader.Tool.Commands
         private async Task<int> HandleExport(ConnectionProperties properties, string pathToJson)
         {
             using (var client = properties.CreateClient())
-            { 
+            {
                 var manager = new TransponderManager(client);
                 var data = await manager.GetTransponderDataAsync();
                 return manager.ExportToFile(data, pathToJson) ? 0 : 1;

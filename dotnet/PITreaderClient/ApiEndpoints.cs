@@ -1,5 +1,5 @@
-﻿using Pilz.PITreader.Client.Model;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {

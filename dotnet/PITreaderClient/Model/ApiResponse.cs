@@ -46,6 +46,22 @@ namespace Pilz.PITreader.Client.Model
         public override string ToString() => this.DebuggerDisplay;
 
         /// <summary>
+        /// Returns new ApiResponse of type GenericResponse with ErrorData of current response object.
+        /// </summary>
+        /// <returns>New ApiResponse of type GenericResponse with ErrorData of current response object.</returns>
+        public ApiResponse<GenericResponse> AsGenericResponse()
+        {
+            return new ApiResponse<GenericResponse>
+            {
+                Data = new GenericResponse { Success = this.Success, Message = this.ErrorData?.Message, Data = this.ErrorData },
+                ErrorData = this.ErrorData,
+                Success = this.Success,
+                ResponseCode = this.ResponseCode,
+                Retryable = this.Retryable
+            };
+        }
+
+        /// <summary>
         /// Creates a new ApiResponse{T} instance on successful requests.
         /// </summary>
         /// <param name="data">Response data object</param>

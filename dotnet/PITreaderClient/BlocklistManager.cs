@@ -1,12 +1,8 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {
@@ -40,35 +36,11 @@ namespace Pilz.PITreader.Client
         }
 
         /// <summary>
-        /// Sync entries on the device with entries contained in the specified CSV file.
+        /// Sync entries on the device with entries passed to the function as an argument.
         /// </summary>
-        /// <param name="csvFilePath">Path to CSV file.</param>
-        public async Task SyncFromCsvAsync(string csvFilePath)
+        /// <param name="imported">List of imported (to be synced) entries.</param>
+        public async Task SyncAsync(IList<BlocklistEntry> imported)
         {
-            IList<BlocklistEntry> imported = new List<BlocklistEntry>();
-            using (var fileReader = File.OpenText(csvFilePath))
-            {
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    DetectDelimiter = true,
-                    HasHeaderRecord = true
-                };
-
-                var csvReader = new CsvReader(fileReader, config);
-
-                csvReader.Read();
-                csvReader.ReadHeader();
-
-                while (csvReader.Read())
-                {
-                    imported.Add(new BlocklistEntry
-                    {
-                        Id = csvReader.GetField<string>(0),
-                        Comment = csvReader.GetField<string>(1)
-                    });
-                }
-            }
-
             IList<BlocklistEntry> online = await this.GetEntriesAsync();
 
             foreach (var entry in online.Where(o => !imported.Any(i => i.Id == o.Id)).ToList())

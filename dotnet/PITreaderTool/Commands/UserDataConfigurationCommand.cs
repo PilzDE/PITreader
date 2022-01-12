@@ -1,9 +1,9 @@
-﻿using Pilz.PITreader.Client;
-using Pilz.PITreader.Client.Model;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Binding;
 using System.IO;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Tool.Commands
 {

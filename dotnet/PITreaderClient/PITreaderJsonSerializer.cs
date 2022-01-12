@@ -1,10 +1,10 @@
-﻿using Pilz.PITreader.Client.Serialization;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Serialization;
 
 namespace Pilz.PITreader.Client
 {
@@ -39,7 +39,7 @@ namespace Pilz.PITreader.Client
         {
             return JsonSerializer.Serialize(value, options);
         }
-   
+
         /// <summary>
         /// Parses the text representing a single JSON value into an instance of the type specified by a generic type parameter.
         /// </summary>

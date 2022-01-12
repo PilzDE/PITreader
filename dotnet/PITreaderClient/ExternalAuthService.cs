@@ -1,7 +1,6 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {
@@ -40,10 +39,10 @@ namespace Pilz.PITreader.Client
             this.client = client;
             this.evaluator = asyncEvaluator;
             this.monitor = new ApiEndpointMonitor<AuthenticationStatusResponse>(
-                client, 
+                client,
                 ApiEndpoints.StatusAuthentication,
-                r => r != null && r.AuthenticationStatus == AuthenticationStatus.Waiting, 
-                this.SetSecurityId, 
+                r => r != null && r.AuthenticationStatus == AuthenticationStatus.Waiting,
+                this.SetSecurityId,
                 queryInterval);
         }
 

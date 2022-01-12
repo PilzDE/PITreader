@@ -1,13 +1,10 @@
-﻿using Pilz.PITreader.Client;
-using Pilz.PITreader.Client.Model;
-using Pilz.PITreader.Tool.Commands;
-using System.Linq;
+﻿using System;
 using System.CommandLine;
-using System.CommandLine.Parsing;
-using System.Threading.Tasks;
 using System.CommandLine.Builder;
-using System;
 using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using System.Linq;
+using Pilz.PITreader.Tool.Commands;
 
 namespace Pilz.PITreader.Tool
 {

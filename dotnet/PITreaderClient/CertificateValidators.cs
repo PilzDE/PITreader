@@ -29,7 +29,8 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Accept only the certificates with the specified SHA2 thumbprint.
         /// </summary>
-        public static Func<string, CertificateValidationDelegate> AcceptThumbprintSha2 = (string thumbprint) => {
+        public static Func<string, CertificateValidationDelegate> AcceptThumbprintSha2 = (string thumbprint) =>
+        {
             byte[] thumbprintRaw = thumbprint.HexStringToByteArray();
             return (HttpRequestMessage message, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors pollicyErrors) =>
             {

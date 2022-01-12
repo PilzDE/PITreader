@@ -7,7 +7,7 @@ namespace Pilz.PITreader.Client.Model
     /// </summary>
     /// <typeparam name="TKey">Type of the id parameter (integer or <see cref="SecurityId"/>)</typeparam>
     /// <typeparam name="TData">Type of the data entry.</typeparam>
-    public class GenericCrudRequest<TKey, TData> where TData: class
+    public class GenericCrudRequest<TKey, TData> where TData : class
     {
         /// <summary>
         /// The id represention the item.

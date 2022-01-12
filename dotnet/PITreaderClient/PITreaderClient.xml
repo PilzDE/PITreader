@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>PITreaderClient</name>
+        <name>Pilz.PITreader.Client</name>
     </assembly>
     <members>
         <member name="T:Pilz.PITreader.Client.ApiEndpointMonitor`1">
@@ -286,11 +286,11 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Pilz.PITreader.Client.BlocklistManager.SyncFromCsvAsync(System.String)">
+        <member name="M:Pilz.PITreader.Client.BlocklistManager.SyncAsync(System.Collections.Generic.IList{Pilz.PITreader.Client.Model.BlocklistEntry})">
             <summary>
-            Sync entries on the device with entries contained in the specified CSV file.
+            Sync entries on the device with entries passed to the function as an argument.
             </summary>
-            <param name="csvFilePath">Path to CSV file.</param>
+            <param name="imported">List of imported (to be synced) entries.</param>
         </member>
         <member name="M:Pilz.PITreader.Client.BlocklistManager.UpdateBlockListAsync(Pilz.PITreader.Client.Model.CrudAction,Pilz.PITreader.Client.Model.BlocklistEntry)">
             <summary>
@@ -416,6 +416,12 @@
             Returns a string that represents the current object.
             </summary>
             <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.AsGenericResponse">
+            <summary>
+            Returns new ApiResponse of type GenericResponse with ErrorData of current response object.
+            </summary>
+            <returns>New ApiResponse of type GenericResponse with ErrorData of current response object.</returns>
         </member>
         <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Ok(`0)">
             <summary>
@@ -2041,7 +2047,7 @@
             <param name="version">Version number, must be larger than 0 if a comment is provided</param>
             <param name="comment">Comment for the version</param>
             <param name="parameters">List of parameters</param>
-            <param name="dontDeleteParamaters">if <c>true</c>, no parameters are deleted on the device.</param>
+            <param name="dontDeleteParameters">if <c>true</c>, no parameters are deleted on the device.</param>
             <returns></returns>
             <exception cref="T:System.ArgumentException">version == 0, but a comment is provided</exception>
         </member>

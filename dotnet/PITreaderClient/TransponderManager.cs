@@ -1,11 +1,10 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {
@@ -106,7 +105,7 @@ namespace Pilz.PITreader.Client
         {
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
-                        
+
             string json = PITreaderJsonSerializer.Serialize(data);
             using (var file = File.Open(path, FileMode.Create, FileAccess.Write))
             {

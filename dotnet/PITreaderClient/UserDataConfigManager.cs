@@ -1,11 +1,10 @@
-﻿using Pilz.PITreader.Client.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Client
 {
@@ -53,7 +52,7 @@ namespace Pilz.PITreader.Client
             if (version > 0)
             {
                 response = await this.client.PostAsync<GenericResponse, UserDataVersionRequest>(
-                    ApiEndpoints.ConfigUserDataVersion, 
+                    ApiEndpoints.ConfigUserDataVersion,
                     new UserDataVersionRequest { Version = version, Comment = comment ?? string.Empty });
             }
 
@@ -66,35 +65,59 @@ namespace Pilz.PITreader.Client
         /// <param name="version">Version number, must be larger than 0 if a comment is provided</param>
         /// <param name="comment">Comment for the version</param>
         /// <param name="parameters">List of parameters</param>
-        /// <param name="dontDeleteParamaters">if <c>true</c>, no parameters are deleted on the device.</param>
+        /// <param name="dontDeleteParameters">if <c>true</c>, no parameters are deleted on the device.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentException">version == 0, but a comment is provided</exception>
         public async Task<ApiResponse<GenericResponse>> MigrateConfigurationAsync(ushort? version, string comment, IEnumerable<UserDataParameter> parameters, bool dontDeleteParameters = false)
         {
-            var config = await this.GetConfigurationAsync();
             if (version < 1 && !string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Version must be >= 1", nameof(version));
+
+            var configResponse = await this.GetConfigurationAsync();
+            if (!configResponse.Success) return configResponse.AsGenericResponse();
+            var config = configResponse.Data;
+
+            if (!version.HasValue || version == 0)
+            {
+                version = config.Version;
+            }
+
+            if (string.IsNullOrEmpty(comment))
+            {
+                comment = config.Comment;
+            }
+
+            if (config.Parameters == null || config.Parameters.Count == 0)
+            {
+                // No existing parameters? -> just upload new configuration.
+                return await this.ApplyConfigurationAsync(version ?? 0, comment, parameters);
+            }
 
             ApiResponse<GenericResponse> response = await this.client.PostAsync<GenericResponse>(ApiEndpoints.ConfigUserDataReset);
             if (!response.Success) return response;
 
             if (parameters != null)
             {
-                // TODO
-                ////foreach (var parameter in parameters)
-                ////{
-                ////    response = await this.client.PostAsync<GenericResponse, UserDataParameter>("/api/config/userData/parameter", parameter);
-                ////    if (!response.Success) return response;
-                ////}
-            }
+                var remainingParameters = parameters.ToList();
+                foreach (var existing in config.Parameters)
+                {
+                    var newParameter = remainingParameters.SingleOrDefault(p => p.Id == existing.Id);
+                    if (newParameter != null || dontDeleteParameters)
+                    {
+                        response = await this.client.PostAsync<GenericResponse, UserDataParameter>(ApiEndpoints.ConfigUserDataParameter, newParameter ?? existing);
+                        if (!response.Success) return response;
+                    }
 
-            if (!version.HasValue || version == 0)
-            {
-                version = config.Data.Version;
-            }
+                    if (newParameter != null)
+                    {
+                        remainingParameters.Remove(newParameter);
+                    }
+                }
 
-            if (string.IsNullOrEmpty(comment))
-            {
-                comment = config.Data.Comment;
+                foreach (var parameter in remainingParameters)
+                {
+                    response = await this.client.PostAsync<GenericResponse, UserDataParameter>(ApiEndpoints.ConfigUserDataParameter, parameter);
+                    if (!response.Success) return response;
+                }
             }
 
             if (version.HasValue && version > 0)
