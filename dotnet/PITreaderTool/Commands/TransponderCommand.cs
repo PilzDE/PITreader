@@ -70,7 +70,7 @@ namespace Pilz.PITreader.Tool.Commands
                         {
                             if ((await udcManager.ApplyConfigurationAsync(data.UserData.ParameterDefintion)).Success)
                             {
-                                Console.WriteLine("Updated user data on device.");
+                                console.WriteLine("Updated user data on device.");
                             }
                             else
                             {
@@ -79,7 +79,7 @@ namespace Pilz.PITreader.Tool.Commands
                         }
                         else
                         {
-                            Console.WriteLine("User data configuration in device up to date.");
+                            console.WriteLine("User data configuration in device up to date.");
                         }
                     }
                 }
@@ -97,17 +97,21 @@ namespace Pilz.PITreader.Tool.Commands
                             if (string.IsNullOrWhiteSpace(teachInId) || string.IsNullOrWhiteSpace(teachInId.Replace("0", string.Empty))) return Task.CompletedTask;
 
                             var t = manager.WriteDataToTransponderAsync(data);
-                            return t.ContinueWith(z => Console.WriteLine(z.Result ? ("Updated data on tranponder, Security ID: " + r.SecurityId) : ("ERROR: failed to update data on tranponder, Security ID: " + r.SecurityId)));
+                            return t.ContinueWith(z =>
+                            {
+                                if (z.Result) console.WriteLine("Updated data on tranponder, Security ID: " + r.SecurityId);
+                                else console.WriteError("failed to update data on tranponder, Security ID: " + r.SecurityId);
+                            });
                         },
                         1000);
-                    Console.WriteLine("Waiting for transponders...");
-                    Console.WriteLine("[Enter] to abort.");
+                    console.WriteLine("Waiting for transponders...");
+                    console.WriteLine("[Enter] to abort.");
                     Console.ReadLine();
                 }
                 else
                 {
                     var result = await manager.WriteDataToTransponderAsync(data);
-                    if (result) Console.WriteLine("Data successfully written to transponder.");
+                    if (result) console.WriteLine("Data successfully written to transponder.");
                     else console.WriteError("Updating data on transponder.");
                 }
             }

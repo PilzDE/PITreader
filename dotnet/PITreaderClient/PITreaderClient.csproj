@@ -19,6 +19,7 @@
     <PackageReleaseNotes>Initial version for PITreader FW 1.5.x</PackageReleaseNotes>
     <PackageId>Pilz.PITreader.Client</PackageId>
     <AssemblyName>Pilz.PITreader.Client</AssemblyName>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

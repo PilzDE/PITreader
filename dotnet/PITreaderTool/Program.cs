@@ -54,7 +54,7 @@ namespace Pilz.PITreader.Tool
                 if (!commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(acceptAllOption.Name))
                     && !commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(thumbprintOption.Name)))
                 {
-                    return $"Either option '{acceptAllOption.Name}' or '{thumbprintOption.Name}' needs to be used.";
+                    return $"One of the options '{acceptAllOption.Name}' or '{thumbprintOption.Name}' are required.";
                 }
 
                 return default(string);
@@ -76,6 +76,7 @@ namespace Pilz.PITreader.Tool
                 {
                     context.Console.WriteError(exception.Message);
                 }
+
                 context.ExitCode = 1;
             }
             catch

@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>PITreaderTool</title>
+</head>
+<body>
+
+    <h1 id="pitreadertool">PITreaderTool</h1>
+<p><em>PITreaderTool</em> is an example application for the REST API of <em>PITreader</em> devices.</p>
+<h2 id="getting-started">Getting Started</h2>
+<p>Access to the REST API is secured by <em>API tokens</em> (see Configuration -&gt; API-Clients in the web interface of the device and the <a href="https://www.pilz.com/download/open/PITreader_REST_API_Operat_Man_1005365-DE-04.pdf">API user manual</a>).</p>
+<p>The client (<em>PITreaderTool</em>) can ensure that communication is established with the correct PITreader device by specifying the certificate thumbprint for the connection (see Configuration -&gt; Certificate in the web interface of the device).</p>
+<h2 id="parameters">Parameters</h2>
+<p>The tool accepts the following general parameters for the connection to a PITreader device:</p>
+<ul>
+<li><code>-h, --host &lt;host&gt;</code> IP address or hostname of PITreader device [optional, default: 192.168.0.12]</li>
+<li><code>-p, --port &lt;port&gt;</code> HTTPS port number of PITreader device [optional, default: 443]</li>
+<li><code>--accept-all</code> If set, certificates of the PITreader device are not validated [default: false]</li>
+<li><code>--thumbprint &lt;thumbprint&gt;</code> Sha2 thumbprint in hexadecimal format of the certificate of the PITreader device</li>
+<li><code>&lt;api token&gt;</code> API token for the connection to the device</li>
+</ul>
+<h2 id="commands">Commands</h2>
+<p>Following the general parameters one of the commands can be passed to the tool for execution:</p>
+<ul>
+<li><code>xpndr</code> Transponder</li>
+<li><code>udc</code> User Data Configuration</li>
+<li><code>bl</code> Blocklist</li>
+</ul>
+<h3 id="transponder">Transponder</h3>
+<p>The transponder command (<code>xpndr</code>) has two sub-commands:</p>
+<ul>
+<li><code>export &lt;path to json&gt;</code>  Export content of a transponder to file</li>
+<li><code>write &lt;path to json&gt;</code>   Write data from file (see export) to transponders</li>
+</ul>
+<p><code>&lt;path to json&gt;</code> is a realtive of absolute path to a file to store or read the contents of the transponder.</p>
+<p>The <code>write</code> command has two additional options:</p>
+<ul>
+<li><code>--update-udc</code> To update the user data configuration of the device before writing data onto the transponder</li>
+<li><code>--loop</code> To run forever (exit with <code>Ctrl + C</code>) and update all transponders detected by the PITreader device</li>
+</ul>
+<p>The combination of both commands can be used to clone transponders.</p>
+<h4 id="example">Example</h4>
+<p>Example to write the data of a transponder to the file <code>my_transponder.json</code><br />
+The PITreader has a certificate with SHA2 thumbprint <code>C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC</code> and API token <code>hJgwmy/5gyl84lKSynGIVQ==</code>.</p>
+<pre><code>PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== xpndr export my_transponder.json
+</code></pre>
+<h3 id="user-data-configuration">User Data Configuration</h3>
+<p>The user data configuration command (<code>udc</code>) has two sub-commands:</p>
+<ul>
+<li><code>export &lt;path to json&gt;</code>  Export user data configuration from a device to a json file</li>
+<li><code>import &lt;path to json&gt;</code>  Import user data confguration from a json file to a device</li>
+</ul>
+<p><code>&lt;path to json&gt;</code> is a realtive of absolute path to a file to store or read the user data configuration.</p>
+<h4 id="example-1">Example</h4>
+<p>Example to write the data of a transponder to the file <code>my_transponder.json</code><br />
+The PITreader has a certificate with SHA2 thumbprint <code>C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC</code> and API token <code>hJgwmy/5gyl84lKSynGIVQ==</code>.</p>
+<pre><code>PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== udc export my_udc.json
+</code></pre>
+<h3 id="blocklist">Blocklist</h3>
+<p>The blocklist command (<code>bl</code>) has one sub-command:</p>
+<ul>
+<li><code>import &lt;path to csv&gt;</code> Import blocklist from a csv file into a device</li>
+</ul>
+<p><code>&lt;path to csv&gt;</code> is a realtive of absolute path to an existing csv file with two fields/columns: Security ID and comment.<br />
+The first line of the CSV file is ignored.</p>
+
+
+</body>
+</html>
