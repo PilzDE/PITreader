@@ -54,7 +54,7 @@ namespace Pilz.PITreader.Client
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task<bool> WriteDataToTransponderAsync(TransponderDataContainer data)
+        public async Task<GenericResponse> WriteDataToTransponderAsync(TransponderDataContainer data)
         {
             if (data is null || data.StaticData is null)
                 throw new ArgumentNullException(nameof(data));
@@ -68,7 +68,7 @@ namespace Pilz.PITreader.Client
             };
 
             var dataResponse = await this.client.PostAsync<GenericResponse, TransponderRequest>(ApiEndpoints.Transponder, staticData);
-            if (!dataResponse.Success) return false;
+            if (!dataResponse.Success) return dataResponse.ErrorData;
 
             if (data.UserData != null)
             {
@@ -76,7 +76,7 @@ namespace Pilz.PITreader.Client
                     throw new ArgumentException("No ParameterDefinition for user data.", nameof(data));
 
                 var genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataClear);
-                if (!genericResponse.Success) return false;
+                if (!genericResponse.Success) return genericResponse.ErrorData;
 
                 foreach (var group in data.UserData.Groups)
                 {
@@ -84,15 +84,15 @@ namespace Pilz.PITreader.Client
                     if (dataRequest.Values.Count > 0)
                     {
                         genericResponse = await this.client.PostAsync<GenericResponse, UserDataGroupRequest>(ApiEndpoints.TransponderUserDataAddGroupValues, dataRequest);
-                        if (!genericResponse.Success) return false;
+                        if (!genericResponse.Success) return genericResponse.ErrorData;
                     }
                 }
 
                 genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataWrite);
-                if (!genericResponse.Success) return false;
+                if (!genericResponse.Success) return genericResponse.ErrorData;
             }
 
-            return true;
+            return null;
         }
 
         /// <summary>

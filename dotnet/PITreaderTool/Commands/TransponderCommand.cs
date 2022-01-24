@@ -99,8 +99,9 @@ namespace Pilz.PITreader.Tool.Commands
                             var t = manager.WriteDataToTransponderAsync(data);
                             return t.ContinueWith(z =>
                             {
-                                if (z.Result) console.WriteLine("Updated data on tranponder, Security ID: " + r.SecurityId);
-                                else console.WriteError("failed to update data on tranponder, Security ID: " + r.SecurityId);
+                                if (z.Result == null) console.WriteLine("Updated data on tranponder, Security ID: " + r.SecurityId);
+                                else console.WriteError("failed to update data on tranponder, Security ID: " + r.SecurityId 
+                                    + (string.IsNullOrWhiteSpace(z.Result.Message) ? string.Empty : (" (" + z.Result.Message + ")")));
                             });
                         },
                         1000);
@@ -111,8 +112,8 @@ namespace Pilz.PITreader.Tool.Commands
                 else
                 {
                     var result = await manager.WriteDataToTransponderAsync(data);
-                    if (result) console.WriteLine("Data successfully written to transponder.");
-                    else console.WriteError("Updating data on transponder.");
+                    if (result == null) console.WriteLine("Data successfully written to transponder.");
+                    else console.WriteError("Updating data on transponder" + (string.IsNullOrWhiteSpace(result.Message) ? "." : (": " + result.Message)));
                 }
             }
         }
