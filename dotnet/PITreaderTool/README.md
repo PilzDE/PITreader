@@ -25,6 +25,7 @@ Following the general parameters one of the commands can be passed to the tool f
 - `xpndr` Transponder
 - `udc` User Data Configuration
 - `bl` Blocklist
+- `coding` Basic Coding
 
 ### Transponder
 
@@ -75,3 +76,24 @@ The blocklist command (`bl`) has one sub-command:
 
 `<path to csv>` is a realtive of absolute path to an existing csv file with two fields/columns: Security ID and comment.\
 The first line of the CSV file is ignored.
+
+
+### Coding
+
+The coding command (`coding`) has two sub-commands:
+
+- `set <coding identifier> [<coding comment>]` Set basic coding
+- `delete` Delete basic coding
+
+The `set` command has the following arguments:
+
+- `<coding identifier>` is the identifier that should be used as basic coding
+- `<coding comment>` is an optional argument to set a comment for the coding identifier
+
+#### Example
+
+Example to set the basic coding to "SecretC0ding" with the comment "DE Plant 01-A"\
+The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC` and API token `hJgwmy/5gyl84lKSynGIVQ==`.
+
+    PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== coding set SecretC0ding "DE Plant 01-A"
+

@@ -48,6 +48,7 @@ namespace Pilz.PITreader.Tool
             rootCommand.AddCommand(new TransponderCommand(clientBinder));
             rootCommand.AddCommand(new BlocklistCommand(clientBinder));
             rootCommand.AddCommand(new UserDataConfigurationCommand(clientBinder));
+            rootCommand.AddCommand(new CodingCommand(clientBinder));
 
             rootCommand.AddValidator(commandResult =>
             {

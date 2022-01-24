@@ -25,6 +25,7 @@
 <li><code>xpndr</code> Transponder</li>
 <li><code>udc</code> User Data Configuration</li>
 <li><code>bl</code> Blocklist</li>
+<li><code>coding</code> Basic Coding</li>
 </ul>
 <h3 id="transponder">Transponder</h3>
 <p>The transponder command (<code>xpndr</code>) has two sub-commands:</p>
@@ -63,6 +64,22 @@ The PITreader has a certificate with SHA2 thumbprint <code>C44E954C64B50AA2AF7CA
 </ul>
 <p><code>&lt;path to csv&gt;</code> is a realtive of absolute path to an existing csv file with two fields/columns: Security ID and comment.<br />
 The first line of the CSV file is ignored.</p>
+<h3 id="coding">Coding</h3>
+<p>The coding command (<code>coding</code>) has two sub-commands:</p>
+<ul>
+<li><code>set &lt;coding identifier&gt; [&lt;coding comment&gt;]</code> Set basic coding</li>
+<li><code>delete</code> Delete basic coding</li>
+</ul>
+<p>The <code>set</code> command has the following arguments:</p>
+<ul>
+<li><code>&lt;coding identifier&gt;</code> is the identifier that should be used as basic coding</li>
+<li><code>&lt;coding comment&gt;</code> is an optional argument to set a comment for the coding identifier</li>
+</ul>
+<h4 id="example-2">Example</h4>
+<p>Example to set the basic coding to &quot;SecretC0ding&quot; with the comment &quot;DE Plant 01-A&quot;<br />
+The PITreader has a certificate with SHA2 thumbprint <code>C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC</code> and API token <code>hJgwmy/5gyl84lKSynGIVQ==</code>.</p>
+<pre><code>PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== coding set SecretC0ding &quot;DE Plant 01-A&quot;
+</code></pre>
 
 
 </body>
