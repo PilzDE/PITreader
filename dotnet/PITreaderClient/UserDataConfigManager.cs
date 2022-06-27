@@ -202,7 +202,7 @@ namespace Pilz.PITreader.Client
             var response = await this.client.GetUserDataConfig();
             if (!response.Success) return false;
 
-            string json = PITreaderJsonSerializer.Serialize(response.Data);
+            string json = PITreaderJsonSerializer.Serialize(response.Data, pretty: true);
             using (var file = File.OpenWrite(path))
             {
                 byte[] data = Encoding.UTF8.GetBytes(json);

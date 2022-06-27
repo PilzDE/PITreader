@@ -28,18 +28,20 @@
 <li><code>coding</code> Basic Coding</li>
 </ul>
 <h3 id="transponder">Transponder</h3>
-<p>The transponder command (<code>xpndr</code>) has two sub-commands:</p>
+<p>The transponder command (<code>xpndr</code>) has three sub-commands:</p>
 <ul>
 <li><code>export &lt;path to json&gt;</code>  Export content of a transponder to file</li>
 <li><code>write &lt;path to json&gt;</code>   Write data from file (see export) to transponders</li>
+<li><code>log &lt;path to csv&gt;</code>      Log ids (order number, serial number and security id) of transponders</li>
 </ul>
-<p><code>&lt;path to json&gt;</code> is a realtive of absolute path to a file to store or read the contents of the transponder.</p>
+<p><code>&lt;path to json&gt;</code> is a realtive or absolute path to a file to store or read the contents of the transponder.</p>
+<p><code>&lt;path to csv&gt;</code> is a realtive or absolute path to a file to store data about all transpodners read by the PITreader.</p>
 <p>The <code>write</code> command has two additional options:</p>
 <ul>
 <li><code>--update-udc</code> To update the user data configuration of the device before writing data onto the transponder</li>
 <li><code>--loop</code> To run forever (exit with <code>Ctrl + C</code>) and update all transponders detected by the PITreader device</li>
 </ul>
-<p>The combination of both commands can be used to clone transponders.</p>
+<p>The combination of the <code>export</code> and <code>write</code> command can be used to clone transponders.</p>
 <h4 id="example">Example</h4>
 <p>Example to write the data of a transponder to the file <code>my_transponder.json</code><br />
 The PITreader has a certificate with SHA2 thumbprint <code>C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC</code> and API token <code>hJgwmy/5gyl84lKSynGIVQ==</code>.</p>

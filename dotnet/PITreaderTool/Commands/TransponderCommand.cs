@@ -15,6 +15,8 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client;
 using Pilz.PITreader.Client.Model;
@@ -50,6 +52,13 @@ namespace Pilz.PITreader.Tool.Commands
 
             System.CommandLine.Handler.SetHandler(xpndrWriteCommand, (ConnectionProperties c, bool b1, bool b2, string s, IConsole console) => this.HandleWrite(c, b1, b2, s, console), connectionPropertiesBinder, updateUdcOption, loopOption, jsonPathArg);
             this.AddCommand(xpndrWriteCommand);
+
+            var xpndrLogCommand = new Command("log", "Log ids of transponder to file");
+
+            var csvPathArg = new Argument<string>("path to csv");
+            xpndrLogCommand.AddArgument(csvPathArg);
+            System.CommandLine.Handler.SetHandler(xpndrLogCommand, (ConnectionProperties c, string s, IConsole console) => this.HandleLog(c, s, console), connectionPropertiesBinder, csvPathArg);
+            this.AddCommand(xpndrLogCommand);
         }
 
         private async Task<int> HandleExport(ConnectionProperties properties, string pathToJson)
@@ -128,6 +137,47 @@ namespace Pilz.PITreader.Tool.Commands
                     var result = await manager.WriteDataToTransponderAsync(data);
                     if (result == null) console.WriteLine("Data successfully written to transponder.");
                     else console.WriteError("Updating data on transponder" + (string.IsNullOrWhiteSpace(result.Message) ? "." : (": " + result.Message)));
+                }
+            }
+        }
+
+        private async Task HandleLog(ConnectionProperties properties, string pathToCsv, IConsole console)
+        {
+            using (var client = properties.CreateClient())
+            {
+                using (var writer = File.Open(pathToCsv, FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    console.WriteLine("Collecting order number, serial number and security id of transponders...");
+
+                    if (writer.Position == 0)
+                    {
+                        byte[] data = Encoding.UTF8.GetBytes("Order Number;Serial Number;Security ID" + Environment.NewLine);
+                        await writer.WriteAsync(data, 0, data.Length);
+                        await writer.FlushAsync();
+                    }
+
+                    SecurityId securityId = null;
+                    var monitor = new ApiEndpointMonitor<AuthenticationStatusResponse>(
+                        client,
+                        ApiEndpoints.StatusAuthentication,
+                        r => r != null && r.SecurityId != securityId,
+                        async r => 
+                        {
+                            securityId = r.SecurityId;
+                            if (securityId == null) return;
+
+                            string line = $"{r.OrderNumber};{r.SerialNumber};{r.SecurityId}";
+                            console.WriteLine(line);
+
+                            byte[] data = Encoding.UTF8.GetBytes(line + Environment.NewLine);
+                            await writer.WriteAsync(data, 0, data.Length);
+                            await writer.FlushAsync();
+                        },
+                        1000);
+
+                    console.WriteLine("Waiting for transponders...");
+                    console.WriteLine("[Enter] to abort.");
+                    Console.ReadLine();
                 }
             }
         }

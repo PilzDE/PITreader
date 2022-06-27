@@ -2,7 +2,7 @@
   "profiles": {
     "PITreaderTool": {
       "commandName": "Project",
-      "commandLineArgs": "J6lD8BmCY8gaUM0x5YSKXA== --thumbprint EE:D7:A5:54:38:4C:F6:78:C6:60:FA:1D:3B:60:02:B5:05:ED:9C:69:BB:9A:97:36:6C:8D:68:18:09:8C:3F:B9 xpndr export test_xpndr.json --host 192.168.0.13"
+      "commandLineArgs": "vch2QV8frbg/OO2iDNoVjA== --thumbprint D5:C1:0B:73:A7:D8:89:76:5D:6F:9F:A3:E3:AD:A7:AD:DE:AD:53:41:EB:7E:4A:D7:99:09:35:BE:2E:2D:3E:F6 xpndr log xpndr_list.csv --host 192.168.0.12"
     }
   }
 }

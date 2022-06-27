@@ -47,11 +47,17 @@ namespace Pilz.PITreader.Client
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to convert.</param>
+        /// <param name="pretty">Pretty print output.</param>
         /// <returns> A JSON string representation of the value.</returns>
         /// <exception cref="System.NotSupportedException">There is no compatible System.Text.Json.Serialization.JsonConverter for TValue or its serializable members.</exception>
-        public static string Serialize<TValue>(TValue value)
+        public static string Serialize<TValue>(TValue value, bool pretty = false)
         {
-            return JsonSerializer.Serialize(value, options);
+            var localOptions = new JsonSerializerOptions(options)
+            {
+                WriteIndented = pretty
+            };
+
+            return JsonSerializer.Serialize(value, localOptions);
         }
 
         /// <summary>

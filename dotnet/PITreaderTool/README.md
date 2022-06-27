@@ -29,19 +29,22 @@ Following the general parameters one of the commands can be passed to the tool f
 
 ### Transponder
 
-The transponder command (`xpndr`) has two sub-commands:
+The transponder command (`xpndr`) has three sub-commands:
 
 - `export <path to json>`  Export content of a transponder to file
 - `write <path to json>`   Write data from file (see export) to transponders
+- `log <path to csv>`      Log ids (order number, serial number and security id) of transponders
 
-`<path to json>` is a realtive of absolute path to a file to store or read the contents of the transponder.
+`<path to json>` is a realtive or absolute path to a file to store or read the contents of the transponder.
+
+`<path to csv>` is a realtive or absolute path to a file to store data about all transpodners read by the PITreader.
 
 The `write` command has two additional options:
 
 - `--update-udc` To update the user data configuration of the device before writing data onto the transponder
 - `--loop` To run forever (exit with `Ctrl + C`) and update all transponders detected by the PITreader device
 
-The combination of both commands can be used to clone transponders.
+The combination of the `export` and `write` command can be used to clone transponders.
 
 #### Example
 
