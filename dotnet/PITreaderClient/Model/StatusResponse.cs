@@ -60,6 +60,13 @@ namespace Pilz.PITreader.Client.Model
         public string MacAddress { get; set; }
 
         /// <summary>
+        /// Verification code for the TLS fingerprint
+        /// Format: 000000 (6 digits)
+        /// </summary>
+        [JsonPropertyName("tlsFingerprintVerification")]
+        public string TlsFingerprintVerification { get; set; }
+
+        /// <summary>
         /// Status of the connection between PIT m4SEU and PITreader
         /// </summary>
         /// <value><c>true</c>: There is an active connection between a PIT m4SEU and the PITreader, otherwise: <c>false</c>.</value>

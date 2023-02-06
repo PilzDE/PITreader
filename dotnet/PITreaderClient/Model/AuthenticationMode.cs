@@ -27,6 +27,11 @@ namespace Pilz.PITreader.Client.Model
         /// <summary>
         /// Transponder data
         /// </summary>
-        TransponderData = 1
+        TransponderData = 1,
+
+        /// <summary>
+        /// Permissino list
+        /// </summary>
+        PermissionList = 2
     }
 }

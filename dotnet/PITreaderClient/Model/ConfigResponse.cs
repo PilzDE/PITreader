@@ -76,6 +76,18 @@ namespace Pilz.PITreader.Client.Model
         public ushort HttpsPort { get; set; }
 
         /// <summary>
+        /// Network discovery using MDNS enabled
+        /// </summary>
+        [JsonPropertyName("networkDiscoveryEnabled")]
+        public bool NetworkDiscoveryEnabled { get; set; }
+
+        /// <summary>
+        /// Multicast configuration protocol for initial setup of device enabled
+        /// </summary>
+        [JsonPropertyName("multicastConfEnabled")]
+        public bool MulticastConfigurationEnabled { get; set; }
+
+        /// <summary>
         /// Status of SNTP client on the device
         /// </summary>
         [JsonPropertyName("sntpEnabled")]
@@ -116,6 +128,12 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("authenticationMode")]
         public AuthenticationMode AuthenticationMode { get; set; }
+
+        /// <summary>
+        /// Allow external override
+        /// </summary>
+        [JsonPropertyName("allowExternalOverride")]
+        public bool AllowExternalOverride { get; set; }
 
         /// <summary>
         /// Device group for authentication mode "TransponderData"

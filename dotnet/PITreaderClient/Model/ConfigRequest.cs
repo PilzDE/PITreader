@@ -24,16 +24,136 @@ namespace Pilz.PITreader.Client.Model
     public class ConfigRequest
     {
         /// <summary>
+        /// Hostname/device name
+        /// </summary>
+        [JsonPropertyName("hostName")]
+        public string HostName { get; set; }
+
+        /// <summary>
         /// Location information of the device.
         /// </summary>
         [JsonPropertyName("location")]
         public string Location { get; set; }
 
         /// <summary>
+        /// Domain name for HTTPS certificates
+        /// </summary>
+        [JsonPropertyName("domain")]
+        public string Domain { get; set; }
+
+        /// <summary>
+        /// Device's IP address
+        /// </summary>
+        [JsonPropertyName("ipAddress")]
+        public string IpAddress { get; set; }
+
+        /// <summary>
+        /// Device’s subnet mask
+        /// </summary>
+        [JsonPropertyName("subnetMask")]
+        public string SubnetMask { get; set; }
+
+        /// <summary>
+        /// Standard Gateway's IP address
+        /// </summary>
+        [JsonPropertyName("defaultGateway")]
+        public string DefaultGateway { get; set; }
+
+        /// <summary>
+        /// HTTP port number
+        /// </summary>
+        [JsonPropertyName("httpPort")]
+        public ushort? HttpPort { get; set; }
+
+        /// <summary>
+        /// HTTP protocol enabled
+        /// </summary>
+        [JsonPropertyName("httpEnabled")]
+        public bool? HttpEnabled { get; set; }
+
+        /// <summary>
+        /// HTTPS port number
+        /// </summary>
+        [JsonPropertyName("httpsPort")]
+        public ushort? HttpsPort { get; set; }
+
+        /// <summary>
+        /// Network discovery using MDNS enabled
+        /// </summary>
+        [JsonPropertyName("networkDiscoveryEnabled")]
+        public bool? NetworkDiscoveryEnabled { get; set; }
+
+        /// <summary>
+        /// Multicast configuration protocol for initial setup of device enabled
+        /// </summary>
+        [JsonPropertyName("multicastConfEnabled")]
+        public bool? MulticastConfigurationEnabled { get; set; }
+
+        /// <summary>
+        /// Status of SNTP client on the device
+        /// </summary>
+        [JsonPropertyName("sntpEnabled")]
+        public bool? SntpEnabled { get; set; }
+
+        /// <summary>
+        /// IP address of configured SNTP server.
+        /// </summary>
+        [JsonPropertyName("sntpServer")]
+        public string SntpServer { get; set; }
+
+        /// <summary>
+        /// Port number of configured SNTP server.
+        /// </summary>
+        [JsonPropertyName("sntpPort")]
+        public ushort? SntpPort { get; set; }
+
+        /// <summary>
+        /// SNTP refresh interval in minutes.
+        /// </summary>
+        [JsonPropertyName("sntpRefreshRate")]
+        public uint? SntpRefreshRate { get; set; }
+
+        /// <summary>
+        /// Activation state of the Modbus/TCP slave (server) in the device.
+        /// </summary>
+        [JsonPropertyName("modbusTcpEnabled")]
+        public bool? ModbusTcpEnabled { get; set; }
+
+        /// <summary>
+        /// Port number of the Modbus/TCP slave (server) in the device.
+        /// </summary>
+        [JsonPropertyName("modbusTcpPort")]
+        public ushort? ModbusTcpPort { get; set; }
+
+        /// <summary>
+        /// Device's authentication mode
+        /// </summary>
+        [JsonPropertyName("authenticationMode")]
+        public AuthenticationMode? AuthenticationMode { get; set; }
+
+        /// <summary>
+        /// Allow external override
+        /// </summary>
+        [JsonPropertyName("allowExternalOverride")]
+        public bool? AllowExternalOverride { get; set; }
+
+        /// <summary>
         /// Device group for authentication mode "TransponderData"
         /// </summary>
         [JsonPropertyName("deviceGroup")]
         public ushort? DeviceGroup { get; set; }
+
+        /// <summary>
+        /// Mode of 24 V I/O port
+        /// </summary>
+        [JsonPropertyName("ioPortFunction")]
+        public IoPortFunction? IoPortFunction { get; set; }
+
+        /// <summary>
+        /// Permission for the 24 V I/O port when configured as an output.
+        /// </summary>
+        [JsonPropertyName("ioPortPermission")]
+        public Permission? IoPortPermission { get; set; }
 
         /// <summary>
         /// Setting to enable/disable evaluation of start-/end dates on transponder keys.
@@ -46,6 +166,18 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("timeZone")]
         public string TimeZone { get; set; }
+
+        /// <summary>
+        /// Recording of personal indentifiable information (PII) in diagnostic list and diagnostic log
+        /// </summary>
+        [JsonPropertyName("logPersonalData")]
+        public bool? LogPersonalData { get; set; }
+
+        /// <summary>
+        /// Active authentication type
+        /// </summary>
+        [JsonPropertyName("authenticationType")]
+        public AuthenticationType? AuthenticationType { get; set; }
 
         /// <summary>
         /// Updates the real time clock on the device.

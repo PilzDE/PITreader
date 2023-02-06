@@ -12,32 +12,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Sets the permission for a transponder key in authentication mode "External"
+    /// Led status of status monitor endpoint
     /// </summary>
-    public class ExternalAuthenticationRequest
+    public class StatusMonitorLed
     {
         /// <summary>
-        /// Security ID, for which external authentication is to be defined
+        /// Current LED colour
         /// </summary>
-        [JsonPropertyName("securityId")]
-        public SecurityId SecurityId { get; set; }
+        [JsonPropertyName("colour")]
+        public LedColour Colour { get; set; }
 
         /// <summary>
-        /// Permission that is to be set for the stated transponder key
+        /// Current LED flash mode
         /// </summary>
-        [JsonPropertyName("permission")]
-        public Permission? Permission { get; set; }
-
-        /// <summary>
-        /// User data values
-        /// </summary>
-        [JsonPropertyName("userData"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<UserDataValue> UserData { get; set; }
+        [JsonPropertyName("flashMode")]
+        public LedFlashMode FlashMode { get; set; }
     }
 }

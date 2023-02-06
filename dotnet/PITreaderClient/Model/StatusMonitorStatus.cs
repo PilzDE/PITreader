@@ -12,32 +12,33 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Collections.Generic;
+using System;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Sets the permission for a transponder key in authentication mode "External"
+    /// General device status information of status monitor endpoint
     /// </summary>
-    public class ExternalAuthenticationRequest
+    public class StatusMonitorStatus
     {
         /// <summary>
-        /// Security ID, for which external authentication is to be defined
+        /// Device's firmware version
         /// </summary>
-        [JsonPropertyName("securityId")]
-        public SecurityId SecurityId { get; set; }
+        [JsonPropertyName("fwVersion")]
+        public Version FirmwareVersion { get; set; }
 
         /// <summary>
-        /// Permission that is to be set for the stated transponder key
+        /// Status of the connection between PIT m4SEU and PITreader
         /// </summary>
-        [JsonPropertyName("permission")]
-        public Permission? Permission { get; set; }
+        /// <value><c>true</c>: There is an active connection between a PIT m4SEU and the PITreader, otherwise: <c>false</c>.</value>
+        [JsonPropertyName("seuStatus")]
+        public bool SeuStatus { get; set; }
 
         /// <summary>
-        /// User data values
+        /// Signal present at the 24 V I/O port
         /// </summary>
-        [JsonPropertyName("userData"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<UserDataValue> UserData { get; set; }
+        [JsonPropertyName("ioPortValue")]
+        public IoPortValue IoPortValue { get; set; }
     }
 }

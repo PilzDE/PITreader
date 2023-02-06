@@ -33,6 +33,11 @@ namespace Pilz.PITreader.Client
         public const string StatusAuthentication = "/api/status/authentication";
 
         /// <summary>
+        /// Status monitoring endpoint
+        /// </summary>
+        public const string StatusMonitor = "/api/status/monitor";
+
+        /// <summary>
         /// Configuration endpoint.
         /// </summary>
         public const string Config = "/api/config";
@@ -46,6 +51,16 @@ namespace Pilz.PITreader.Client
         /// Coding endpoint.
         /// </summary>
         public const string ConfigCoding = "/api/config/coding";
+
+        /// <summary>
+        /// OEM Coding endpoint.
+        /// </summary>
+        public const string ConfigCodingOem = "/api/config/coding/oem";
+
+        /// <summary>
+        /// Permission list endpoint.
+        /// </summary>
+        public const string ConfigPermissionList = "/api/config/permissionList";
 
         /// <summary>
         /// User data configuration endpoint.
@@ -154,6 +169,16 @@ namespace Pilz.PITreader.Client
         }
 
         /// <summary>
+        /// Returns information about the oem coding settings on a device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<CodingResponse>> GetOemCoding(this PITreaderClient client)
+        {
+            return client.GetAsync<CodingResponse>(ConfigCodingOem);
+        }
+
+        /// <summary>
         /// Sets or updates the basic coding on a device.
         /// </summary>
         /// <param name="client">PITreader client instance.</param>
@@ -165,6 +190,17 @@ namespace Pilz.PITreader.Client
         }
 
         /// <summary>
+        /// Sets or updates the oem coding on a device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="coding"></param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> SetOemCoding(this PITreaderClient client, OemCodingRequest coding)
+        {
+            return client.PostAsync<GenericResponse, OemCodingRequest>(ConfigCoding, coding);
+        }
+
+        /// <summary>
         /// Returns the authentication status of the current transponder.
         /// </summary>
         /// <param name="client">PITreader client instance.</param>
@@ -172,6 +208,16 @@ namespace Pilz.PITreader.Client
         public static Task<ApiResponse<AuthenticationStatusResponse>> GetAuthenticationStatus(this PITreaderClient client)
         {
             return client.GetAsync<AuthenticationStatusResponse>(StatusAuthentication);
+        }
+
+        /// <summary>
+        /// Returns the status monitoring data.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<StatusMonitorResponse>> GetStatusMonitor(this PITreaderClient client)
+        {
+            return client.GetAsync<StatusMonitorResponse>(StatusMonitor);
         }
 
         /// <summary>
@@ -251,7 +297,7 @@ namespace Pilz.PITreader.Client
         }
 
         /// <summary>
-        /// Returns all block list entries currently configured in the device.
+        /// Returns all blocklist entries currently configured in the device.
         /// </summary>
         /// <param name="client">PITreader client instance.</param>
         /// <returns></returns>
@@ -270,6 +316,28 @@ namespace Pilz.PITreader.Client
         public static Task<ApiResponse<GenericResponse>> UpdateBlocklist(this PITreaderClient client, CrudAction action, BlocklistEntry entry)
         {
             return client.PostAsync<GenericResponse, BlocklistCrudRequest>(ConfigBlocklist, new BlocklistCrudRequest { Id = entry.Id, Action = action, Data = entry });
+        }
+
+        /// <summary>
+        /// Returns all permission list entries currently configured in the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<PermissionListResponse>> GetPermissionList(this PITreaderClient client)
+        {
+            return client.GetAsync<PermissionListResponse>(ConfigPermissionList);
+        }
+
+        /// <summary>
+        /// Adds, deletes or updates a permission list entry on the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="action">Action to be performed.</param>
+        /// <param name="entry">Data of the permission list entry.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> UpdatePermissionList(this PITreaderClient client, CrudAction action, PermissionListEntry entry)
+        {
+            return client.PostAsync<GenericResponse, PermissionListCrudRequest>(ConfigBlocklist, new PermissionListCrudRequest { Id = entry.Id, Action = action, Data = entry });
         }
     }
 }

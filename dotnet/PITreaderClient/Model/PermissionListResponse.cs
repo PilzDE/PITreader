@@ -18,26 +18,14 @@ using System.Text.Json.Serialization;
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Sets the permission for a transponder key in authentication mode "External"
+    /// Response with the list of permissino list entries stored on the device.
     /// </summary>
-    public class ExternalAuthenticationRequest
+    public class PermissionListResponse
     {
         /// <summary>
-        /// Security ID, for which external authentication is to be defined
+        /// List of permission list entries stored on the device.
         /// </summary>
-        [JsonPropertyName("securityId")]
-        public SecurityId SecurityId { get; set; }
-
-        /// <summary>
-        /// Permission that is to be set for the stated transponder key
-        /// </summary>
-        [JsonPropertyName("permission")]
-        public Permission? Permission { get; set; }
-
-        /// <summary>
-        /// User data values
-        /// </summary>
-        [JsonPropertyName("userData"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<UserDataValue> UserData { get; set; }
+        [JsonPropertyName("items")]
+        public List<PermissionListEntry> Items { get; set; }
     }
 }

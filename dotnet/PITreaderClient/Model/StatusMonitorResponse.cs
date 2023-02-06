@@ -12,63 +12,49 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Text.Json.Serialization;
+
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Failure reasons of the authentication process running for transponders of the PITreader.
+    /// Summarized status information of device
     /// </summary>
-    public enum AuthenticationFailureReason
+    public class StatusMonitorResponse
     {
         /// <summary>
-        /// No error
+        /// General device status information
         /// </summary>
-        None = 0,
+        [JsonPropertyName("status")]
+        public StatusMonitorStatus Status { get; set; }
 
         /// <summary>
-        /// No transponder key inserted
+        /// LED status information
         /// </summary>
-        NoTransponder = 1,
+        [JsonPropertyName("led")]
+        public StatusMonitorLed Led { get; set; }
 
         /// <summary>
-        /// Permission "0"
-        /// The transponder key has no permissions for device groups.
+        /// Configuration settings
         /// </summary>
-        Permission_0 = 2,
+        [JsonPropertyName("config")]
+        public StatusMonitorConfig Config { get; set; }
 
         /// <summary>
-        /// The validity of the transponder key is outside the validity period.
-        /// (Start date/end date)
+        /// Transponder authentication status information
         /// </summary>
-        TimeLimitation = 3,
+        [JsonPropertyName("authentication")]
+        public StatusMonitorAuthentication Authentication { get; set; }
 
         /// <summary>
-        /// The transponder key is included in the block list.
+        /// Diagnostic log status
         /// </summary>
-        Blocklist = 4,
+        [JsonPropertyName("log")]
+        public StatusMonitorLog Log { get; set; }
 
         /// <summary>
-        /// No permission has been stored for the security-ID yet. ("External" authentication mode)
+        /// Change notification tags for settings and list data
         /// </summary>
-        ExternalModeWating = 5,
-
-        /// <summary>
-        /// Authentication is locked by the 24 V I/O port.
-        /// </summary>
-        IoPortLock = 6,
-
-        /// <summary>
-        /// The "Single authentication" authentication type is configured and authentication is locked by another registered transponder key.
-        /// </summary>
-        SingleAuthLock = 7,
-
-        /// <summary>
-        /// The "4 Eyes Principle" authentication type is configured and the second transponder key was not authenticated yes.
-        /// </summary>
-        FourEyesFirstKey = 8,
-
-        /// <summary>
-        /// Authentication mode "permission list" is used but the transponder is not part of the permission list on the device.
-        /// </summary>
-        NotInPermissionList = 9
+        [JsonPropertyName("tags")]
+        public StatusMonitorTags Tags { get; set; }
     }
 }

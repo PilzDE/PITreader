@@ -12,32 +12,43 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Sets the permission for a transponder key in authentication mode "External"
+    /// Transponder authentication data of status monitor endpoint
     /// </summary>
-    public class ExternalAuthenticationRequest
+    public class StatusMonitorAuthentication
     {
         /// <summary>
-        /// Security ID, for which external authentication is to be defined
+        /// Authentication status of the transponder key
+        /// </summary>
+        [JsonPropertyName("authenticated")]
+        public bool Authenticated { get; set; }
+
+        /// <summary>
+        /// Authenticated permission
+        /// </summary>
+        [JsonPropertyName("permission")]
+        public Permission Permission { get; set; }
+
+        /// <summary>
+        /// Status of authentication process
+        /// </summary>
+        [JsonPropertyName("authenticationStatus")]
+        public AuthenticationStatus AuthenticationStatus { get; set; }
+
+        /// <summary>
+        /// Reason for failed authentication
+        /// </summary>
+        [JsonPropertyName("failureReason")]
+        public AuthenticationFailureReason FailureReason { get; set; }
+
+        /// <summary>
+        /// Security ID
         /// </summary>
         [JsonPropertyName("securityId")]
         public SecurityId SecurityId { get; set; }
-
-        /// <summary>
-        /// Permission that is to be set for the stated transponder key
-        /// </summary>
-        [JsonPropertyName("permission")]
-        public Permission? Permission { get; set; }
-
-        /// <summary>
-        /// User data values
-        /// </summary>
-        [JsonPropertyName("userData"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<UserDataValue> UserData { get; set; }
     }
 }

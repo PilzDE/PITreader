@@ -46,6 +46,11 @@
             Authentication status endpoint
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.StatusMonitor">
+            <summary>
+            Status monitoring endpoint
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.Config">
             <summary>
             Configuration endpoint.
@@ -59,6 +64,11 @@
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCoding">
             <summary>
             Coding endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCodingOem">
+            <summary>
+            OEM Coding endpoint.
             </summary>
         </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserData">
@@ -155,6 +165,13 @@
             <param name="client">PITreader client instance.</param>
             <returns></returns>
         </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetOemCoding(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns information about the oem coding settings on a device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetBasicCoding(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.BasicCodingRequest)">
             <summary>
             Sets or updates the basic coding on a device.
@@ -163,9 +180,24 @@
             <param name="coding"></param>
             <returns></returns>
         </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetOemCoding(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.OemCodingRequest)">
+            <summary>
+            Sets or updates the oem coding on a device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="coding"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetAuthenticationStatus(Pilz.PITreader.Client.PITreaderClient)">
             <summary>
             Returns the authentication status of the current transponder.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetStatusMonitor(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns the status monitoring data.
             </summary>
             <param name="client">PITreader client instance.</param>
             <returns></returns>
@@ -500,6 +532,11 @@
             The "4 Eyes Principle" authentication type is configured and the second transponder key was not authenticated yes.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.NotInPermissionList">
+            <summary>
+            Authentication mode "permission list" is used but the transponder is not part of the permission list on the device.
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.AuthenticationMode">
             <summary>
             Device's authentication mode
@@ -513,6 +550,11 @@
         <member name="F:Pilz.PITreader.Client.Model.AuthenticationMode.TransponderData">
             <summary>
             Transponder data
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationMode.PermissionList">
+            <summary>
+            Permissino list
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.AuthenticationStatus">
@@ -650,14 +692,114 @@
             Request to update the device configuration.
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.HostName">
+            <summary>
+            Hostname/device name
+            </summary>
+        </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.Location">
             <summary>
             Location information of the device.
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.Domain">
+            <summary>
+            Domain name for HTTPS certificates
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.IpAddress">
+            <summary>
+            Device's IP address
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SubnetMask">
+            <summary>
+            Device’s subnet mask
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.DefaultGateway">
+            <summary>
+            Standard Gateway's IP address
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.HttpPort">
+            <summary>
+            HTTP port number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.HttpEnabled">
+            <summary>
+            HTTP protocol enabled
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.HttpsPort">
+            <summary>
+            HTTPS port number
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.NetworkDiscoveryEnabled">
+            <summary>
+            Network discovery using MDNS enabled
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.MulticastConfigurationEnabled">
+            <summary>
+            Multicast configuration protocol for initial setup of device enabled
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SntpEnabled">
+            <summary>
+            Status of SNTP client on the device
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SntpServer">
+            <summary>
+            IP address of configured SNTP server.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SntpPort">
+            <summary>
+            Port number of configured SNTP server.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SntpRefreshRate">
+            <summary>
+            SNTP refresh interval in minutes.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.ModbusTcpEnabled">
+            <summary>
+            Activation state of the Modbus/TCP slave (server) in the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.ModbusTcpPort">
+            <summary>
+            Port number of the Modbus/TCP slave (server) in the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.AuthenticationMode">
+            <summary>
+            Device's authentication mode
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.AllowExternalOverride">
+            <summary>
+            Allow external override
+            </summary>
+        </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.DeviceGroup">
             <summary>
             Device group for authentication mode "TransponderData"
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.IoPortFunction">
+            <summary>
+            Mode of 24 V I/O port
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.IoPortPermission">
+            <summary>
+            Permission for the 24 V I/O port when configured as an output.
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.EvaluateTimeLimitation">
@@ -668,6 +810,16 @@
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.TimeZone">
             <summary>
             Timezone for the evaluation of start-/end dates.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.LogPersonalData">
+            <summary>
+            Recording of personal indentifiable information (PII) in diagnostic list and diagnostic log
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.AuthenticationType">
+            <summary>
+            Active authentication type
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.RealTimeClock">
@@ -725,6 +877,16 @@
             HTTPS port number
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.NetworkDiscoveryEnabled">
+            <summary>
+            Network discovery using MDNS enabled
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.MulticastConfigurationEnabled">
+            <summary>
+            Multicast configuration protocol for initial setup of device enabled
+            </summary>
+        </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SntpEnabled">
             <summary>
             Status of SNTP client on the device
@@ -758,6 +920,11 @@
         <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.AuthenticationMode">
             <summary>
             Device's authentication mode
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.AllowExternalOverride">
+            <summary>
+            Allow external override
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.DeviceGroup">
@@ -828,6 +995,11 @@
         <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.Permission">
             <summary>
             Permission that is to be set for the stated transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.UserData">
+            <summary>
+            User data values
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.GenericCrudRequest`2">
@@ -1056,6 +1228,56 @@
         <member name="P:Pilz.PITreader.Client.Model.MeResponse.Type">
             <summary>
             API user type
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.OemCodingRequest">
+            <summary>
+            Request to set or update the oem coding of a device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.OemCodingRequest.NewIdentifier">
+            <summary>
+            New / to be set oem coding indentifier.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.OemCodingRequest.OldIdentifier">
+            <summary>
+            Old/previous value of oem coding indentifier.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.OemCodingRequest.Comment">
+            <summary>
+            Comment
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.PermissionListCrudRequest">
+            <summary>
+            Request to create, update or delete a permission list entry.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.PermissionListEntry">
+            <summary>
+            An entry in the permission list.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.PermissionListEntry.Id">
+            <summary>
+            Security ID
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.PermissionListEntry.Permission">
+            <summary>
+            Permission for the security id.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.PermissionListResponse">
+            <summary>
+            Response with the list of permissino list entries stored on the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.PermissionListResponse.Items">
+            <summary>
+            List of permission list entries stored on the device.
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.Permission">
@@ -1387,6 +1609,177 @@
         <member name="P:Pilz.PITreader.Client.Model.SingleAuthResponse.SingleAuthLocked">
             <summary>
             <c>true</c>, if the authentication locked by a transponder key
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorAuthentication">
+            <summary>
+            Transponder authentication data of status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.Authenticated">
+            <summary>
+            Authentication status of the transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.Permission">
+            <summary>
+            Authenticated permission
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.AuthenticationStatus">
+            <summary>
+            Status of authentication process
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.FailureReason">
+            <summary>
+            Reason for failed authentication
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.SecurityId">
+            <summary>
+            Security ID
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorConfig">
+            <summary>
+            Configuration settings data of status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorConfig.DeviceGroup">
+            <summary>
+            Device group for authentication mode "TransponderData"
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorConfig.AuthenticationMode">
+            <summary>
+            Device's authentication mode
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLed">
+            <summary>
+            Led status of status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLed.Colour">
+            <summary>
+            Current LED colour
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLed.FlashMode">
+            <summary>
+            Current LED flash mode
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLog">
+            <summary>
+            Diagnostic log status of status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLog.LatestEntry">
+            <summary>
+            Latest entry in diagnostic log
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLogEntry">
+            <summary>
+            Log entry in status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLogEntry.Id">
+            <summary>
+            Diagnostic id
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLogEntry.Timestamp">
+            <summary>
+            Timestamp of logged event
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorLogEntry.Index">
+            <summary>
+            Index in log list (incrementing)
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorResponse">
+            <summary>
+            Summarized status information of device
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Status">
+            <summary>
+            General device status information
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Led">
+            <summary>
+            LED status information
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Config">
+            <summary>
+            Configuration settings
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Authentication">
+            <summary>
+            Transponder authentication status information
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Log">
+            <summary>
+            Diagnostic log status
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorResponse.Tags">
+            <summary>
+            Change notification tags for settings and list data
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorStatus">
+            <summary>
+            General device status information of status monitor endpoint
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorStatus.FirmwareVersion">
+            <summary>
+            Device's firmware version
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorStatus.SeuStatus">
+            <summary>
+            Status of the connection between PIT m4SEU and PITreader
+            </summary>
+            <value><c>true</c>: There is an active connection between a PIT m4SEU and the PITreader, otherwise: <c>false</c>.</value>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorStatus.IoPortValue">
+            <summary>
+            Signal present at the 24 V I/O port
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.StatusMonitorTags">
+            <summary>
+            Tags indicating changes in settings and list data of device
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorTags.Settings">
+            <summary>
+            Indicates change in device settings
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorTags.BlockList">
+            <summary>
+            Indicates change in blocklist
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorTags.PermissionList">
+            <summary>
+            Indicates change in permission list
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusMonitorTags.UserDataConfig">
+            <summary>
+            Indicates change in user data configuration
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusResponse">
