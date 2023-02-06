@@ -5,14 +5,14 @@
     <RootNamespace>Pilz.PITreader.Client</RootNamespace>
     <Company>Pilz GmbH &amp; Co. KG</Company>
     <Authors>Pilz GmbH &amp; Co. KG</Authors>
-    <Copyright>© 2022 Pilz GmbH &amp; Co. KG</Copyright>
+    <Copyright>© 2023 Pilz GmbH &amp; Co. KG</Copyright>
     <Description>Client library for Pilz PITreader REST API</Description>
     <Product>PITreader Client</Product>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/PITreader/dotnet.git</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/PITreader/dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PilzDE/pitreader.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/PilzDE/PITreader</PackageProjectUrl>
     <PackageTags>PITreader Pilz rest json</PackageTags>
     <PackageIcon></PackageIcon>
     <RepositoryType>git</RepositoryType>
