@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Pilz.PITreader.PitTransponderManager.LdapExport</RootNamespace>
+    <StartupObject>Pilz.PITreader.PitTransponderManager.LdapExport.Program</StartupObject>
+    <Company>Pilz GmbH &amp; Co. KG</Company>
+    <Copyright>(c) 2026 Pilz GmbH &amp; Co. KG</Copyright>
+    <Version>1.0.0</Version>
+    <AssemblyName>PtmLdapSync</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PITTransponderManager\PITTransponderManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

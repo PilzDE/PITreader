@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>PtmCsvTransponderImport</AssemblyName>
+    <RootNamespace>Pilz.PITreader.PitTransponderManager.Import</RootNamespace>
+    <Company>Pilz GmbH &amp; Co. KG</Company>
+    <Copyright>(c) 2026 Pilz GmbH &amp; Co. KG</Copyright>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PITTransponderManager.Import.Tests" />
+  </ItemGroup>
+
+  <!-- Publish: dotnet publish -p:PublishProfile=win-x64 -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\PITTransponderManager\PITTransponderManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Pilz.PITreader.PITTransponderManager" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="example.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

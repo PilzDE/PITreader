@@ -1,0 +1,107 @@
+==============================================================================
+  PtmCsvTransponderImport - CSV-zu-PTM-Datei-Konverter
+  Pilz GmbH & Co. KG
+==============================================================================
+
+ZWECK
+-----
+Dieses Tool wandelt eine Liste von Fremdtransponder-UIDs aus einer CSV-Datei
+in eine .ptm-Datei um, die in den PIT Transponder Manager (PTM) importiert
+werden kann.
+
+Dies ist nuetzlich, wenn Transponder-UIDs mit einem externen RFID-Leser oder
+aus einem Fremdsystem fuer Zutrittskontrolle erfasst wurden. Das Tool
+berechnet die von PITreader-Geraeten benoetigte Security ID fuer jeden
+Transponder.
+
+
+SCHNELLSTART
+------------
+1. Bereiten Sie eine CSV-Datei mit Ihren Transponderdaten vor (siehe
+   CSV-FORMAT weiter unten).
+2. Doppelklicken Sie auf PtmCsvTransponderImport.exe
+3. Ziehen Sie Ihre CSV-Datei in das Fenster (oder geben Sie den Dateipfad
+   ein).
+4. Druecken Sie Enter, um den vorgeschlagenen Ausgabe-Dateinamen zu
+   uebernehmen.
+5. Die .ptm-Datei wird erstellt und kann in PTM importiert werden.
+
+
+CSV-FORMAT
+----------
+Die CSV-Datei muss eine Kopfzeile haben. Nur die Spalte "uid" ist
+erforderlich. Das Trennzeichen (Komma oder Semikolon) wird automatisch
+erkannt.
+
+  Spalten:
+
+    uid        - Transponder-UID als Hexadezimalwert (erforderlich)
+                 Beispiel: 04A1B2C3D4E5F6
+                 Laenge: 8 bis 20 Hex-Zeichen (4 bis 10 Bytes)
+
+    startDate  - Gueltigkeitsbeginn (optional)
+                 Format: JJJJ-M-T (z.B. 2025-1-15)
+
+    endDate    - Gueltigkeitsende (optional)
+                 Format: JJJJ-M-T (z.B. 2026-12-31)
+
+  Beispieldatei (Semikolon-getrennt, z.B. aus Excel):
+
+    uid;startDate;endDate
+    04A1B2C3D4E5F6;;
+    0102030405060708;2025-1-1;2026-12-31
+
+  Beispieldatei (Komma-getrennt):
+
+    uid
+    04A1B2C3D4E5F6
+    AABBCCDDEEFF0011
+
+
+UID-BYTE-REIHENFOLGE
+--------------------
+Manche RFID-Leser geben UIDs in umgekehrter Byte-Reihenfolge aus
+(LSB-first). Das Tool erkennt dies in den meisten Faellen automatisch:
+
+  - 8-Byte-UIDs, die alle mit E0 enden: ISO 15693, wird automatisch
+    umgekehrt
+  - 7-Byte-UIDs, die alle mit 04 enden: NXP ISO 14443-A, wird automatisch
+    umgekehrt
+
+Wenn Ihr Leser die UIDs bereits in der richtigen Reihenfolge (MSB-first)
+ausgibt, ist keine Aktion erforderlich.
+
+
+KOMMANDOZEILEN-NUTZUNG
+----------------------
+Das Tool kann auch ohne Interaktion ueber die Kommandozeile genutzt werden:
+
+  CSV in .ptm-Datei umwandeln:
+    PtmCsvTransponderImport.exe daten.csv ausgabe.ptm
+
+  Mit bestehender .ptm-Datei zusammenfuehren:
+    PtmCsvTransponderImport.exe daten.csv ausgabe.ptm bestehende.ptm
+
+  Direkt in laufenden PIT Transponder Manager importieren:
+    PtmCsvTransponderImport.exe --online daten.csv
+
+
+ZUSAMMENFUEHREN MIT BESTEHENDEN DATEN
+-------------------------------------
+Wenn eine bestehende .ptm-Datei angegeben wird, bleiben alle vorhandenen
+Daten (Benutzer, Gruppen, Berechtigungen, Sperrlisten usw.) erhalten.
+Die neuen Transponder aus der CSV werden hinzugefuegt.
+
+Wenn ein Transponder mit derselben UID bereits vorhanden ist:
+  - Ohne Security ID: Die Security ID wird berechnet und ergaenzt.
+  - Mit vorhandener Security ID: Der Eintrag bleibt unveraendert.
+  - Leere optionale Felder werden aus der CSV gefuellt, sofern vorhanden.
+
+
+VORAUSSETZUNGEN
+---------------
+  - Windows 10 oder neuer (64-Bit)
+  - Keine zusaetzliche Softwareinstallation erforderlich
+
+
+==============================================================================
