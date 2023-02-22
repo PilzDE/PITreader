@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
@@ -19,7 +20,7 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// Configuration settings data of status monitor endpoint
     /// </summary>
-    public class StatusMonitorConfig
+    public class StatusMonitorConfig : IEquatable<StatusMonitorConfig>
     {
         /// <summary>
         /// Device group for authentication mode "TransponderData"
@@ -32,5 +33,19 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("authenticationMode")]
         public AuthenticationMode AuthenticationMode { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorConfig other)
+        {
+            if (other == null)
+                return false;
+
+            return this.DeviceGroup == other.DeviceGroup
+                && this.AuthenticationMode == other.AuthenticationMode;
+        }
     }
 }

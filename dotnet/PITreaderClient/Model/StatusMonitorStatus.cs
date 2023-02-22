@@ -20,7 +20,7 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// General device status information of status monitor endpoint
     /// </summary>
-    public class StatusMonitorStatus
+    public class StatusMonitorStatus : IEquatable<StatusMonitorStatus>
     {
         /// <summary>
         /// Device's firmware version
@@ -40,5 +40,20 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("ioPortValue")]
         public IoPortValue IoPortValue { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorStatus other)
+        {
+            if (other == null)
+                return false;
+
+            return this.FirmwareVersion == other.FirmwareVersion
+                && this.SeuStatus == other.SeuStatus
+                && this.IoPortValue == other.IoPortValue;
+        }
     }
 }

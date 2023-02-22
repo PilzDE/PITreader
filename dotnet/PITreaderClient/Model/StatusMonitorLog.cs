@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
@@ -19,12 +20,28 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// Diagnostic log status of status monitor endpoint
     /// </summary>
-    public class StatusMonitorLog
+    public class StatusMonitorLog : IEquatable<StatusMonitorLog>
     {
         /// <summary>
         /// Latest entry in diagnostic log
         /// </summary>
         [JsonPropertyName("latestEntry")]
         public StatusMonitorLogEntry LatestEntry { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorLog other)
+        {
+            if (other == null)
+                return false;
+
+            if (this.LatestEntry == null || other.LatestEntry == null)
+                return this.LatestEntry == other.LatestEntry;
+
+            return this.LatestEntry.Equals(other.LatestEntry);
+        }
     }
 }

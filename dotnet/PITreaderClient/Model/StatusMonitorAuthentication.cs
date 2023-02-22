@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
@@ -19,7 +20,7 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// Transponder authentication data of status monitor endpoint
     /// </summary>
-    public class StatusMonitorAuthentication
+    public class StatusMonitorAuthentication : IEquatable<StatusMonitorAuthentication>
     {
         /// <summary>
         /// Authentication status of the transponder key
@@ -50,5 +51,22 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("securityId")]
         public SecurityId SecurityId { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorAuthentication other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Authenticated == other.Authenticated
+                && this.Permission == other.Permission
+                && this.AuthenticationStatus == other.AuthenticationStatus
+                && this.FailureReason == other.FailureReason
+                && this.SecurityId == other.SecurityId;
+        }
     }
 }

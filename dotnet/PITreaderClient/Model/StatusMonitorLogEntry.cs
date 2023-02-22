@@ -20,7 +20,7 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// Log entry in status monitor endpoint
     /// </summary>
-    public class StatusMonitorLogEntry
+    public class StatusMonitorLogEntry : IEquatable<StatusMonitorLogEntry>
     {
         /// <summary>
         /// Diagnostic id
@@ -39,5 +39,20 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("index")]
         public int Index { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorLogEntry other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Id == other.Id
+                && this.Timestamp == other.Timestamp
+                && this.Index == other.Index;
+        }
     }
 }

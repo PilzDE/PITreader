@@ -12,40 +12,42 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Pilz.PITreader.Client.Model;
 using System;
-using System.Text.Json.Serialization;
 
-namespace Pilz.PITreader.Client.Model
+namespace Pilz.PITreader.Client
 {
     /// <summary>
-    /// Led status of status monitor endpoint
+    /// Event handler for notification of status changes by monitoring /api/status/monitor
     /// </summary>
-    public class StatusMonitorLed : IEquatable<StatusMonitorLed>
+    /// <param name="sender">The sender of the event</param>
+    /// <param name="e">Event arguments</param>
+    public delegate void PITreaderStatusMonitorChange(object sender, PITreaderStatusMonitorChangeEventArgs e);
+
+    /// <summary>
+    /// Argument for <see cref="PITreaderStatusMonitorChange"/> events.
+    /// </summary>
+    public class PITreaderStatusMonitorChangeEventArgs : EventArgs
     {
         /// <summary>
-        /// Current LED colour
+        /// Creates a new instance of the class.
         /// </summary>
-        [JsonPropertyName("colour")]
-        public LedColour Colour { get; set; }
-
-        /// <summary>
-        /// Current LED flash mode
-        /// </summary>
-        [JsonPropertyName("flashMode")]
-        public LedFlashMode FlashMode { get; set; }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
-        /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(StatusMonitorLed other)
+        /// <param name="change">Flags of detected changes.</param>
+        /// <param name="data">API response data</param>
+        public PITreaderStatusMonitorChangeEventArgs(StatusMonitorFlags change, StatusMonitorResponse data)
         {
-            if (other == null)
-                return false;
-
-            return this.FlashMode == other.FlashMode
-                && this.Colour == other.Colour;
+            Change = change;
+            Data = data;
         }
+
+        /// <summary>
+        /// Flags of detected changes.
+        /// </summary>
+        public StatusMonitorFlags Change { get; }
+
+        /// <summary>
+        /// API response data
+        /// </summary>
+        public StatusMonitorResponse Data { get; }
     }
 }

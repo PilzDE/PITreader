@@ -26,6 +26,7 @@ Following the general parameters one of the commands can be passed to the tool f
 - `udc` User Data Configuration
 - `bl` Blocklist
 - `coding` Basic Coding
+- `monitor` Monitor for status changes
 
 ### Transponder
 
@@ -100,3 +101,16 @@ The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F11
 
     PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== coding set SecretC0ding "DE Plant 01-A"
 
+
+### Monitor
+
+The monitor command (`monitor`) is an example for monitoring a PITreader device for changes and has no sub-commands or arguments.
+
+It just outputs detected changes to the command line.
+
+#### Example
+
+The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC` and API token `hJgwmy/5gyl84lKSynGIVQ==`.
+Example for the monitor command:
+
+    PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== monitor

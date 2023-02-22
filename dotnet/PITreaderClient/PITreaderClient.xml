@@ -71,6 +71,11 @@
             OEM Coding endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigPermissionList">
+            <summary>
+            Permission list endpoint.
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigUserData">
             <summary>
             User data configuration endpoint.
@@ -259,7 +264,7 @@
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetBlocklist(Pilz.PITreader.Client.PITreaderClient)">
             <summary>
-            Returns all block list entries currently configured in the device.
+            Returns all blocklist entries currently configured in the device.
             </summary>
             <param name="client">PITreader client instance.</param>
             <returns></returns>
@@ -271,6 +276,22 @@
             <param name="client">PITreader client instance.</param>
             <param name="action">Action to be performed.</param>
             <param name="entry">Data of the blocklist entry.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetPermissionList(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Returns all permission list entries currently configured in the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.UpdatePermissionList(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.CrudAction,Pilz.PITreader.Client.Model.PermissionListEntry)">
+            <summary>
+            Adds, deletes or updates a permission list entry on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="action">Action to be performed.</param>
+            <param name="entry">Data of the permission list entry.</param>
             <returns></returns>
         </member>
         <member name="T:Pilz.PITreader.Client.ApiUtilities">
@@ -300,6 +321,15 @@
             <param name="certificate"></param>
             <returns></returns>
             <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiUtilities.SafeEquals``1(System.IEquatable{``0},System.IEquatable{``0})">
+            <summary>
+            Indicates whether two objects of the same type are equal.
+            </summary>
+            <typeparam name="T">type of objects for comparison</typeparam>
+            <param name="value">An object.</param>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.BlocklistManager">
             <summary>
@@ -1641,6 +1671,13 @@
             Security ID
             </summary>
         </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorAuthentication.Equals(Pilz.PITreader.Client.Model.StatusMonitorAuthentication)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorConfig">
             <summary>
             Configuration settings data of status monitor endpoint
@@ -1655,6 +1692,13 @@
             <summary>
             Device's authentication mode
             </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorConfig.Equals(Pilz.PITreader.Client.Model.StatusMonitorConfig)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLed">
             <summary>
@@ -1671,6 +1715,13 @@
             Current LED flash mode
             </summary>
         </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorLed.Equals(Pilz.PITreader.Client.Model.StatusMonitorLed)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLog">
             <summary>
             Diagnostic log status of status monitor endpoint
@@ -1680,6 +1731,13 @@
             <summary>
             Latest entry in diagnostic log
             </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorLog.Equals(Pilz.PITreader.Client.Model.StatusMonitorLog)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorLogEntry">
             <summary>
@@ -1700,6 +1758,13 @@
             <summary>
             Index in log list (incrementing)
             </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorLogEntry.Equals(Pilz.PITreader.Client.Model.StatusMonitorLogEntry)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorResponse">
             <summary>
@@ -1736,6 +1801,13 @@
             Change notification tags for settings and list data
             </summary>
         </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorResponse.Equals(Pilz.PITreader.Client.Model.StatusMonitorResponse)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorStatus">
             <summary>
             General device status information of status monitor endpoint
@@ -1756,6 +1828,13 @@
             <summary>
             Signal present at the 24 V I/O port
             </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorStatus.Equals(Pilz.PITreader.Client.Model.StatusMonitorStatus)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusMonitorTags">
             <summary>
@@ -1781,6 +1860,13 @@
             <summary>
             Indicates change in user data configuration
             </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.StatusMonitorTags.Equals(Pilz.PITreader.Client.Model.StatusMonitorTags)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.StatusResponse">
             <summary>
@@ -1816,6 +1902,12 @@
             <summary>
             Device's MAC address
             Format: 00:00:00:00:00:00
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.StatusResponse.TlsFingerprintVerification">
+            <summary>
+            Verification code for the TLS fingerprint
+            Format: 000000 (6 digits)
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.StatusResponse.SeuStatus">
@@ -2285,6 +2377,65 @@
             <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
             <returns>The task object representing the asynchronous operation.</returns>
         </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderStatusMonitor">
+            <summary>
+            Monitors PITreader status monitoring endpoint
+            </summary>
+        </member>
+        <member name="E:Pilz.PITreader.Client.PITreaderStatusMonitor.OnChange">
+            <summary>
+            Event triggered when a change in the selected area was detected
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitor.#ctor(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.StatusMonitorFlags,System.Int32)">
+            <summary>
+            Creates a new instance of the class.
+            </summary>
+            <param name="client">Reference to PITreaderClient object.</param>
+            <param name="changeNotificationFlags">Flags of changes for notifications see event <see cref="E:Pilz.PITreader.Client.PITreaderStatusMonitor.OnChange"/></param>
+            <param name="queryInterval">Interval in milliseconds to check for transponder waiting for authentication.</param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitor.Dispose(System.Boolean)">
+            <summary>
+            Implementation of the dispose functionality.
+            The disposing parameter should be false when called from a finalizer, and true when called from the IDisposable.Dispose method. In other words, it is true when deterministically called and false when non-deterministically called.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitor.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderStatusMonitorChange">
+            <summary>
+            Event handler for notification of status changes by monitoring /api/status/monitor
+            </summary>
+            <param name="sender">The sender of the event</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderStatusMonitorChangeEventArgs">
+            <summary>
+            Argument for <see cref="T:Pilz.PITreader.Client.PITreaderStatusMonitorChange"/> events.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitorChangeEventArgs.#ctor(Pilz.PITreader.Client.StatusMonitorFlags,Pilz.PITreader.Client.Model.StatusMonitorResponse)">
+            <summary>
+            Creates a new instance of the class.
+            </summary>
+            <param name="change">Flags of detected changes.</param>
+            <param name="data">API response data</param>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderStatusMonitorChangeEventArgs.Change">
+            <summary>
+            Flags of detected changes.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderStatusMonitorChangeEventArgs.Data">
+            <summary>
+            API response data
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter">
             <summary>
             Converts between <see cref="T:Pilz.PITreader.Client.Model.CrudAction"/> values and their JSON representation.
@@ -2371,6 +2522,61 @@
             <param name="writer">The writer to write to.</param>
             <param name="value">The value to convert to JSON.</param>
             <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.StatusMonitorFlags">
+            <summary>
+            Status monitoring change types
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.None">
+            <summary>
+            Default none value
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.StatusChange">
+            <summary>
+            Device status change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.LedChange">
+            <summary>
+            Led status change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.ConfigurationChange">
+            <summary>
+            Configuration settings change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.TransponderChange">
+            <summary>
+            Transponder/authentication status change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.DiagnosticChange">
+            <summary>
+            Diagnostic status/log change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.BlocklistChange">
+            <summary>
+            Blocklist change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.PermissionListChange">
+            <summary>
+            Permission list change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.UserDataConfigChange">
+            <summary>
+            User data config change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.All">
+            <summary>
+            Combination of all flags
+            </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.TransponderManager">
             <summary>

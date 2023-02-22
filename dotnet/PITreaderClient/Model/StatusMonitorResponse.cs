@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
@@ -19,7 +20,7 @@ namespace Pilz.PITreader.Client.Model
     /// <summary>
     /// Summarized status information of device
     /// </summary>
-    public class StatusMonitorResponse
+    public class StatusMonitorResponse : IEquatable<StatusMonitorResponse>
     {
         /// <summary>
         /// General device status information
@@ -56,5 +57,23 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("tags")]
         public StatusMonitorTags Tags { get; set; }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(StatusMonitorResponse other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Status.SafeEquals(other.Status)
+                && this.Led.SafeEquals(other.Led)
+                && this.Config.SafeEquals(other.Config)
+                && this.Authentication.SafeEquals(other.Authentication)
+                && this.Log.SafeEquals(other.Log)
+                && this.Tags.SafeEquals(other.Tags);
+        }
     }
 }

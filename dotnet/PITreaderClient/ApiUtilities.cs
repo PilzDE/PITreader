@@ -87,5 +87,20 @@ namespace Pilz.PITreader.Client
 
             return certificate.Thumbprint;
         }
+
+        /// <summary>
+        /// Indicates whether two objects of the same type are equal.
+        /// </summary>
+        /// <typeparam name="T">type of objects for comparison</typeparam>
+        /// <param name="value">An object.</param>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        internal static bool SafeEquals<T>(this IEquatable<T> value, IEquatable<T> other)
+        {
+            if (value == null)
+                return other == null;
+
+            return value.Equals(other);
+        }
     }
 }
