@@ -2,9 +2,9 @@
 
 # PILZ PITreader Client Libraries and Examples
 
-PILZ [PITreader](https://www.pilz.com/en-INT/access-permission) devices are RFID based authentication systems for implementation of industrial access management.
+PILZ [PITreader](https://www.pilz.com/en-INT/iam) devices are RFID based authentication systems for implementation of industrial access management.
 
-[![PILZ PITreader](doc/pitreader_ptm.png)](https://www.pilz.com/en-INT/access-permission)
+[![PILZ PITreader](doc/pitreader_ptm.png)](https://www.pilz.com/en-INT/iam)
 
 The devices implement three interfaces for integration into other systems:
 - REST API (HTTPS)
@@ -23,7 +23,7 @@ Documentation about the features of the device and publicly available APIs is av
 
 ## .NET Library
 
-[Pilz.PITreader.Client](dotnet/PITreaderClient) is a .NET Standard 2.0 library for accessing the REST API of PITreader devices with firmware version 1.5.
+[Pilz.PITreader.Client](dotnet/PITreaderClient) is a .NET Standard 2.0 library for accessing the REST API of PITreader devices with firmware version 2.0.
 
 In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example application using this library for a number of typical use cases:
 
@@ -31,6 +31,7 @@ In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example applicat
 - writing and updating user data configuration
 - updating the blocklist
 - setting the basic coding
+- monitoring a device for change
 
 
 ## Support
