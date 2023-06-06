@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 Pilz GmbH & Co. KG
+﻿// Copyright (c) 2023 Pilz GmbH & Co. KG
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,42 +12,21 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Diagnostics;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Response to POST requests or on entry.
+    /// Action for <see cref="FirmwareUpdateRequest"/>
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class GenericResponse
+    public enum FirmwareUpdateAction
     {
         /// <summary>
-        /// Status of request execution.
+        /// Apply firmware update package
         /// </summary>
-        [JsonPropertyName("success")]
-        public bool Success { get; set; }
+        Confirm,
 
         /// <summary>
-        /// Message key returned by the device.
+        /// Cancel update and delete firmware update package on device
         /// </summary>
-        [JsonPropertyName("msg")]
-        public string Message { get; set; }
-
-        /// <summary>
-        /// Data returned by the device.
-        /// </summary>
-        [JsonPropertyName("data")]
-        public JsonNode Data { get; set; }
-
-        private string DebuggerDisplay { get => string.Format("Succes: {0}, Message: {1}, Data: {{ {2} }}", this.Success, this.Message, (object)this.Data ?? "null"); }
-
-        /// <summary>
-        /// Returns a string that represents the current object.
-        /// </summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString() => this.DebuggerDisplay;
+        Cancel
     }
 }

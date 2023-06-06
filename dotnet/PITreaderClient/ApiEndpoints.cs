@@ -128,6 +128,16 @@ namespace Pilz.PITreader.Client
         public const string TransponderTeachIn = "/api/transponder/teachIn";
 
         /// <summary>
+        /// Firmware upload endpoint.
+        /// </summary>
+        public const string FilesFirmware = "/api/files/firmware";
+
+        /// <summary>
+        /// Firmware update endpoint.
+        /// </summary>
+        public const string FirmwareUpdate = "/api/firmware/update";
+
+        /// <summary>
         /// Read general device information (e.g. device name, order number, serial number, firmware version, hardware version, software version)
         /// </summary>
         /// <param name="client">PITreader client instance.</param>

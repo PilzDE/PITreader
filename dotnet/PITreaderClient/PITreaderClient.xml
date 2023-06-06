@@ -141,6 +141,16 @@
             Transponder teach-in endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.FilesFirmware">
+            <summary>
+            Firmware upload endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.FirmwareUpdate">
+            <summary>
+            Firmware update endpoint.
+            </summary>
+        </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceStatus(Pilz.PITreader.Client.PITreaderClient)">
             <summary>
             Read general device information (e.g. device name, order number, serial number, firmware version, hardware version, software version)
@@ -440,6 +450,98 @@
             <summary>
             Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
             </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.FirmwareVersion">
+            <summary>
+            PITreader device or update package version.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.#ctor">
+            <summary>
+            Create a new FirmwareVersion instance.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.#ctor(System.Version)">
+            <summary>
+            Create a new FirmwareVersion instance.
+            </summary>
+            <param name="version">Base version</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Create a new FirmwareVersion instance.
+            </summary>
+            <param name="major"></param>
+            <param name="minor"></param>
+            <param name="patch"></param>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.#ctor(System.Int32,System.Int32,System.Int32,System.UInt32)">
+            <summary>
+            Create a new FirmwareVersion instance.
+            </summary>
+            <param name="major"></param>
+            <param name="minor"></param>
+            <param name="patch"></param>
+            <param name="build"></param>
+        </member>
+        <member name="P:Pilz.PITreader.Client.FirmwareVersion.Major">
+            <summary>
+            Major component of firmware version.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.FirmwareVersion.Minor">
+            <summary>
+            Minor component of firmware version.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.FirmwareVersion.Patch">
+            <summary>
+            Patch component of firmware version.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.FirmwareVersion.Build">
+            <summary>
+            (Optional) Build component of firmware version.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.FirmwareVersion.Released">
+            <summary>
+            Released flag (true/false)
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.CompareTo(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.CompareTo(Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.CompareTo(System.Version)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_Equality(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_Inequality(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_LessThan(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_GreaterThanOrEqual(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_LessThanOrEqual(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.ApiResponse`1">
             <summary>
@@ -1030,6 +1132,36 @@
         <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.UserData">
             <summary>
             User data values
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.FirmwareUpdateAction">
+            <summary>
+            Action for <see cref="T:Pilz.PITreader.Client.Model.FirmwareUpdateRequest"/>
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.FirmwareUpdateAction.Confirm">
+            <summary>
+            Apply firmware update package
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.FirmwareUpdateAction.Cancel">
+            <summary>
+            Cancel update and delete firmware update package on device
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.FirmwareUpdateRequest">
+            <summary>
+            Request message to apply firmware update package.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.FirmwareUpdateRequest.Action">
+            <summary>
+            Action to be performed with previously uploaded firmware update package.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.FirmwareUpdateRequest.Hash">
+            <summary>
+            Hash returned in data property of firmware file upload response.
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.GenericCrudRequest`2">
@@ -2330,6 +2462,18 @@
             <param name="url">Endpoint</param>
             <returns></returns>
         </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.PostFileAsync``1(System.String,System.IO.Stream,System.String,System.String,System.TimeSpan)">
+            <summary>
+            Executes an HTTP POST request to the given endpoint uploading a file.
+            </summary>
+            <typeparam name="TResponse">Type of the response data object.</typeparam>
+            <param name="url">Endpoint</param>
+            <param name="file">File contents</param>
+            <param name="fileName">File name</param>
+            <param name="fieldName">Field name</param>
+            <param name="timeout">Request timeout</param>
+            <returns></returns>
+        </member>
         <member name="M:Pilz.PITreader.Client.PITreaderClient.Dispose(System.Boolean)">
             <summary>
             Implementation of the dispose functionality.
@@ -2340,6 +2484,94 @@
         <member name="M:Pilz.PITreader.Client.PITreaderClient.Dispose">
             <summary>
             Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderFirmwareManager">
+            <summary>
+            Checks and manages firmware versions and updates
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderFirmwareManager.#ctor(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Creates a new firmware manager instance.
+            </summary>
+            <param name="client">A PITreader API client instance.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderFirmwareManager.GetPITreaderFirmwareVersionAsync">
+            <summary>
+            Reads the current firmware version from the PITreader device.
+            </summary>
+            <returns>The current firmware version running on the device.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderFirmwareManager.PerformUpdateAsync(Pilz.PITreader.Client.PITreaderFirmwarePackage,System.Boolean)">
+            <summary>
+            Uploads a firmware package to the device and applies the update.
+            </summary>
+            <param name="package">The firmware update package</param>
+            <param name="force">If true, the update is started also the device reports it already has the same or a newer firmware.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderFirmwarePackage">
+            <summary>
+            Wrapper for firmware update packages
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderFirmwarePackage.FileName">
+            <summary>
+            The file name of the update file
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderFirmwarePackage.PackageVersion">
+            <summary>
+            The package version (major, minor and patch)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderFirmwarePackage.PackageBuild">
+            <summary>
+            The build number of the update file
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.PITreaderFirmwarePackage.Data">
+            <summary>
+            The firmware update data.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderFirmwarePackage.#ctor(System.String)">
+            <summary>
+            Creates a wrapper for a firmware update package.
+            </summary>
+            <param name="filePath">Path to the firmware update package (*.fwu or *.zip)</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult">
+            <summary>
+            Result of PITreader firmware update process
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult.Unknown">
+            <summary>
+            Unkown
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult.Success">
+            <summary>
+            Update performed sucessfully
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult.AlreadyInstalledOrNewer">
+            <summary>
+            Firmware version is already installed on device or device already has newer firmware version.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult.UploadError">
+            <summary>
+            An error occured during uploading the firmware to the device.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderFirmwareUpdateResult.UpdateError">
+            <summary>
+            An error occured during applying the update on the device.
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.PITreaderJsonSerializer">
@@ -2445,6 +2677,22 @@
             <inheritdoc cref="M:System.Text.Json.Serialization.JsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)"/>
         </member>
         <member name="M:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter.Write(System.Text.Json.Utf8JsonWriter,Pilz.PITreader.Client.Model.CrudAction,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonFirmwareUpdateActionConverter">
+            <summary>
+            Converts between <see cref="T:Pilz.PITreader.Client.Model.FirmwareUpdateAction"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonFirmwareUpdateActionConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc cref="M:System.Text.Json.Serialization.JsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)"/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonFirmwareUpdateActionConverter.Write(System.Text.Json.Utf8JsonWriter,Pilz.PITreader.Client.Model.FirmwareUpdateAction,System.Text.Json.JsonSerializerOptions)">
             <summary>
             Writes a specified value as JSON.
             </summary>

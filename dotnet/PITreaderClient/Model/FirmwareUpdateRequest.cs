@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 Pilz GmbH & Co. KG
+﻿// Copyright (c) 2023 Pilz GmbH & Co. KG
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,42 +12,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Diagnostics;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Pilz.PITreader.Client.Model
 {
     /// <summary>
-    /// Response to POST requests or on entry.
+    /// Request message to apply firmware update package.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class GenericResponse
+    public class FirmwareUpdateRequest
     {
         /// <summary>
-        /// Status of request execution.
+        /// Action to be performed with previously uploaded firmware update package.
         /// </summary>
-        [JsonPropertyName("success")]
-        public bool Success { get; set; }
+        [JsonPropertyName("action")]
+        public FirmwareUpdateAction Action { get; set; }
 
         /// <summary>
-        /// Message key returned by the device.
+        /// Hash returned in data property of firmware file upload response.
         /// </summary>
-        [JsonPropertyName("msg")]
-        public string Message { get; set; }
-
-        /// <summary>
-        /// Data returned by the device.
-        /// </summary>
-        [JsonPropertyName("data")]
-        public JsonNode Data { get; set; }
-
-        private string DebuggerDisplay { get => string.Format("Succes: {0}, Message: {1}, Data: {{ {2} }}", this.Success, this.Message, (object)this.Data ?? "null"); }
-
-        /// <summary>
-        /// Returns a string that represents the current object.
-        /// </summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString() => this.DebuggerDisplay;
+        [JsonPropertyName("hash")]
+        public string Hash { get; set; }
     }
 }

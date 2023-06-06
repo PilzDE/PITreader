@@ -38,6 +38,7 @@ namespace Pilz.PITreader.Client
 
             options.Converters.Add(new JsonVersionConverter());
             options.Converters.Add(new JsonCrudActionConverter());
+            options.Converters.Add(new JsonFirmwareUpdateActionConverter());
             options.Converters.Add(new JsonSecurityIdConverter());
             options.Converters.Add(new JsonNullableDateTimeConverter());
         }

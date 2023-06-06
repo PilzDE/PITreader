@@ -67,7 +67,7 @@ namespace Pilz.PITreader.Client.Model
         {
             return new ApiResponse<GenericResponse>
             {
-                Data = new GenericResponse { Success = this.Success, Message = this.ErrorData?.Message, Data = this.ErrorData },
+                Data = new GenericResponse { Success = this.Success, Message = this.ErrorData?.Message, Data = this.ErrorData?.Data },
                 ErrorData = this.ErrorData,
                 Success = this.Success,
                 ResponseCode = this.ResponseCode,
