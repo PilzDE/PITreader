@@ -4,7 +4,7 @@
 
 ## Getting Started
 
-Access to the REST API is secured by *API tokens* (see Configuration -> API-Clients in the web interface of the device and the [API user manual](https://www.pilz.com/download/open/PITreader_REST_API_Operat_Man_1005365-DE-04.pdf)).
+Access to the REST API is secured by *API tokens* (see User → Device user in the web interface of the device and the [API user manual](https://www.pilz.com/download/open/PITreader_REST_API_Operat_Man_1005365-DE-06.pdf)).
 
 The client (*PITreaderTool*) can ensure that communication is established with the correct PITreader device by specifying the certificate thumbprint for the connection (see Configuration -> Certificate in the web interface of the device).
 
@@ -27,6 +27,7 @@ Following the general parameters one of the commands can be passed to the tool f
 - `bl` Blocklist
 - `coding` Basic Coding
 - `monitor` Monitor for status changes
+- `firmware` Update firmware on device
 
 ### Transponder
 
@@ -110,7 +111,27 @@ It just outputs detected changes to the command line.
 
 #### Example
 
-The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC` and API token `hJgwmy/5gyl84lKSynGIVQ==`.
+The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC` and API token `hJgwmy/5gyl84lKSynGIVQ==`.\
 Example for the monitor command:
 
     PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== monitor
+
+
+### Firmware
+
+The firmware command (`firmware`) has two sub-commands:
+
+- `version` Reads the current firmware version from the device
+- `update [--force] <path to fwu>` Update firmware on device
+
+The `update` command has the following arguments:
+
+- `--force` if set, the update is attempted although the device reports to also have the same or a newer version installed
+- `<path to fwu>` Path to firmware update package (*.fwu)
+
+#### Example
+
+The PITreader has a certificate with SHA2 thumbprint `C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC` and API token `hJgwmy/5gyl84lKSynGIVQ==`.\
+Example for the firmware update command:
+
+    PITreaderTool.exe --thumbprint C44E954C64B50AA2AF7CAC9F1108CEDF59FFF7D520DE27223AF92A5976F7E5FC hJgwmy/5gyl84lKSynGIVQ== firmware update ..\PITreader_update_2-1-0.fwu

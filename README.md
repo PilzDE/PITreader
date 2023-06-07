@@ -32,6 +32,7 @@ In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example applicat
 - updating the blocklist
 - setting the basic coding
 - monitoring a device for change
+- updating the firmware of a device
 
 
 ## Support
@@ -44,7 +45,7 @@ If you have any questions about the PITreader devices not specifically related t
 
 ## License
 
-Copyright © 2022 Pilz GmbH & Co. KG
+Copyright © 2023 Pilz GmbH & Co. KG
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

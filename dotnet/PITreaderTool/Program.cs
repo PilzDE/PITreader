@@ -64,6 +64,7 @@ namespace Pilz.PITreader.Tool
             rootCommand.AddCommand(new UserDataConfigurationCommand(clientBinder));
             rootCommand.AddCommand(new CodingCommand(clientBinder));
             rootCommand.AddCommand(new StatusMonitorCommand(clientBinder));
+            rootCommand.AddCommand(new FirmwareCommand(clientBinder));
 
             rootCommand.AddValidator(commandResult =>
             {
