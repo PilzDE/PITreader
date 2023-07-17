@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,6 +22,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
 
@@ -41,9 +43,15 @@ namespace Pilz.PITreader.Client
         /// </summary>
         public const ushort DefaultPortNumber = 443;
 
-        private readonly HttpClient client;
+        /// <summary>
+        /// Base client instance
+        /// </summary>
+        protected readonly HttpClient client;
 
-        private readonly HttpClientHandler handler;
+        /// <summary>
+        /// HTTP handler
+        /// </summary>
+        protected readonly HttpClientHandler handler;
 
         private bool disposed;
 
@@ -128,6 +136,27 @@ namespace Pilz.PITreader.Client
         }
 
         /// <summary>
+        /// Executes an HTTP GET request to the given endpoint.
+        /// </summary>
+        /// <param name="url">Endpoint</param>
+        /// <param name="destinationStream">Stream to receive download data.</param>
+        /// <param name="timeout">Request timeout</param>
+        /// <returns></returns>
+        public async Task<ApiResponse<Stream>> GetFileAsync(string url, Stream destinationStream, TimeSpan? timeout = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            using (var client = this.CreateClient(
+                this.client.BaseAddress.Host,
+                (ushort)this.client.BaseAddress.Port,
+                false))
+            {
+                client.Timeout = timeout ?? TimeSpan.FromSeconds(15);
+                return await this.ExecuteDownloadRequest(client, request, destinationStream);
+            }
+        }
+
+        /// <summary>
         /// Executes an HTTP POST request to the given endpoint.
         /// </summary>
         /// <typeparam name="TResponse">Type of the response data object.</typeparam>
@@ -167,9 +196,10 @@ namespace Pilz.PITreader.Client
         /// <param name="file">File contents</param>
         /// <param name="fileName">File name</param>
         /// <param name="fieldName">Field name</param>
+        /// <param name="additionalFields">Additional form fields/parameters</param>
         /// <param name="timeout">Request timeout</param>
         /// <returns></returns>
-        public async Task<ApiResponse<TResponse>> PostFileAsync<TResponse>(string url, Stream file, string fileName, string fieldName, TimeSpan timeout) where TResponse : class
+        public async Task<ApiResponse<TResponse>> PostFileAsync<TResponse>(string url, Stream file, string fileName, string fieldName, IEnumerable<KeyValuePair<string, string>> additionalFields, TimeSpan timeout) where TResponse : class
         {
             var request = new HttpRequestMessage(HttpMethod.Post, url);
 
@@ -189,6 +219,20 @@ namespace Pilz.PITreader.Client
                 fileData.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
                 multipartFormDataContent.Add(fileData, fieldName, fileName);
+
+                if (additionalFields != null)
+                {
+                    foreach (var field in additionalFields)
+                    {
+                        var data = new StringContent(field.Value);
+                        data.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                        {
+                            Name = $"\"{field.Key}\""
+                        };
+
+                        multipartFormDataContent.Add(data);
+                    }
+                }
 
                 // Cleanup quotes from bondary parameter
                 var boundaryParam = multipartFormDataContent.Headers.ContentType?.Parameters.SingleOrDefault(p => p.Name == "boundary");
@@ -210,7 +254,14 @@ namespace Pilz.PITreader.Client
             }
         }
 
-        private async Task<ApiResponse<T>> ExecuteRequest<T>(HttpClient client, HttpRequestMessage message) where T : class
+        /// <summary>
+        /// Executes an HTTP request with given HTTP client.
+        /// </summary>
+        /// <typeparam name="T">Type of the response object</typeparam>
+        /// <param name="client">The HTTP client</param>
+        /// <param name="message">The HTTP request message</param>
+        /// <returns>An ApiResponse</returns>
+        protected virtual async Task<ApiResponse<T>> ExecuteRequest<T>(HttpClient client, HttpRequestMessage message) where T : class
         {
             try
             {
@@ -230,7 +281,19 @@ namespace Pilz.PITreader.Client
                     if (response.StatusCode != HttpStatusCode.NotFound)
                     {
                         // HTTP 404 is returned with a default HTML error page -> no JSON
-                        return ApiResponse<T>.Error(response.StatusCode, ((int)response.StatusCode) % 100 != 4, await response.Content.ReadFromJsonAsync<GenericResponse>());
+
+                        GenericResponse data = null;
+
+                        try
+                        {
+                            data = await response.Content.ReadFromJsonAsync<GenericResponse>();
+                        }
+                        catch (JsonException)
+                        {
+                            // response is no JSON
+                        }
+
+                        return ApiResponse<T>.Error(response.StatusCode, ((int)response.StatusCode) % 100 != 4, data);
                     }
 
                     return ApiResponse<T>.Error("Endpoint not found", false);
@@ -262,7 +325,73 @@ namespace Pilz.PITreader.Client
             }
         }
 
-        private HttpClient CreateClient(string hostnameOrIp, ushort portNumber, bool disposeHandler)
+        /// <summary>
+        /// Executes an HTTP request with given HTTP client.
+        /// </summary>
+        /// <param name="client">The HTTP client</param>
+        /// <param name="message">The HTTP request message</param>
+        /// <param name="stream">Stream to receive file data</param>
+        /// <returns>An ApiResponse</returns>
+        protected virtual async Task<ApiResponse<Stream>> ExecuteDownloadRequest(HttpClient client, HttpRequestMessage message, Stream stream)
+        {
+            try
+            {
+                using (var response = await client.SendAsync(message))
+                {
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        if (response.Content == null)
+                        {
+                            return ApiResponse<Stream>.Error("Response content was null", true, ResponseCode.Ok);
+                        }
+
+                        await response.Content.CopyToAsync(stream);
+                        return ApiResponse<Stream>.Ok(stream);
+                    }
+
+                    if (response.StatusCode != HttpStatusCode.NotFound)
+                    {
+                        // HTTP 404 is returned with a default HTML error page -> no JSON
+                        return ApiResponse<Stream>.Error(response.StatusCode, ((int)response.StatusCode) % 100 != 4, await response.Content.ReadFromJsonAsync<GenericResponse>());
+                    }
+
+                    return ApiResponse<Stream>.Error("Endpoint not found", false);
+                }
+            }
+            catch (HttpRequestException exception)
+            {
+                return ApiResponse<Stream>.Error("HttpRequestException calling the API: " + exception.Message, false);
+            }
+            catch (JsonException exception)
+            {
+                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true);
+            }
+            catch (NotImplementedException exception)
+            {
+                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true);
+            }
+            catch (TimeoutException exception)
+            {
+                return ApiResponse<Stream>.Error("TimeoutException during call to API: " + exception.Message, true);
+            }
+            catch (OperationCanceledException exception)
+            {
+                return ApiResponse<Stream>.Error("Task was canceled during call to API: " + exception.Message, true);
+            }
+            catch (Exception exception)
+            {
+                return ApiResponse<Stream>.Error("Unhandled exception when calling the API: " + exception.Message, false);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="HttpClient"/> instance.
+        /// </summary>
+        /// <param name="hostnameOrIp">Hostname or IP address of device.</param>
+        /// <param name="portNumber">HTTPS port number of device.</param>
+        /// <param name="disposeHandler">true if the inner handler should be disposed of by Dispose(), false if you intend to reuse the inner handler.</param>
+        /// <returns></returns>
+        protected virtual HttpClient CreateClient(string hostnameOrIp, ushort portNumber, bool disposeHandler)
         {
             var client = new HttpClient(this.handler, disposeHandler)
             {
@@ -272,7 +401,10 @@ namespace Pilz.PITreader.Client
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.apiToken);
+            if (!string.IsNullOrEmpty(this.apiToken))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.apiToken);
+            }
 
             return client;
         }

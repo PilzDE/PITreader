@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "PITreaderCommissioningTool": {
+      "commandName": "Project",
+      "commandLineArgs": "run --scan-timeout=10 --set-ip=192.168.0.16 --set-netmask=255.255.255.0 --set-gateway=0.0.0.0 --config=C:\\temp\\commissioning\\PITreader_default.config --generate-api-token=UAS --config-strip-network --commissioning-user=factory --upload-certificate=C:\\Users\\p.schuster\\Documents\\CSRs\\192.168.0.16.pem --opc-ua-client-certificate=%APPDATA%\\unifiedautomation\\uaexpert\\PKI\\own\\certs\\uaexpert.der --opc-ua-server-certificate-destination=C:\\temp\\commissioning\\opua-server-cert.der --config-backup-destination=C:\\temp\\commissioning\\new.config",
+      "remoteDebugEnabled": false
+    }
+  }
+}

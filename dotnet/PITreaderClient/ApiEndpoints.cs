@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.IO;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
 
@@ -46,6 +47,16 @@ namespace Pilz.PITreader.Client
         /// Blocklist endpoint.
         /// </summary>
         public const string ConfigBlocklist = "/api/config/blocklist";
+
+        /// <summary>
+        /// Regenerate certificate endpoint.
+        /// </summary>
+        public const string FilesCertificate = "/api/files/certificate";
+
+        /// <summary>
+        /// Regenerate certificate endpoint.
+        /// </summary>
+        public const string ConfigCertificateRegenerate = "/api/config/certificate/regenerate";
 
         /// <summary>
         /// Coding endpoint.
@@ -138,6 +149,16 @@ namespace Pilz.PITreader.Client
         public const string FirmwareUpdate = "/api/firmware/update";
 
         /// <summary>
+        /// OPC UA server certificate endpoint.
+        /// </summary>
+        public const string FilesOpcuaServer = "/api/files/opcua/server";
+
+        /// <summary>
+        /// Configuration backup endpoint.
+        /// </summary>
+        public const string FilesBackup = "/api/files/backup";
+
+        /// <summary>
         /// Read general device information (e.g. device name, order number, serial number, firmware version, hardware version, software version)
         /// </summary>
         /// <param name="client">PITreader client instance.</param>
@@ -207,7 +228,7 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public static Task<ApiResponse<GenericResponse>> SetOemCoding(this PITreaderClient client, OemCodingRequest coding)
         {
-            return client.PostAsync<GenericResponse, OemCodingRequest>(ConfigCoding, coding);
+            return client.PostAsync<GenericResponse, OemCodingRequest>(ConfigCodingOem, coding);
         }
 
         /// <summary>
@@ -348,6 +369,50 @@ namespace Pilz.PITreader.Client
         public static Task<ApiResponse<GenericResponse>> UpdatePermissionList(this PITreaderClient client, CrudAction action, PermissionListEntry entry)
         {
             return client.PostAsync<GenericResponse, PermissionListCrudRequest>(ConfigBlocklist, new PermissionListCrudRequest { Id = entry.Id, Action = action, Data = entry });
+        }
+
+        /// <summary>
+        /// Uploads a TLS certificate to the PITreader device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="certificate">Stream with certificate data.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> UploadCertificate(this PITreaderClient client, Stream certificate)
+        {
+            return client.PostFileAsync<GenericResponse>(FilesCertificate, certificate, "cert.pem", "certFile", null, System.TimeSpan.FromSeconds(30));
+        }
+
+        /// <summary>
+        /// Request to renew certificate on PITreader device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="scope">Scope of certificate renew request</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> RegenerateCertificate(this PITreaderClient client, CertificateRegenerateScope scope)
+        {
+            return client.PostAsync<GenericResponse, CertificateRegenerateRequest>(ConfigCertificateRegenerate, new CertificateRegenerateRequest { Scope = scope });
+        }
+
+        /// <summary>
+        /// Downloads the current OPC UA Server certificate to provided io stream.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="stream">IO stream to receive the certificate data.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<Stream>> GetOpcUaServerCertificate(this PITreaderClient client, Stream stream)
+        {
+            return client.GetFileAsync(FilesOpcuaServer, stream);
+        }
+
+        /// <summary>
+        /// Downloads the current configuration backup to provided io stream.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="stream">IO stream to receive the configuration backup.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<Stream>> GetConfigurationBackup(this PITreaderClient client, Stream stream)
+        {
+            return client.GetFileAsync(FilesBackup, stream);
         }
     }
 }

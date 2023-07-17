@@ -16,7 +16,7 @@
     <PackageTags>PITreader Pilz rest json</PackageTags>
     <PackageIcon></PackageIcon>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Initial version for PITreader FW 1.5.x</PackageReleaseNotes>
+    <PackageReleaseNotes>Initial version for PITreader FW 1.5</PackageReleaseNotes>
     <PackageId>Pilz.PITreader.Client</PackageId>
     <AssemblyName>Pilz.PITreader.Client</AssemblyName>
     <SignAssembly>false</SignAssembly>

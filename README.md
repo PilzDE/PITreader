@@ -34,6 +34,9 @@ In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example applicat
 - monitoring a device for change
 - updating the firmware of a device
 
+## Commissioning and Setup Tool
+
+In [dotnet/PITreaderCommissioningTool](dotnet/PITreaderCommissioningTool) you can find a tool to automate the setup and customization of PITreader devices from unboxing to a fully operational and configured state.
 
 ## Support
 

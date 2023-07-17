@@ -242,6 +242,7 @@ namespace Pilz.PITreader.Client
             return a.CompareTo(b) != 0;
         }
 
+        /// <inheritdoc/>
         public static bool operator >(FirmwareVersion a, FirmwareVersion b)
         {
             if (a is null && b is null) return false;

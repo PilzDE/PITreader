@@ -80,6 +80,7 @@ namespace Pilz.PITreader.Client
                 package.Data, 
                 package.FileName, 
                 "fwFile",
+                null,
                 TimeSpan.FromMinutes(5));
 
             string hash = fileResult?.Data?.Data?.AsValue()?.GetValue<string>();

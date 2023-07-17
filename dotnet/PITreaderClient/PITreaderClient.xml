@@ -61,6 +61,16 @@
             Blocklist endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.FilesCertificate">
+            <summary>
+            Regenerate certificate endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCertificateRegenerate">
+            <summary>
+            Regenerate certificate endpoint.
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCoding">
             <summary>
             Coding endpoint.
@@ -149,6 +159,16 @@
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.FirmwareUpdate">
             <summary>
             Firmware update endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.FilesOpcuaServer">
+            <summary>
+            OPC UA server certificate endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.FilesBackup">
+            <summary>
+            Configuration backup endpoint.
             </summary>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceStatus(Pilz.PITreader.Client.PITreaderClient)">
@@ -302,6 +322,38 @@
             <param name="client">PITreader client instance.</param>
             <param name="action">Action to be performed.</param>
             <param name="entry">Data of the permission list entry.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.UploadCertificate(Pilz.PITreader.Client.PITreaderClient,System.IO.Stream)">
+            <summary>
+            Uploads a TLS certificate to the PITreader device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="certificate">Stream with certificate data.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.RegenerateCertificate(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.CertificateRegenerateScope)">
+            <summary>
+            Request to renew certificate on PITreader device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="scope">Scope of certificate renew request</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetOpcUaServerCertificate(Pilz.PITreader.Client.PITreaderClient,System.IO.Stream)">
+            <summary>
+            Downloads the current OPC UA Server certificate to provided io stream.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="stream">IO stream to receive the certificate data.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetConfigurationBackup(Pilz.PITreader.Client.PITreaderClient,System.IO.Stream)">
+            <summary>
+            Downloads the current configuration backup to provided io stream.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="stream">IO stream to receive the configuration backup.</param>
             <returns></returns>
         </member>
         <member name="T:Pilz.PITreader.Client.ApiUtilities">
@@ -532,6 +584,9 @@
             <inheritdoc/>
         </member>
         <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_Inequality(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_GreaterThan(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
             <inheritdoc/>
         </member>
         <member name="M:Pilz.PITreader.Client.FirmwareVersion.op_LessThan(Pilz.PITreader.Client.FirmwareVersion,Pilz.PITreader.Client.FirmwareVersion)">
@@ -797,6 +852,31 @@
         <member name="P:Pilz.PITreader.Client.Model.BlocklistResponse.Items">
             <summary>
             List of blocklist entries stored on the device.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CertificateRegenerateRequest">
+            <summary>
+            Request to renew TLS certificate (and key)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CertificateRegenerateRequest.Scope">
+            <summary>
+            Scope of renew operation
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CertificateRegenerateScope">
+            <summary>
+            Scope of certificate renew request
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CertificateRegenerateScope.CertOnly">
+            <summary>
+            Only renew certificate (keeps the same key) 
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CertificateRegenerateScope.All">
+            <summary>
+            Renew certificate and key
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.CodingResponse">
@@ -2415,6 +2495,16 @@
             Default port number for HTTPS connections to PITreader devices.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.client">
+            <summary>
+            Base client instance
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.handler">
+            <summary>
+            HTTP handler
+            </summary>
+        </member>
         <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.String,System.UInt16,Pilz.PITreader.Client.CertificateValidationDelegate)">
             <summary>
             Create a new client instance.
@@ -2444,6 +2534,15 @@
             <param name="url">Endpoint</param>
             <returns></returns>
         </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.GetFileAsync(System.String,System.IO.Stream,System.Nullable{System.TimeSpan})">
+            <summary>
+            Executes an HTTP GET request to the given endpoint.
+            </summary>
+            <param name="url">Endpoint</param>
+            <param name="destinationStream">Stream to receive download data.</param>
+            <param name="timeout">Request timeout</param>
+            <returns></returns>
+        </member>
         <member name="M:Pilz.PITreader.Client.PITreaderClient.PostAsync``2(System.String,``1)">
             <summary>
             Executes an HTTP POST request to the given endpoint.
@@ -2462,7 +2561,7 @@
             <param name="url">Endpoint</param>
             <returns></returns>
         </member>
-        <member name="M:Pilz.PITreader.Client.PITreaderClient.PostFileAsync``1(System.String,System.IO.Stream,System.String,System.String,System.TimeSpan)">
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.PostFileAsync``1(System.String,System.IO.Stream,System.String,System.String,System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.String}},System.TimeSpan)">
             <summary>
             Executes an HTTP POST request to the given endpoint uploading a file.
             </summary>
@@ -2471,7 +2570,35 @@
             <param name="file">File contents</param>
             <param name="fileName">File name</param>
             <param name="fieldName">Field name</param>
+            <param name="additionalFields">Additional form fields/parameters</param>
             <param name="timeout">Request timeout</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.ExecuteRequest``1(System.Net.Http.HttpClient,System.Net.Http.HttpRequestMessage)">
+            <summary>
+            Executes an HTTP request with given HTTP client.
+            </summary>
+            <typeparam name="T">Type of the response object</typeparam>
+            <param name="client">The HTTP client</param>
+            <param name="message">The HTTP request message</param>
+            <returns>An ApiResponse</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.ExecuteDownloadRequest(System.Net.Http.HttpClient,System.Net.Http.HttpRequestMessage,System.IO.Stream)">
+            <summary>
+            Executes an HTTP request with given HTTP client.
+            </summary>
+            <param name="client">The HTTP client</param>
+            <param name="message">The HTTP request message</param>
+            <param name="stream">Stream to receive file data</param>
+            <returns>An ApiResponse</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.CreateClient(System.String,System.UInt16,System.Boolean)">
+            <summary>
+            Creates a new <see cref="T:System.Net.Http.HttpClient"/> instance.
+            </summary>
+            <param name="hostnameOrIp">Hostname or IP address of device.</param>
+            <param name="portNumber">HTTPS port number of device.</param>
+            <param name="disposeHandler">true if the inner handler should be disposed of by Dispose(), false if you intend to reuse the inner handler.</param>
             <returns></returns>
         </member>
         <member name="M:Pilz.PITreader.Client.PITreaderClient.Dispose(System.Boolean)">
@@ -2667,6 +2794,22 @@
             <summary>
             API response data
             </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Serialization.JsonCertificateRegenerateScopeConverter">
+            <summary>
+            Converts between <see cref="T:Pilz.PITreader.Client.Model.CertificateRegenerateScope"/> values and their JSON representation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonCertificateRegenerateScopeConverter.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc cref="M:System.Text.Json.Serialization.JsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)"/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Serialization.JsonCertificateRegenerateScopeConverter.Write(System.Text.Json.Utf8JsonWriter,Pilz.PITreader.Client.Model.CertificateRegenerateScope,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Writes a specified value as JSON.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="value">The value to convert to JSON.</param>
+            <param name="options">An object that specifies serialization options to use.</param>
         </member>
         <member name="T:Pilz.PITreader.Client.Serialization.JsonCrudActionConverter">
             <summary>

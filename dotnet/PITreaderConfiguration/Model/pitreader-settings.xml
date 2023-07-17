@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<parameter>
+  <param name="TCPIP_IP_ADDRESS" id="0x10002" label="ip parameter ip address" type="IPv4" />
+  <param name="TCPIP_IP_SUBNETMASK" id="0x10003" label="ip parameter subnet mask" type="IPv4" />
+  <param name="TCPIP_IP_GATEWAY" id="0x10004" label="ip parameter default gateway" type="IPv4" />
+</parameter>

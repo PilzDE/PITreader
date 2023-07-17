@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Pilz.PITreader.Configuration</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="SharpCompress" Version="0.33.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Model\SettingsParamter.Ids.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SettingsParamter.Ids.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Model\SettingsParamter.Ids.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SettingsParamter.Ids.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

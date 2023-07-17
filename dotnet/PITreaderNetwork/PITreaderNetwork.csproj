@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Pilz.PITreader.Network</RootNamespace>
+    <AssemblyName>Pilz.PITreader.Network</AssemblyName>
+	<Company>Pilz GmbH &amp; Co. KG</Company>
+	<Authors>Pilz GmbH &amp; Co. KG</Authors>
+	<Copyright>© 2023 Pilz GmbH &amp; Co. KG</Copyright>
+	<Description>Client library to perform network scans and configuration for Pilz PITreader devices.</Description>
+	<Product>PITreader Network Scan and Configuration</Product>
+	<Version>1.0.0</Version>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/PilzDE/pitreader.git</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/PilzDE/PITreader</PackageProjectUrl>
+	<PackageTags>PITreader Pilz mdns network-scan</PackageTags>
+	<PackageIcon></PackageIcon>
+	<RepositoryType>git</RepositoryType>
+	<PackageReleaseNotes>Initial version for PITreader FW 2.0</PackageReleaseNotes>
+	<PackageId>Pilz.PITreader.Network</PackageId>
+	<SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Makaretu.Dns.Multicast" Version="0.27.0" />
+  </ItemGroup>
+
+</Project>
