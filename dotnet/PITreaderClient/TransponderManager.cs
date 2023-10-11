@@ -50,16 +50,21 @@ namespace Pilz.PITreader.Client
 
             if (dataResponse.Data.SecurityId == null) return null;
 
+            UserDataResponse userData = null;
             var genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataRead);
-            if (!genericResponse.Success) throw new InvalidOperationException(genericResponse.ErrorData?.Message);
+            if (genericResponse.Success)
+            {
+                // user data might not be used on the tranpsonder
+                var userDataResponse = await this.client.GetAsync<UserDataResponse>(ApiEndpoints.TransponderUserData);
+                if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError) throw new InvalidOperationException(userDataResponse.ErrorData?.Message);
 
-            var userDataResponse = await this.client.GetAsync<UserDataResponse>(ApiEndpoints.TransponderUserData);
-            if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError) throw new InvalidOperationException(userDataResponse.ErrorData?.Message);
+                userData = userDataResponse.Data;
+            }
 
             return new TransponderDataContainer
             {
                 StaticData = dataResponse.Data,
-                UserData = userDataResponse.Data
+                UserData = userData
             };
         }
 
