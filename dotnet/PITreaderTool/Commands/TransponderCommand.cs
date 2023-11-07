@@ -15,6 +15,7 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,14 +32,22 @@ namespace Pilz.PITreader.Tool.Commands
             //                                                          if --update-udc is set the user data configuration in the device is updated, if necessary.
             //                                                          if --loop is set the operation runs forever and updates transponder when inserted.
          */
-        public TransponderCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+        public TransponderCommand(ConnectionPropertiesBinder connectionPropertiesBinder)
             : base("xpndr", "Export and writing of transponder content")
         {
             var jsonPathArg = new Argument<string>("path to json");
 
             var xpndrExportCommand = new Command("export", "Export content of a transponder to file");
             xpndrExportCommand.AddArgument(jsonPathArg);
-            System.CommandLine.Handler.SetHandler(xpndrExportCommand, (ConnectionProperties c, string s) => this.HandleExport(c, s), connectionPropertiesBinder, jsonPathArg);
+
+            xpndrExportCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string pathToJson = ctx.ParseResult.GetValueForArgument(jsonPathArg);
+
+                return this.HandleExport(conn, pathToJson);
+            });
+
             this.AddCommand(xpndrExportCommand);
 
             var xpndrWriteCommand = new Command("write", "Write data from file (see export) to transponders");
@@ -50,14 +59,31 @@ namespace Pilz.PITreader.Tool.Commands
 
             xpndrWriteCommand.AddArgument(jsonPathArg);
 
-            System.CommandLine.Handler.SetHandler(xpndrWriteCommand, (ConnectionProperties c, bool b1, bool b2, string s, IConsole console) => this.HandleWrite(c, b1, b2, s, console), connectionPropertiesBinder, updateUdcOption, loopOption, jsonPathArg);
+            xpndrWriteCommand.SetHandler((InvocationContext c) =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(c);
+                bool updateUdc = c.ParseResult.GetValueForOption(updateUdcOption);
+                bool loop = c.ParseResult.GetValueForOption(loopOption);
+                string pathToJson = c.ParseResult.GetValueForArgument(jsonPathArg);
+
+                return this.HandleWrite(conn, updateUdc, loop, pathToJson, c.Console);
+            });
+
             this.AddCommand(xpndrWriteCommand);
 
             var xpndrLogCommand = new Command("log", "Log ids of transponder to file");
 
             var csvPathArg = new Argument<string>("path to csv");
             xpndrLogCommand.AddArgument(csvPathArg);
-            System.CommandLine.Handler.SetHandler(xpndrLogCommand, (ConnectionProperties c, string s, IConsole console) => this.HandleLog(c, s, console), connectionPropertiesBinder, csvPathArg);
+
+            xpndrLogCommand.SetHandler((InvocationContext c) =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(c);
+                string pathToCsv = c.ParseResult.GetValueForArgument(csvPathArg);
+
+                return this.HandleLog(conn, pathToCsv, c.Console);
+            });
+
             this.AddCommand(xpndrLogCommand);
         }
 

@@ -13,11 +13,11 @@
 // SPDX-License-Identifier: MIT
 
 using System.CommandLine;
-using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
 
 namespace Pilz.PITreader.Tool
 {
-    internal class ConnectionPropertiesBinder : BinderBase<ConnectionProperties>
+    internal class ConnectionPropertiesBinder
     {
         private readonly Option<string> host;
         private readonly Option<ushort> port;
@@ -34,15 +34,15 @@ namespace Pilz.PITreader.Tool
             this.apiToken = apiToken;
         }
 
-        protected override ConnectionProperties GetBoundValue(BindingContext bindingContext)
+        public ConnectionProperties GetValue(InvocationContext context)
         {
             var properties = new ConnectionProperties
             {
-                Host = bindingContext.ParseResult.GetValueForOption(this.host),
-                Port = bindingContext.ParseResult.GetValueForOption(this.port),
-                AcceptAll = bindingContext.ParseResult.GetValueForOption(this.acceptAll),
-                Thumbprint = bindingContext.ParseResult.GetValueForOption(this.thumbprint),
-                ApiToken = bindingContext.ParseResult.GetValueForArgument(this.apiToken)
+                Host = context.ParseResult.GetValueForOption(this.host),
+                Port = context.ParseResult.GetValueForOption(this.port),
+                AcceptAll = context.ParseResult.GetValueForOption(this.acceptAll),
+                Thumbprint = context.ParseResult.GetValueForOption(this.thumbprint),
+                ApiToken = context.ParseResult.GetValueForArgument(this.apiToken)
             };
 
             return properties;

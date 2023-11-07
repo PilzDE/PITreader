@@ -27,19 +27,35 @@ namespace Pilz.PITreader.Tool.Commands
             //  udc export <path to json>                   Exports user data configuration of device to JSON file.
             //  udc import <path to json>                   Imports user data configuration from JSON file into device.
          */
-        public UserDataConfigurationCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+        public UserDataConfigurationCommand(ConnectionPropertiesBinder connectionPropertiesBinder)
             : base("udc", "Export and import of user data configurations")
         {
             var jsonPathArg = new Argument<string>("path to json");
 
             var exportCommand = new Command("export", "Export user data configuration from a device to a json file");
             exportCommand.AddArgument(jsonPathArg);
-            System.CommandLine.Handler.SetHandler(exportCommand, (ConnectionProperties c, string s) => this.HandleExport(c, s), connectionPropertiesBinder, jsonPathArg);
+
+            exportCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string jsonPath = ctx.ParseResult.GetValueForArgument(jsonPathArg);
+
+                return this.HandleExport(conn, jsonPath);
+            });
+
             this.AddCommand(exportCommand);
 
             var importCommand = new Command("import", "Import user data confguration from a json file to a device");
             importCommand.AddArgument(jsonPathArg);
-            System.CommandLine.Handler.SetHandler(importCommand, (ConnectionProperties c, string s) => this.HandleImport(c, s), connectionPropertiesBinder, jsonPathArg);
+
+            importCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string jsonPath = ctx.ParseResult.GetValueForArgument(jsonPathArg);
+
+                return this.HandleImport(conn, jsonPath);
+            });
+
             this.AddCommand(importCommand);
         }
 

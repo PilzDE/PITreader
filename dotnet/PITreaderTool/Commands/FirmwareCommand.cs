@@ -26,12 +26,17 @@ namespace Pilz.PITreader.Tool.Commands
             //  firmware version
             //  firmware update <path to fwu> [--force]
          */
-        public FirmwareCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+        public FirmwareCommand(ConnectionPropertiesBinder connectionPropertiesBinder)
             : base("firmware", "Firmware update")
         {
             var versionCommand = new Command("version", "Get firmware version");
 
-            System.CommandLine.Handler.SetHandler(versionCommand, (ConnectionProperties c, IConsole console) => this.HandleVersion(c, console), connectionPropertiesBinder);
+            versionCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                return this.HandleVersion(conn, ctx.Console);
+            });
+
             this.AddCommand(versionCommand);
 
             var fwuPathArgument = new Argument<string>("path to *.fwu");
@@ -41,7 +46,15 @@ namespace Pilz.PITreader.Tool.Commands
             updateCommand.AddArgument(fwuPathArgument);
             updateCommand.AddOption(forceOption);
 
-            System.CommandLine.Handler.SetHandler(updateCommand, (ConnectionProperties c, IConsole console, string s, bool b) => this.HandleUpdate(c, console, s, b), connectionPropertiesBinder, fwuPathArgument, forceOption);
+            updateCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string fwuPath = ctx.ParseResult.GetValueForArgument(fwuPathArgument);
+                bool force = ctx.ParseResult.GetValueForOption(forceOption);
+
+                return this.HandleUpdate(conn, ctx.Console, fwuPath, force);
+            });
+
             this.AddCommand(updateCommand);
         }
 

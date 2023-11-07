@@ -66,15 +66,13 @@ namespace Pilz.PITreader.Tool
             rootCommand.AddCommand(new StatusMonitorCommand(clientBinder));
             rootCommand.AddCommand(new FirmwareCommand(clientBinder));
 
-            rootCommand.AddValidator(commandResult =>
+            rootCommand.AddValidator(result =>
             {
-                if (!commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(acceptAllOption.Name))
-                    && !commandResult.Children.Any(sr => sr.Symbol is IdentifierSymbol id && id.HasAlias(thumbprintOption.Name)))
+                if (!result.GetValueForOption(acceptAllOption)
+                    && string.IsNullOrEmpty(result.GetValueForOption(thumbprintOption)))
                 {
-                    return $"One of the options '{acceptAllOption.Name}' or '{thumbprintOption.Name}' are required.";
+                    result.ErrorMessage = $"One of the options '{acceptAllOption.Name}' or '{thumbprintOption.Name}' are required.";
                 }
-
-                return default(string);
             });
 
             return new CommandLineBuilder(rootCommand)

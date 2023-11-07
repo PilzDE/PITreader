@@ -31,7 +31,7 @@ namespace Pilz.PITreader.Tool.Commands
             //  bl export <path to csv>
             //  bl import <path to csv>
          */
-        public BlocklistCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+        public BlocklistCommand(ConnectionPropertiesBinder connectionPropertiesBinder)
             : base("bl", "Import of blocklists")
         {
             var csvPathArgument = new Argument<string>("path to csv");
@@ -39,7 +39,14 @@ namespace Pilz.PITreader.Tool.Commands
             var importCommand = new Command("import", "Import blocklist from a csv file into a device");
             importCommand.AddArgument(csvPathArgument);
 
-            System.CommandLine.Handler.SetHandler(importCommand, (ConnectionProperties c, string s) => this.HandleImport(c, s), connectionPropertiesBinder, csvPathArgument);
+            importCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string pathToCsv = ctx.ParseResult.GetValueForArgument(csvPathArgument);
+
+                return this.HandleImport(conn, pathToCsv);
+            });
+
             this.AddCommand(importCommand);
         }
 

@@ -8,10 +8,14 @@ namespace Pilz.PITreader.Tool.Commands
 {
     internal class StatusMonitorCommand : Command
         {
-            public StatusMonitorCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+            public StatusMonitorCommand(ConnectionPropertiesBinder  connectionPropertiesBinder)
                 : base("monitor", "Monitor the status of a PITreader")
             {
-                System.CommandLine.Handler.SetHandler(this, (ConnectionProperties c, IConsole console) => this.Handle(c, console), connectionPropertiesBinder);
+                this.SetHandler(ctx =>
+                {
+                    var conn = connectionPropertiesBinder.GetValue(ctx);
+                    return this.Handle(conn, ctx.Console);
+                });
             }
 
             private Task Handle(ConnectionProperties properties, IConsole console)

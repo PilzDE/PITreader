@@ -84,7 +84,9 @@ Example to
 - set an oem coding
 - and download the final configuration of the device for backup
 
-```
+**Windows Batch:**
+
+```batch
 PITreaderCommissioningTool run ^
     --set-ip 192.168.0.23 ^
     --firmware PITreader_update_2-2-0.zip ^

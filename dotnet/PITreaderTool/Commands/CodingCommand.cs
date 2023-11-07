@@ -12,14 +12,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Binding;
-using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
 using Pilz.PITreader.Client;
 using Pilz.PITreader.Client.Model;
 
@@ -31,7 +25,7 @@ namespace Pilz.PITreader.Tool.Commands
             //  coding set <coding> [<comment>]
             //  coding delete
          */
-        public CodingCommand(IValueDescriptor<ConnectionProperties> connectionPropertiesBinder)
+        public CodingCommand(ConnectionPropertiesBinder connectionPropertiesBinder)
             : base("coding", "Set basic coding of device")
         {
             var codingArgument = new Argument<string>("coding", "coding identifier");
@@ -41,11 +35,24 @@ namespace Pilz.PITreader.Tool.Commands
             setCommand.AddArgument(codingArgument);
             setCommand.AddArgument(commentArgument);
 
-            System.CommandLine.Handler.SetHandler(setCommand, (ConnectionProperties c, string id, string comment, IConsole console) => this.HandleSet(c, id, comment, console), connectionPropertiesBinder, codingArgument, commentArgument);
+            setCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                string id = ctx.ParseResult.GetValueForArgument(codingArgument);
+                string comment = ctx.ParseResult.GetValueForArgument(commentArgument);
+
+                return this.HandleSet(conn, id, comment, ctx.Console);
+            });
+
             this.AddCommand(setCommand);
 
             var deleteCommand = new Command("delete", "Delete basic coding of device");
-            System.CommandLine.Handler.SetHandler(deleteCommand, (ConnectionProperties c, IConsole console) => this.HandleDelete(c, console), connectionPropertiesBinder);
+            deleteCommand.SetHandler(ctx =>
+            {
+                var conn = connectionPropertiesBinder.GetValue(ctx);
+                return this.HandleDelete(conn, ctx.Console);
+            });
+
             this.AddCommand(deleteCommand);
         }
 
