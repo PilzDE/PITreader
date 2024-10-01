@@ -64,7 +64,22 @@ namespace Pilz.PITreader.Client
         /// <param name="portNumber">Portnumber for webserver (https)</param>
         /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
         public PITreaderClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate certificateValidation = null)
+            : this(new Uri($"https://{hostnameOrIp}:{portNumber}"), certificateValidation)
         {
+        }
+        /// <summary>
+        /// Create a new client instance.
+        /// </summary>
+        /// <param name="address">Address of PITreader device.</param>
+        /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public PITreaderClient(Uri address, CertificateValidationDelegate certificateValidation = null)
+        {
+            if (address is null)
+            {
+                throw new ArgumentNullException("address");
+            }
+
             this.handler = new HttpClientHandler();
 
             if (certificateValidation != null)
@@ -72,7 +87,7 @@ namespace Pilz.PITreader.Client
                 handler.ServerCertificateCustomValidationCallback = (msg, cert, chain, policyErrors) => certificateValidation(msg, cert, chain, policyErrors);
             }
 
-            this.client = this.CreateClient(hostnameOrIp, portNumber, true);
+            this.client = this.CreateClient(address, true);
             this.client.Timeout = TimeSpan.FromSeconds(5);
         }
 
@@ -146,10 +161,7 @@ namespace Pilz.PITreader.Client
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-            using (var client = this.CreateClient(
-                this.client.BaseAddress.Host,
-                (ushort)this.client.BaseAddress.Port,
-                false))
+            using (var client = this.CreateClient(this.client.BaseAddress, false))
             {
                 client.Timeout = timeout ?? TimeSpan.FromSeconds(15);
                 return await this.ExecuteDownloadRequest(client, request, destinationStream);
@@ -243,10 +255,7 @@ namespace Pilz.PITreader.Client
 
                 request.Content = multipartFormDataContent;
 
-                using (var client = this.CreateClient(
-                    this.client.BaseAddress.Host, 
-                    (ushort)this.client.BaseAddress.Port,
-                    false))
+                using (var client = this.CreateClient(this.client.BaseAddress, false))
                 {
                     client.Timeout = timeout;
                     return await this.ExecuteRequest<TResponse>(client, request);
@@ -387,15 +396,14 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Creates a new <see cref="HttpClient"/> instance.
         /// </summary>
-        /// <param name="hostnameOrIp">Hostname or IP address of device.</param>
-        /// <param name="portNumber">HTTPS port number of device.</param>
+        /// <param name="address">Address of PITreader device.</param>
         /// <param name="disposeHandler">true if the inner handler should be disposed of by Dispose(), false if you intend to reuse the inner handler.</param>
         /// <returns></returns>
-        protected virtual HttpClient CreateClient(string hostnameOrIp, ushort portNumber, bool disposeHandler)
+        protected virtual HttpClient CreateClient(Uri address, bool disposeHandler)
         {
             var client = new HttpClient(this.handler, disposeHandler)
             {
-                BaseAddress = new Uri($"https://{hostnameOrIp}:{portNumber}"),
+                BaseAddress = address,
             };
 
             client.DefaultRequestHeaders.Accept.Clear();
