@@ -124,6 +124,18 @@ namespace Pilz.PITreader.Client.Model
         public ushort ModbusTcpPort { get; set; }
 
         /// <summary>
+        /// Support third-party transponders.
+        /// </summary>
+        [JsonPropertyName("supportThirdPartyTransponders")]
+        public bool SupportThirdPartyTransponders { get; set; }
+
+        /// <summary>
+        /// Selected rfid protocol for support of third-party transponders.
+        /// </summary>
+        [JsonPropertyName("rfidProtocols")]
+        public RfidProtocol[] RfidProtocols { get; set; }
+
+        /// <summary>
         /// Device's authentication mode
         /// </summary>
         [JsonPropertyName("authenticationMode")]

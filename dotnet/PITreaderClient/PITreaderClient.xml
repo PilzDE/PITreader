@@ -989,6 +989,16 @@
             Port number of the Modbus/TCP slave (server) in the device.
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.SupportThirdPartyTransponders">
+            <summary>
+            Support third-party transponders.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.RfidProtocols">
+            <summary>
+            Selected rfid protocol for support of third-party transponders.
+            </summary>
+        </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigRequest.AuthenticationMode">
             <summary>
             Device's authentication mode
@@ -1127,6 +1137,16 @@
         <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.ModbusTcpPort">
             <summary>
             Port number of the Modbus/TCP slave (server) in the device.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.SupportThirdPartyTransponders">
+            <summary>
+            Support third-party transponders.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.RfidProtocols">
+            <summary>
+            Selected rfid protocol for support of third-party transponders.
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.AuthenticationMode">
@@ -1750,6 +1770,21 @@
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.DeviceError">
             <summary>
             Internal error of the device (restart the device and try again).
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.RfidProtocol">
+            <summary>
+            RFID protocol.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.RfidProtocol.Iso14443A">
+            <summary>
+            ISO 14443 Type A
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.RfidProtocol.Iso15693">
+            <summary>
+            ISO 15693
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.SecurityId">
@@ -2513,6 +2548,14 @@
             <param name="portNumber">Portnumber for webserver (https)</param>
             <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
         </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.Uri,Pilz.PITreader.Client.CertificateValidationDelegate)">
+            <summary>
+            Create a new client instance.
+            </summary>
+            <param name="address">Address of PITreader device.</param>
+            <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="P:Pilz.PITreader.Client.PITreaderClient.ApiToken">
             <summary>
             Gets or sets the API token for connections to the PITreader device.
@@ -2592,12 +2635,11 @@
             <param name="stream">Stream to receive file data</param>
             <returns>An ApiResponse</returns>
         </member>
-        <member name="M:Pilz.PITreader.Client.PITreaderClient.CreateClient(System.String,System.UInt16,System.Boolean)">
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.CreateClient(System.Uri,System.Boolean)">
             <summary>
             Creates a new <see cref="T:System.Net.Http.HttpClient"/> instance.
             </summary>
-            <param name="hostnameOrIp">Hostname or IP address of device.</param>
-            <param name="portNumber">HTTPS port number of device.</param>
+            <param name="address">Address of PITreader device.</param>
             <param name="disposeHandler">true if the inner handler should be disposed of by Dispose(), false if you intend to reuse the inner handler.</param>
             <returns></returns>
         </member>
