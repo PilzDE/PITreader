@@ -9,7 +9,12 @@
             Wrapper to monitor an API endpoint periodically for changes.
             </summary>
         </member>
-        <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.#ctor(Pilz.PITreader.Client.PITreaderClient,System.String,System.Func{`0,System.Boolean},System.Func{`0,System.Threading.Tasks.Task},System.Int32)">
+        <member name="F:Pilz.PITreader.Client.ApiEndpointMonitor`1.DEFAULT_REQUEST_RETRY_COUNT">
+            <summary>
+            Default value for tolerated, consecutive failed requests.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.#ctor(Pilz.PITreader.Client.PITreaderClient,System.String,System.Func{`0,System.Boolean},System.Func{`0,System.Threading.Tasks.Task},System.Func{`0,System.Threading.Tasks.Task},System.Int32,System.Int32)">
             <summary>
             Create a new instance of the class.
             </summary>
@@ -17,7 +22,9 @@
             <param name="endpoint">Endpoint to be monitored.</param>
             <param name="changeTrigger">Callback for change detection (returns true if change occured).</param>
             <param name="changeHandler">Callback executed when a change was detected.</param>
+            <param name="errorHandler">Callback executed when an error was detected.</param>
             <param name="queryInterval">Query interval.</param>
+            <param name="failedRequestLimit">Count of tolerated, consecutive failed reuests.</param>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpointMonitor`1.Dispose(System.Boolean)">
             <summary>
@@ -2796,6 +2803,12 @@
             <param name="changeNotificationFlags">Flags of changes for notifications see event <see cref="E:Pilz.PITreader.Client.PITreaderStatusMonitor.OnChange"/></param>
             <param name="queryInterval">Interval in milliseconds to check for transponder waiting for authentication.</param>
         </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitor.HandleConnectionError(Pilz.PITreader.Client.Model.StatusMonitorResponse)">
+            <summary>
+            Signals PITreader disconnect after several consecutively failed API calls.
+            </summary>
+            <param name="data"></param>
+        </member>
         <member name="M:Pilz.PITreader.Client.PITreaderStatusMonitor.Dispose(System.Boolean)">
             <summary>
             Implementation of the dispose functionality.
@@ -3004,6 +3017,11 @@
         <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.UserDataConfigChange">
             <summary>
             User data config change
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.ConnectionChange">
+            <summary>
+            PITreader connection change
             </summary>
         </member>
         <member name="F:Pilz.PITreader.Client.StatusMonitorFlags.All">

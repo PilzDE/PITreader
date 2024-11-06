@@ -153,6 +153,11 @@ namespace Pilz.PITreader.Tool.Commands
                                     + (string.IsNullOrWhiteSpace(z.Result.Message) ? string.Empty : (" (" + z.Result.Message + ")")));
                             });
                         },
+                        r =>
+                        {
+                            Console.WriteLine("Request failed.");
+                            return Task.CompletedTask;
+                        },
                         1000);
                     console.WriteLine("Waiting for transponders...");
                     console.WriteLine("[Enter] to abort.");
@@ -198,6 +203,11 @@ namespace Pilz.PITreader.Tool.Commands
                             byte[] data = Encoding.UTF8.GetBytes(line + Environment.NewLine);
                             await writer.WriteAsync(data, 0, data.Length);
                             await writer.FlushAsync();
+                        },
+                        r =>
+                        {
+                            Console.WriteLine("Request failed.");
+                            return Task.CompletedTask;
                         },
                         1000);
 

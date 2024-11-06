@@ -57,6 +57,7 @@ namespace Pilz.PITreader.Client
                 ApiEndpoints.StatusAuthentication,
                 r => r != null && r.AuthenticationStatus == AuthenticationStatus.Waiting,
                 this.SetSecurityId,
+                this.SetError,
                 queryInterval);
         }
 
@@ -66,6 +67,11 @@ namespace Pilz.PITreader.Client
             {
                 this.client.SetExternalAuth(data.SecurityId, t2.Result);
             });
+        }
+
+        private Task SetError(AuthenticationStatusResponse data)
+        {
+            return Task.CompletedTask;
         }
 
         /// <summary>

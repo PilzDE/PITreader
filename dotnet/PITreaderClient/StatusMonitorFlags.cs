@@ -54,6 +54,11 @@ namespace Pilz.PITreader.Client
         UserDataConfigChange = 1 << 7,
 
         /// <summary>
+        /// PITreader connection change
+        /// </summary>
+        ConnectionChange = 1 << 8,
+
+        /// <summary>
         /// Combination of all flags
         /// </summary>
         All = StatusChange 

@@ -27,7 +27,11 @@ namespace Pilz.PITreader.Client
 
         private bool disposed;
 
-        private StatusMonitorFlags changeNotificationFlags;
+        private bool connectionInitialized = false;
+
+        private bool connectionError = false;
+
+        private readonly StatusMonitorFlags changeNotificationFlags;
 
         private StatusMonitorResponse previousStatus;
 
@@ -51,6 +55,7 @@ namespace Pilz.PITreader.Client
                 ApiEndpoints.StatusMonitor,
                 r => r != null && !r.Equals(this.previousStatus),
                 this.CheckChanges,
+                this.HandleConnectionError,
                 queryInterval);
         }
 
@@ -60,6 +65,18 @@ namespace Pilz.PITreader.Client
                 return Task.CompletedTask;
 
             StatusMonitorFlags changes = StatusMonitorFlags.None;
+
+            // A reconnect (ConnectionChange) is signalled by
+            //  a) the first successful changes event,
+            //  b) a successful changes event after a connection error.
+            // After reconnect transponder data is retrieved again (TransponderChange).
+            if (!this.connectionInitialized || this.connectionError)
+            {
+                this.connectionError = false;
+                changes |= StatusMonitorFlags.ConnectionChange;
+            }
+
+            this.connectionInitialized = true;
 
             if (previousStatus == null || !data.Status.Equals(previousStatus.Status))
             {
@@ -110,6 +127,21 @@ namespace Pilz.PITreader.Client
                 this.OnChange?.Invoke(this, new PITreaderStatusMonitorChangeEventArgs(changes, data));
             }
 
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Signals PITreader disconnect after several consecutively failed API calls.
+        /// </summary>
+        /// <param name="data"></param>
+        private Task HandleConnectionError(StatusMonitorResponse data)
+        {
+            this.connectionError = true;
+;
+            this.OnChange?.Invoke(this, new PITreaderStatusMonitorChangeEventArgs(
+                StatusMonitorFlags.ConnectionChange, 
+                data));
+  
             return Task.CompletedTask;
         }
 
