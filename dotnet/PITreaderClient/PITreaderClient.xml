@@ -2522,6 +2522,18 @@
             4-eyes-principle
             </summary>
         </member>
+        <member name="T:Pilz.PITreader.Client.PermissionsHelper">
+            <summary>
+            Helper for <see cref="T:Pilz.PITreader.Client.Model.Permission"/>
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PermissionsHelper.ToValue(Pilz.PITreader.Client.Model.Permission)">
+            <summary>
+            Converts a permission code to the corresponding value (0 to 64).
+            </summary>
+            <param name="permission">The permission code.</param>
+            <returns>The corresponding value (0-64) or <c>null</c>, if no distinct mapping exists.</returns>
+        </member>
         <member name="T:Pilz.PITreader.Client.PITreaderClient">
             <summary>
             REST API Client for Pilz PITreader device.
