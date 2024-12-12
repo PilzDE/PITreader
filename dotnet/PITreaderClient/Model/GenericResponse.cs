@@ -22,20 +22,8 @@ namespace Pilz.PITreader.Client.Model
     /// Response to POST requests or on entry.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class GenericResponse
+    public class GenericResponse : AbstractGenericResponse
     {
-        /// <summary>
-        /// Status of request execution.
-        /// </summary>
-        [JsonPropertyName("success")]
-        public bool Success { get; set; }
-
-        /// <summary>
-        /// Message key returned by the device.
-        /// </summary>
-        [JsonPropertyName("msg")]
-        public string Message { get; set; }
-
         /// <summary>
         /// Data returned by the device.
         /// </summary>
@@ -49,5 +37,44 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() => this.DebuggerDisplay;
+    }
+
+    /// <summary>
+    /// Response to POST requests or on entry.
+    /// </summary>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public class GenericResponse<T> : AbstractGenericResponse where T : class
+    {
+        /// <summary>
+        /// Data returned by the device.
+        /// </summary>
+        [JsonPropertyName("data")]
+        public T Data { get; set; }
+
+        private string DebuggerDisplay { get => string.Format("Succes: {0}, Message: {1}, Data: {{ {2} }}", this.Success, this.Message, (object)this.Data ?? "null"); }
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString() => this.DebuggerDisplay;
+    }
+
+    /// <summary>
+    /// Abstract base class for generic responses.
+    /// </summary>
+    public abstract class AbstractGenericResponse
+    {
+        /// <summary>
+        /// Status of request execution.
+        /// </summary>
+        [JsonPropertyName("success")]
+        public bool Success { get; set; }
+
+        /// <summary>
+        /// Message key returned by the device.
+        /// </summary>
+        [JsonPropertyName("msg")]
+        public string Message { get; set; }
     }
 }

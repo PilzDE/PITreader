@@ -140,6 +140,11 @@ namespace Pilz.PITreader.Client
         public const string TransponderTeachIn = "/api/transponder/teachIn";
 
         /// <summary>
+        /// Transponder crypto endpoint.
+        /// </summary>
+        public const string TransponderCrypto = "/api/transponder/crypto";
+
+        /// <summary>
         /// Firmware upload endpoint.
         /// </summary>
         public const string FilesFirmware = "/api/files/firmware";
@@ -271,6 +276,50 @@ namespace Pilz.PITreader.Client
         public static Task<ApiResponse<GenericResponse>> TeachInTransponder(this PITreaderClient client, string teachInId)
         {
             return client.PostAsync<GenericResponse, object>(TransponderTeachIn, new { teachInId });
+        }
+
+        /// <summary>
+        /// Sets the cryptographic key for the transponder on the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="type">Transponder crypto key type.</param>
+        /// <param name="keyData">The cryptographic key data as a 16-character string.</param>
+        /// <returns>An ApiResponse of type GenericResponse.</returns>
+        /// <exception cref="ArgumentException">Thrown when keyData is not exactly 16 characters long.</exception>
+        public static Task<ApiResponse<GenericResponse<TransponderCryptoResponseData>>> SetTransponderCryptoKey(this PITreaderClient client, TransponderCryptoKeyType type, byte[] keyData)
+        {
+            // Send the request to the /api/transponder/crypto endpoint
+            return client.PostAsync<GenericResponse<TransponderCryptoResponseData>, TransponderCryptoRequest>(
+                TransponderCrypto, 
+                new TransponderCryptoRequest { Key = new TransponderCryptoKeyRequestData { Type = type, Data = keyData } });
+        }
+
+        /// <summary>
+        /// Sets the cryptographic key for the transponder on the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="type">Transponder crypto key type.</param>
+        /// <param name="passphrase">Passphrase for the logon key stored in the device configuration.</param>
+        /// <returns>An ApiResponse of type GenericResponse.</returns>
+        /// <exception cref="ArgumentException">Thrown when keyData is not exactly 16 characters long.</exception>
+        public static Task<ApiResponse<GenericResponse<TransponderCryptoResponseData>>> SetTransponderCryptoKey(this PITreaderClient client, TransponderCryptoKeyType type, string passphrase)
+        {
+            // Send the request to the /api/transponder/crypto endpoint
+            return client.PostAsync<GenericResponse<TransponderCryptoResponseData>, TransponderCryptoRequest>(
+                TransponderCrypto,
+                new TransponderCryptoRequest { Key = new TransponderCryptoKeyRequestData { Type = type, Passphrase = passphrase } });
+        }
+
+        /// <summary>
+        /// Performs a cryptographic operation (encryption or decryption) on the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="request">The cryptographic request data.</param>
+        /// <returns>An ApiResponse of type CryptoResponse.</returns>
+        public static Task<ApiResponse<GenericResponse<TransponderCryptoResponseData>>> TransponderCrypt(this PITreaderClient client, TransponderCryptoRequest request)
+        {
+            // Send the request to the CryptoEndpoint
+            return client.PostAsync<GenericResponse<TransponderCryptoResponseData>, TransponderCryptoRequest>(TransponderCrypto, request);
         }
 
         /// <summary>

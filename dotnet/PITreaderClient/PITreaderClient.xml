@@ -158,6 +158,11 @@
             Transponder teach-in endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.TransponderCrypto">
+            <summary>
+            Transponder crypto endpoint.
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.FilesFirmware">
             <summary>
             Firmware upload endpoint.
@@ -258,6 +263,34 @@
             <param name="client">PITreader client instance.</param>
             <param name="teachInId">The teach-in id of the transponder as returned by <see cref="M:Pilz.PITreader.Client.ApiEndpoints.GetTransponderData(Pilz.PITreader.Client.PITreaderClient)"/></param>
             <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetTransponderCryptoKey(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.TransponderCryptoKeyType,System.Byte[])">
+            <summary>
+            Sets the cryptographic key for the transponder on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="type">Transponder crypto key type.</param>
+            <param name="keyData">The cryptographic key data as a 16-character string.</param>
+            <returns>An ApiResponse of type GenericResponse.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when keyData is not exactly 16 characters long.</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetTransponderCryptoKey(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.TransponderCryptoKeyType,System.String)">
+            <summary>
+            Sets the cryptographic key for the transponder on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="type">Transponder crypto key type.</param>
+            <param name="passphrase">Passphrase for the logon key stored in the device configuration.</param>
+            <returns>An ApiResponse of type GenericResponse.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when keyData is not exactly 16 characters long.</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.TransponderCrypt(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.TransponderCryptoRequest)">
+            <summary>
+            Performs a cryptographic operation (encryption or decryption) on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="request">The cryptographic request data.</param>
+            <returns>An ApiResponse of type CryptoResponse.</returns>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetLed(Pilz.PITreader.Client.PITreaderClient)">
             <summary>
@@ -1298,16 +1331,6 @@
             Response to POST requests or on entry.
             </summary>
         </member>
-        <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Success">
-            <summary>
-            Status of request execution.
-            </summary>
-        </member>
-        <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Message">
-            <summary>
-            Message key returned by the device.
-            </summary>
-        </member>
         <member name="P:Pilz.PITreader.Client.Model.GenericResponse.Data">
             <summary>
             Data returned by the device.
@@ -1318,6 +1341,37 @@
             Returns a string that represents the current object.
             </summary>
             <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.GenericResponse`1">
+            <summary>
+            Response to POST requests or on entry.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.GenericResponse`1.Data">
+            <summary>
+            Data returned by the device.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.GenericResponse`1.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.AbstractGenericResponse">
+            <summary>
+            Abstract base class for generic responses.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AbstractGenericResponse.Success">
+            <summary>
+            Status of request execution.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AbstractGenericResponse.Message">
+            <summary>
+            Message key returned by the device.
+            </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.IoPortFunction">
             <summary>
@@ -2238,6 +2292,240 @@
             <summary>
             Signal present at the 24 V I/O port
             </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoDecryptRequestData">
+            <summary>
+            Encapsulates the data required for decryption.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptRequestData.Type">
+            <summary>
+            Type of crypto operation to perform
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptRequestData.Iv">
+            <summary>
+            Initialization vector in Base64 format.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptRequestData.Tag">
+            <summary>
+            Authentication tag in Base64 format.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptRequestData.Data">
+            <summary>
+            Encrypted data in Base64 format.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoDecryptResponseData">
+            <summary>
+            Encapsulates the data returned by the decryption operation.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptResponseData.Success">
+            <summary>
+            Status of request execution.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoDecryptResponseData.Data">
+            <summary>
+            Decrypted data in Base64 format.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoEncryptRequestData">
+            <summary>
+            Encapsulates the data required for encryption.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptRequestData.Type">
+            <summary>
+            Type of crypto operation to perform
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptRequestData.Iv">
+            <summary>
+            Initialization vector in Base64 format.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptRequestData.Data">
+            <summary>
+            Data to be encrypted in Base64 format.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoEncryptResponseData">
+            <summary>
+            Encapsulates the data returned by the encryption operation.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptResponseData.Success">
+            <summary>
+            Status of request execution.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptResponseData.Tag">
+            <summary>
+            Authentication tag in Base64 format.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptResponseData.Data">
+            <summary>
+            Encrypted data in Base64 format.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoEncryptResponseData.KeyId">
+            <summary>
+            Key ID of crypto key used for encryption.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoKeyRequestData">
+            <summary>
+            Crypto key data request model
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoKeyRequestData.Type">
+            <summary>
+            Key type
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoKeyRequestData.Data">
+            <summary>
+            AES key data
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoKeyRequestData.Passphrase">
+            <summary>
+            Passphrase for applying logon key from device configuration to transponder.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoKeyResponseData">
+            <summary>
+            Response for the transponder key request.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoKeyResponseData.Success">
+            <summary>
+            Status of request execution.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoKeyResponseData.KeyId">
+            <summary>
+            Key ID of crypto key used for encryption.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.TransponderCryptoKeyResponseData.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoKeyType">
+            <summary>
+            Transponder Crypto Key Type
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoKeyType.Unknown">
+            <summary>
+            Unknown/None
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoKeyType.Aes128">
+            <summary>
+            AES 128
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoKeyType.Aes192">
+            <summary>
+            AES 192
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoKeyType.Aes256">
+            <summary>
+            AES 256
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoOperation">
+            <summary>
+            Crypto operation with key on transponder.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoOperation.UnknownNone">
+            <summary>
+            Unknown / none
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoOperation.AesGcm">
+            <summary>
+            AES-GCM
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoOperation.AesGcm128">
+            <summary>
+            AES128-GCM
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoOperation.AesGcm192">
+            <summary>
+            AES192-GCM
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.TransponderCryptoOperation.AesGcm256">
+            <summary>
+            AES256-GCM
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoRequest">
+            <summary>
+            Request structure for cryptographic operations.
+            Properties are optional.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoRequest.Key">
+            <summary>
+            AES key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoRequest.Decrypt">
+            <summary>
+            Data for decryption request.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoRequest.Encrypt">
+            <summary>
+            Data for encryption request.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.TransponderCryptoRequest.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoResponseData">
+            <summary>
+            Response structure for cryptographic operations ("data" in generic response).
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoResponseData.Key">
+            <summary>
+            Data returned from the key operation.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoResponseData.Decrypt">
+            <summary>
+            Data returned from the decryption operation.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoResponseData.Encrypt">
+            <summary>
+            Data returned from the encryption operation.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.TransponderCryptoResponseData.ToString">
+            <summary>
+            Returns a string that represents the current object.
+            </summary>
+            <returns>A string that represents the current object.</returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.TransponderDataContainer">
             <summary>
