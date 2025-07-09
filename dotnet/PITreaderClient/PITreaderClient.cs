@@ -61,19 +61,21 @@ namespace Pilz.PITreader.Client
         /// Create a new client instance.
         /// </summary>
         /// <param name="hostnameOrIp">Hostname or IP address of device.</param>
-        /// <param name="portNumber">Portnumber for webserver (https)</param>
+        /// <param name="portNumber">Portnumber for webserver (https)</param>        
         /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
-        public PITreaderClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate certificateValidation = null)
-            : this(new Uri($"https://{hostnameOrIp}:{portNumber}"), certificateValidation)
+        /// <param name="timeout">PITreader timeout in ms</param>
+        public PITreaderClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate certificateValidation = null, int timeout = 5000)
+            : this(new Uri($"https://{hostnameOrIp}:{portNumber}"), certificateValidation, timeout)
         {
         }
         /// <summary>
         /// Create a new client instance.
         /// </summary>
-        /// <param name="address">Address of PITreader device.</param>
+        /// <param name="address">Address of PITreader device.</param>        
         /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
+        /// <param name="timeout">PITreader timeout in ms</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public PITreaderClient(Uri address, CertificateValidationDelegate certificateValidation = null)
+        public PITreaderClient(Uri address, CertificateValidationDelegate certificateValidation = null, int timeout = 5000)
         {
             if (address is null)
             {
@@ -87,8 +89,8 @@ namespace Pilz.PITreader.Client
                 handler.ServerCertificateCustomValidationCallback = (msg, cert, chain, policyErrors) => certificateValidation(msg, cert, chain, policyErrors);
             }
 
-            this.client = this.CreateClient(address, true);
-            this.client.Timeout = TimeSpan.FromSeconds(5);
+            this.client = this.CreateClient(address, true);            
+            this.client.Timeout = TimeSpan.FromMilliseconds(timeout);                            
         }
 
         /// <summary>

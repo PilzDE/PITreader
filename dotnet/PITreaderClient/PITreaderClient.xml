@@ -2559,20 +2559,22 @@
             HTTP handler
             </summary>
         </member>
-        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.String,System.UInt16,Pilz.PITreader.Client.CertificateValidationDelegate)">
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.String,System.UInt16,Pilz.PITreader.Client.CertificateValidationDelegate,System.Int32)">
             <summary>
             Create a new client instance.
             </summary>
             <param name="hostnameOrIp">Hostname or IP address of device.</param>
-            <param name="portNumber">Portnumber for webserver (https)</param>
+            <param name="portNumber">Portnumber for webserver (https)</param>        
             <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
+            <param name="timeout">PITreader timeout in ms</param>
         </member>
-        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.Uri,Pilz.PITreader.Client.CertificateValidationDelegate)">
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.#ctor(System.Uri,Pilz.PITreader.Client.CertificateValidationDelegate,System.Int32)">
             <summary>
             Create a new client instance.
             </summary>
-            <param name="address">Address of PITreader device.</param>
+            <param name="address">Address of PITreader device.</param>        
             <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
+            <param name="timeout">PITreader timeout in ms</param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="P:Pilz.PITreader.Client.PITreaderClient.ApiToken">
