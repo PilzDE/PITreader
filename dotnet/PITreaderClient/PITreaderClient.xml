@@ -1756,12 +1756,12 @@
         </member>
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Unknown">
             <summary>
-            Unkown or invalid response code.
+            Unknown or invalid response code.
             </summary>
         </member>
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Ok">
             <summary>
-            Request executed successfull.
+            Request executed successful.
             </summary>
         </member>
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.BadRequest">
@@ -1772,6 +1772,11 @@
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.Forbidden">
             <summary>
             Access to the API endpoint or one of the parameters in the request is not allowed for the current user.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.ResponseCode.NotFound">
+            <summary>
+            The requested API or verb does not exist on the device.
             </summary>
         </member>
         <member name="F:Pilz.PITreader.Client.Model.ResponseCode.DeviceError">

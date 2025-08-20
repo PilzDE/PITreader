@@ -20,12 +20,12 @@ namespace Pilz.PITreader.Client.Model
     public enum ResponseCode
     {
         /// <summary>
-        /// Unkown or invalid response code.
+        /// Unknown or invalid response code.
         /// </summary>
         Unknown = 0,
 
         /// <summary>
-        /// Request executed successfull.
+        /// Request executed successful.
         /// </summary>
         Ok = 200,
 
@@ -38,6 +38,11 @@ namespace Pilz.PITreader.Client.Model
         /// Access to the API endpoint or one of the parameters in the request is not allowed for the current user.
         /// </summary>
         Forbidden = 403,
+
+        /// <summary>
+        /// The requested API or verb does not exist on the device.
+        /// </summary>
+        NotFound = 404,
 
         /// <summary>
         /// Internal error of the device (restart the device and try again).
