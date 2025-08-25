@@ -1804,6 +1804,11 @@
             Security ID of a PITreader transponder.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.Model.SecurityId.EmptySecurityIdString">
+            <summary>
+            Alternative representation of an "empty" security id (all zeros).
+            </summary>
+        </member>
         <member name="M:Pilz.PITreader.Client.Model.SecurityId.#ctor(System.String)">
             <summary>
             Create a security id from specified string of hexadecimal values.
@@ -1826,10 +1831,19 @@
             <summary>
             Creates a Security ID based on the provided value.
             </summary>
-            <param name="value"></param>
+            <param name="value">String of hexadecimal values.</param>
             <returns></returns>
             <exception cref="T:System.ArgumentNullException">Empty of null value provided as hex string</exception>
             <exception cref="T:System.ArgumentException">Invalid hexadecimal string</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.Model.SecurityId.TryParse(System.String,Pilz.PITreader.Client.Model.SecurityId@)">
+            <summary>
+            Tries to parse the provided hex string into a Security ID.
+            An empty string of a string with all zeros results in a null value.
+            </summary>
+            <param name="value">String of hexadecimal values.</param>
+            <param name="securityId">Set to the security id or null.</param>
+            <returns>True, if input represents a valid security id (empty or zeros is parsed to null with result true).</returns>
         </member>
         <member name="M:Pilz.PITreader.Client.Model.SecurityId.op_Implicit(Pilz.PITreader.Client.Model.SecurityId)~System.String">
             <summary>
@@ -2554,12 +2568,12 @@
             Default port number for HTTPS connections to PITreader devices.
             </summary>
         </member>
-        <member name="F:Pilz.PITreader.Client.PITreaderClient.client">
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.httpClient">
             <summary>
             Base client instance
             </summary>
         </member>
-        <member name="F:Pilz.PITreader.Client.PITreaderClient.handler">
+        <member name="F:Pilz.PITreader.Client.PITreaderClient.httpHandler">
             <summary>
             HTTP handler
             </summary>
@@ -2569,7 +2583,7 @@
             Create a new client instance.
             </summary>
             <param name="hostnameOrIp">Hostname or IP address of device.</param>
-            <param name="portNumber">Portnumber for webserver (https)</param>        
+            <param name="portNumber">Port number for webserver (https)</param>
             <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
             <param name="timeout">PITreader timeout in ms</param>
         </member>
@@ -2577,7 +2591,7 @@
             <summary>
             Create a new client instance.
             </summary>
-            <param name="address">Address of PITreader device.</param>        
+            <param name="address">Address of PITreader device.</param>
             <param name="certificateValidation">Validator for server certificate, see <see cref="T:Pilz.PITreader.Client.CertificateValidators"/>.</param>
             <param name="timeout">PITreader timeout in ms</param>
             <exception cref="T:System.ArgumentNullException"></exception>
@@ -2591,7 +2605,7 @@
             <summary>
             Returns the certificate of a PITreader device.
             </summary>
-            <param name="hostnameOrIp">Hotname or ip address of the PITreader device.</param>
+            <param name="hostnameOrIp">Hostname or ip address of the PITreader device.</param>
             <param name="portNumber">Port number for HTTPS connections to the PITreader device.</param>
             <returns></returns>
         </member>

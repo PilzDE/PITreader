@@ -33,7 +33,12 @@ namespace Pilz.PITreader.Client.Serialization
         /// <returns>The converted value.</returns>
         public override SecurityId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return SecurityId.Parse(reader.GetString());
+            if (SecurityId.TryParse(reader.GetString(), out SecurityId securityId))
+            {
+                return securityId;
+            }
+
+            return default;
         }
 
         /// <summary>
@@ -44,8 +49,7 @@ namespace Pilz.PITreader.Client.Serialization
         /// <param name="options">An object that specifies serialization options to use.</param>
         public override void Write(Utf8JsonWriter writer, SecurityId value, JsonSerializerOptions options)
         {
-            if (value == null) writer.WriteStringValue(string.Empty);
-            writer.WriteStringValue(value.HexString);
+            writer.WriteStringValue(value?.HexString ?? string.Empty);
         }
     }
 }

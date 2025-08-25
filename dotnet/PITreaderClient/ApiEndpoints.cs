@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
@@ -314,7 +315,12 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public static Task<ApiResponse<GenericResponse>> SetExternalAuth(this PITreaderClient client, string securityId, Permission permission)
         {
-            return client.SetExternalAuth(SecurityId.Parse(securityId), permission);
+            if (!SecurityId.TryParse(securityId, out SecurityId securityIdObject))
+            {
+                throw new ArgumentException($"Invalid security id \"{securityId}\".", nameof(securityId));
+            }
+
+            return client.SetExternalAuth(securityIdObject, permission);
         }
 
         /// <summary>

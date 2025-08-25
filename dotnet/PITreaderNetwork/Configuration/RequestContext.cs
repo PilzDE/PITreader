@@ -50,15 +50,15 @@ namespace Pilz.PITreader.Network.Configuration
             return this.locking.WaitOneAsync(timeout, cancellationToken);
         }
 
-        public bool IsMatch(ResponsePacket response)
+        public bool IsMatch(ResponsePacket input)
         {
-            if (response == null || this.Request == null)
+            if (input == null || this.Request == null)
                 return false;
 
-            return this.Request.OrderNumber == response.OrderNumber
-                && this.Request.SerialNumber == response.SerialNumber
-                && (this.Request.RequestId == response.RequestId || response.RequestId == 0)
-                && (this.Request.Command == response.Command || response.Command == CommandType.None);
+            return this.Request.OrderNumber == input.OrderNumber
+                && this.Request.SerialNumber == input.SerialNumber
+                && (this.Request.RequestId == input.RequestId || input.RequestId == 0)
+                && (this.Request.Command == input.Command || input.Command == CommandType.None);
         }
 
         protected virtual void Dispose(bool disposing)

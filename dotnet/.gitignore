@@ -260,3 +260,4 @@ ServiceFabricBackup/
 .localhistory/
 
 doc/
+.klocwork/

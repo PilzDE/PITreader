@@ -26,6 +26,11 @@ namespace Pilz.PITreader.Client.Model
     public class SecurityId : IEquatable<SecurityId>
     {
         /// <summary>
+        /// Alternative representation of an "empty" security id (all zeros).
+        /// </summary>
+        public static readonly string EmptySecurityIdString = new string('0', 16);
+
+        /// <summary>
         /// Create a security id from specified string of hexadecimal values.
         /// </summary>
         /// <param name="hexString">String of hexadecimal values.</param>
@@ -33,11 +38,32 @@ namespace Pilz.PITreader.Client.Model
         /// <exception cref="System.ArgumentException">Invalid hexadecimal string</exception>
         public SecurityId(string hexString)
         {
-            if (string.IsNullOrEmpty(hexString)) throw new ArgumentNullException(nameof(hexString));
-            if (hexString.Length != 16 || Regex.IsMatch(hexString, "[^A-Fa-f0-9]")) throw new ArgumentException("Invalid format of hexString", nameof(hexString));
+            if (string.IsNullOrEmpty(hexString))
+            {
+                throw new ArgumentNullException(nameof(hexString));
+            }
 
             this.HexString = hexString.ToUpperInvariant();
-            this.Value = ulong.Parse(this.HexString, NumberStyles.HexNumber);
+
+            if (TryParseInternal(hexString, out ulong value))
+            {
+                this.Value = value;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid format of hexString", nameof(hexString));
+            }
+        }
+
+        private SecurityId(string hexString, ulong value)
+        {
+            if (string.IsNullOrEmpty(hexString))
+            {
+                throw new ArgumentNullException(nameof(hexString));
+            }
+
+            this.HexString = hexString.ToUpperInvariant();
+            this.Value = value;
         }
 
         /// <summary>
@@ -53,14 +79,56 @@ namespace Pilz.PITreader.Client.Model
         /// <summary>
         /// Creates a Security ID based on the provided value.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">String of hexadecimal values.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">Empty of null value provided as hex string</exception>
         /// <exception cref="System.ArgumentException">Invalid hexadecimal string</exception>
         public static SecurityId Parse(string value)
         {
-            if (string.IsNullOrEmpty(value) || value == new string('0', 16)) return null;
+            if (string.IsNullOrEmpty(value) || value == EmptySecurityIdString) return null;
             return new SecurityId(value);
+        }
+
+        /// <summary>
+        /// Tries to parse the provided hex string into a Security ID.
+        /// An empty string of a string with all zeros results in a null value.
+        /// </summary>
+        /// <param name="value">String of hexadecimal values.</param>
+        /// <param name="securityId">Set to the security id or null.</param>
+        /// <returns>True, if input represents a valid security id (empty or zeros is parsed to null with result true).</returns>
+        public static bool TryParse(string value, out SecurityId securityId)
+        {
+            if (string.IsNullOrEmpty(value) || value == EmptySecurityIdString)
+            {
+                securityId = null;
+                return true;
+            }
+
+            if (TryParseInternal(value, out ulong parsed))
+            {
+                securityId = new SecurityId(value, parsed);
+                return true;
+            }
+
+            securityId = null;
+            return false;
+        }
+
+        private static bool TryParseInternal(string input, out ulong value)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                value = 0;
+                return false;
+            }
+
+            if (input.Length != 16 || Regex.IsMatch(input, "[^A-Fa-f0-9]"))
+            {
+                value = 0;
+                return false;
+            }
+
+            return ulong.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out value);
         }
 
         /// <summary>

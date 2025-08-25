@@ -5,7 +5,7 @@
 // and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -46,12 +46,12 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Base client instance
         /// </summary>
-        protected readonly HttpClient client;
+        protected readonly HttpClient httpClient;
 
         /// <summary>
         /// HTTP handler
         /// </summary>
-        protected readonly HttpClientHandler handler;
+        protected readonly HttpClientHandler httpHandler;
 
         private bool disposed;
 
@@ -61,7 +61,7 @@ namespace Pilz.PITreader.Client
         /// Create a new client instance.
         /// </summary>
         /// <param name="hostnameOrIp">Hostname or IP address of device.</param>
-        /// <param name="portNumber">Portnumber for webserver (https)</param>        
+        /// <param name="portNumber">Port number for webserver (https)</param>
         /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
         /// <param name="timeout">PITreader timeout in ms</param>
         public PITreaderClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate certificateValidation = null, int timeout = 5000)
@@ -71,7 +71,7 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Create a new client instance.
         /// </summary>
-        /// <param name="address">Address of PITreader device.</param>        
+        /// <param name="address">Address of PITreader device.</param>
         /// <param name="certificateValidation">Validator for server certificate, see <see cref="CertificateValidators"/>.</param>
         /// <param name="timeout">PITreader timeout in ms</param>
         /// <exception cref="System.ArgumentNullException"></exception>
@@ -82,15 +82,15 @@ namespace Pilz.PITreader.Client
                 throw new ArgumentNullException("address");
             }
 
-            this.handler = new HttpClientHandler();
+            this.httpHandler = new HttpClientHandler();
 
             if (certificateValidation != null)
             {
-                handler.ServerCertificateCustomValidationCallback = (msg, cert, chain, policyErrors) => certificateValidation(msg, cert, chain, policyErrors);
+                httpHandler.ServerCertificateCustomValidationCallback = (msg, cert, chain, policyErrors) => certificateValidation(msg, cert, chain, policyErrors);
             }
 
-            this.client = this.CreateClient(address, true);            
-            this.client.Timeout = TimeSpan.FromMilliseconds(timeout);                            
+            this.httpClient = this.CreateClient(address, true);
+            this.httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
         }
 
         /// <summary>
@@ -106,11 +106,11 @@ namespace Pilz.PITreader.Client
                     this.apiToken = value;
                     if (!string.IsNullOrEmpty(this.apiToken))
                     {
-                        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.apiToken);
+                        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.apiToken);
                     }
                     else
                     {
-                        this.client.DefaultRequestHeaders.Remove("Authorization");
+                        this.httpClient.DefaultRequestHeaders.Remove("Authorization");
                     }
                 }
             }
@@ -119,7 +119,7 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Returns the certificate of a PITreader device.
         /// </summary>
-        /// <param name="hostnameOrIp">Hotname or ip address of the PITreader device.</param>
+        /// <param name="hostnameOrIp">Hostname or ip address of the PITreader device.</param>
         /// <param name="portNumber">Port number for HTTPS connections to the PITreader device.</param>
         /// <returns></returns>
         public static async Task<X509Certificate2> GetDeviceCertificateAsync(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber)
@@ -148,8 +148,13 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string url) where TResponse : class
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            return await this.ExecuteRequest<TResponse>(this.client, request);
+            ApiResponse<TResponse> response = default;
+            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                response = await this.ExecuteRequest<TResponse>(this.httpClient, request);
+            }
+
+            return response;
         }
 
         /// <summary>
@@ -161,13 +166,17 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<Stream>> GetFileAsync(string url, Stream destinationStream, TimeSpan? timeout = null)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-            using (var client = this.CreateClient(this.client.BaseAddress, false))
+            ApiResponse<Stream> response = default;
+            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {
-                client.Timeout = timeout ?? TimeSpan.FromSeconds(15);
-                return await this.ExecuteDownloadRequest(client, request, destinationStream);
+                using (var client = this.CreateClient(this.httpClient.BaseAddress, false))
+                {
+                    client.Timeout = timeout ?? TimeSpan.FromSeconds(15);
+                    response = await this.ExecuteDownloadRequest(client, request, destinationStream);
+                }
             }
+
+            return response;
         }
 
         /// <summary>
@@ -180,14 +189,26 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<TResponse>> PostAsync<TResponse, TRequest>(string url, TRequest data) where TResponse : class
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, url);
-            if (data != null)
+            ApiResponse<TResponse> response;
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                string serialized = PITreaderJsonSerializer.Serialize(data);
-                request.Content = new StringContent(serialized, Encoding.UTF8, "application/json");
+                if (data != null)
+                {
+                    string serialized = PITreaderJsonSerializer.Serialize(data);
+
+                    using (var content = new StringContent(serialized, Encoding.UTF8, "application/json"))
+                    {
+                        request.Content = content;
+                        response = await this.ExecuteRequest<TResponse>(this.httpClient, request);
+                    }
+                }
+                else
+                {
+                    response = await this.ExecuteRequest<TResponse>(this.httpClient, request);
+                }
             }
 
-            return await this.ExecuteRequest<TResponse>(this.client, request);
+            return response;
         }
 
         /// <summary>
@@ -198,8 +219,13 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<TResponse>> PostAsync<TResponse>(string url) where TResponse : class
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, url);
-            return await this.ExecuteRequest<TResponse>(this.client, request);
+            ApiResponse<TResponse> response;
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
+            {
+                response = await this.ExecuteRequest<TResponse>(this.httpClient, request);
+            }
+
+            return response;
         }
 
         /// <summary>
@@ -215,52 +241,54 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<TResponse>> PostFileAsync<TResponse>(string url, Stream file, string fileName, string fieldName, IEnumerable<KeyValuePair<string, string>> additionalFields, TimeSpan timeout) where TResponse : class
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, url);
-
-            string boundary = Guid.NewGuid().ToString();
-            using (var multipartFormDataContent = new MultipartFormDataContent(boundary))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                var fileData = new StreamContent(file);
-
-                // Generate custom Content-Disposition header, to prevent additional parameter "filename*="
-                var cdHeader = new ContentDispositionHeaderValue("form-data")
+                string boundary = Guid.NewGuid().ToString();
+                using (var multipartFormDataContent = new MultipartFormDataContent(boundary))
                 {
-                    Name = $"\"{fieldName}\"",
-                    FileName = $"\"{fileName}\""
-                };
-
-                fileData.Headers.ContentDisposition = cdHeader;
-                fileData.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-
-                multipartFormDataContent.Add(fileData, fieldName, fileName);
-
-                if (additionalFields != null)
-                {
-                    foreach (var field in additionalFields)
+                    using (var fileData = new StreamContent(file))
                     {
-                        var data = new StringContent(field.Value);
-                        data.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                        // Generate custom Content-Disposition header, to prevent additional parameter "filename*="
+                        var cdHeader = new ContentDispositionHeaderValue("form-data")
                         {
-                            Name = $"\"{field.Key}\""
+                            Name = $"\"{fieldName}\"",
+                            FileName = $"\"{fileName}\""
                         };
 
-                        multipartFormDataContent.Add(data);
+                        fileData.Headers.ContentDisposition = cdHeader;
+                        fileData.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                        multipartFormDataContent.Add(fileData, fieldName, fileName);
+
+                        if (additionalFields != null)
+                        {
+                            foreach (var field in additionalFields)
+                            {
+                                var data = new StringContent(field.Value);
+                                data.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                                {
+                                    Name = $"\"{field.Key}\""
+                                };
+
+                                multipartFormDataContent.Add(data);
+                            }
+                        }
+
+                        // Cleanup quotes from boundary parameter
+                        var boundaryParam = multipartFormDataContent.Headers.ContentType?.Parameters.SingleOrDefault(p => p.Name == "boundary");
+                        if (boundaryParam != null)
+                        {
+                            boundaryParam.Value = boundary;
+                        }
+
+                        request.Content = multipartFormDataContent;
+
+                        using (var client = this.CreateClient(this.httpClient.BaseAddress, false))
+                        {
+                            client.Timeout = timeout;
+                            return await this.ExecuteRequest<TResponse>(client, request);
+                        }
                     }
-                }
-
-                // Cleanup quotes from bondary parameter
-                var boundaryParam = multipartFormDataContent.Headers.ContentType?.Parameters.SingleOrDefault(p => p.Name == "boundary");
-                if (boundaryParam != null)
-                {
-                    boundaryParam.Value = boundary;
-                }
-
-                request.Content = multipartFormDataContent;
-
-                using (var client = this.CreateClient(this.client.BaseAddress, false))
-                {
-                    client.Timeout = timeout;
-                    return await this.ExecuteRequest<TResponse>(client, request);
                 }
             }
         }
@@ -401,9 +429,9 @@ namespace Pilz.PITreader.Client
         /// <param name="address">Address of PITreader device.</param>
         /// <param name="disposeHandler">true if the inner handler should be disposed of by Dispose(), false if you intend to reuse the inner handler.</param>
         /// <returns></returns>
-        protected virtual HttpClient CreateClient(Uri address, bool disposeHandler)
+        protected HttpClient CreateClient(Uri address, bool disposeHandler)
         {
-            var client = new HttpClient(this.handler, disposeHandler)
+            var client = new HttpClient(this.httpHandler, disposeHandler)
             {
                 BaseAddress = address,
             };
@@ -430,8 +458,8 @@ namespace Pilz.PITreader.Client
             {
                 if (disposing)
                 {
-                    this.client.Dispose();
-                    this.handler.Dispose();
+                    this.httpClient.Dispose();
+                    this.httpHandler.Dispose();
                 }
 
                 disposed = true;

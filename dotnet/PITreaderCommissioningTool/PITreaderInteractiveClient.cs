@@ -30,8 +30,8 @@ namespace Pilz.PITreader.CommissioningTool
         public PITreaderInteractiveClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate? certificateValidation = null)
             : base(hostnameOrIp, portNumber, certificateValidation)
         {
-            this.handler.CookieContainer = this.cookies;
-            this.handler.UseCookies = true;
+            this.httpHandler.CookieContainer = this.cookies;
+            this.httpHandler.UseCookies = true;
         }
 
         public async Task<ApiResponse<GenericResponse>> LoginAsync(string username = DefaultUsername, string password = "")
@@ -44,7 +44,7 @@ namespace Pilz.PITreader.CommissioningTool
             };
 
             request.Content = new FormUrlEncodedContent(dict);
-            return await this.ExecuteRequest<GenericResponse>(this.client, request);
+            return await this.ExecuteRequest<GenericResponse>(this.httpClient, request);
         }
 
         protected override Task<ApiResponse<T>> ExecuteRequest<T>(HttpClient client, HttpRequestMessage message)

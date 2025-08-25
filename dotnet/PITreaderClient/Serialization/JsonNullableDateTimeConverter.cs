@@ -38,8 +38,8 @@ namespace Pilz.PITreader.Client.Serialization
         public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string value = reader.GetString();
-            if (string.IsNullOrWhiteSpace(value)) return null;
-            return DateTime.Parse(value);
+            if (string.IsNullOrWhiteSpace(value) || !DateTime.TryParse(value, out DateTime dateTime)) return null;
+            return dateTime;
         }
 
         /// <summary>
