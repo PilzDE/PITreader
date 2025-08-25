@@ -31,7 +31,11 @@ namespace Pilz.PITreader.Client.Serialization
             var names = Enum.GetNames(typeof(FirmwareUpdateAction)).Select(x => x.ToLowerInvariant()).ToList();
             var value = reader.GetString().ToLowerInvariant();
             var index = names.IndexOf(value);
-            if (index >= 0) return (FirmwareUpdateAction)(Enum.GetValues(typeof(FirmwareUpdateAction)).GetValue(index));
+            if (index >= 0)
+            {
+                return (FirmwareUpdateAction)(Enum.GetValues(typeof(FirmwareUpdateAction)).GetValue(index));
+            }
+
             return default;
         }
 

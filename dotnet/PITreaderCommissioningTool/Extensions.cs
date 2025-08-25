@@ -25,9 +25,16 @@ namespace Pilz.PITreader.CommissioningTool
 
         public static void WriteError(this IConsole console, string message)
         {
-            if (!Console.IsOutputRedirected) Console.ForegroundColor = ConsoleColor.Red;
+            if (!Console.IsOutputRedirected)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+
             console.Error.Write("ERROR: " + message + Environment.NewLine);
-            if (!Console.IsOutputRedirected) Console.ResetColor();
+            if (!Console.IsOutputRedirected)
+            {
+                Console.ResetColor();
+            }
         }
 
         public static async Task<string> GetCurrentThumbprintAsync(string hostnameOrIp, ushort httpsPort)

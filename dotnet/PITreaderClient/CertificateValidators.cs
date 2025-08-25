@@ -49,7 +49,9 @@ namespace Pilz.PITreader.Client
             return (HttpRequestMessage message, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors pollicyErrors) =>
             {
                 if (certificate == null)
+                {
                     return false;
+                }
 
                 using (var sha2 = new System.Security.Cryptography.SHA256CryptoServiceProvider())
                 {

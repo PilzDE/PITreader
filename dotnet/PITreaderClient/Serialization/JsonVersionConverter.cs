@@ -33,7 +33,13 @@ namespace Pilz.PITreader.Client.Serialization
         public override Version Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string value = reader.GetString();
-            if (string.IsNullOrWhiteSpace(value) || !Version.TryParse(value, out Version version)) return null;
+
+            if (string.IsNullOrWhiteSpace(value)
+                || !Version.TryParse(value, out Version version))
+            {
+                return null;
+            }
+
             return version;
         }
 

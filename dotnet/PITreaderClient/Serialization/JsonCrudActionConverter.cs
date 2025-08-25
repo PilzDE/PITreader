@@ -31,7 +31,11 @@ namespace Pilz.PITreader.Client.Serialization
             var names = Enum.GetNames(typeof(CrudAction)).Select(x => x.ToLowerInvariant()).ToList();
             var value = reader.GetString().ToLowerInvariant();
             var index = names.IndexOf(value);
-            if (index >= 0) return (CrudAction)(Enum.GetValues(typeof(CrudAction)).GetValue(index));
+            if (index >= 0)
+            {
+                return (CrudAction)(Enum.GetValues(typeof(CrudAction)).GetValue(index));
+            }
+
             return default;
         }
 

@@ -46,9 +46,15 @@ namespace Pilz.PITreader.Client
         public async Task<TransponderDataContainer> GetTransponderDataAsync()
         {
             var dataResponse = await this.client.GetTransponderData();
-            if (!dataResponse.Success) throw new InvalidOperationException(dataResponse.ErrorData?.Message);
+            if (!dataResponse.Success)
+            {
+                throw new InvalidOperationException(dataResponse.ErrorData?.Message);
+            }
 
-            if (dataResponse.Data.SecurityId == null) return null;
+            if (dataResponse.Data.SecurityId == null)
+            {
+                return null;
+            }
 
             UserDataResponse userData = null;
             var genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataRead);
@@ -56,7 +62,10 @@ namespace Pilz.PITreader.Client
             {
                 // user data might not be used on the tranpsonder
                 var userDataResponse = await this.client.GetAsync<UserDataResponse>(ApiEndpoints.TransponderUserData);
-                if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError) throw new InvalidOperationException(userDataResponse.ErrorData?.Message);
+                if (!userDataResponse.Success && userDataResponse.ResponseCode != ResponseCode.DeviceError)
+                {
+                    throw new InvalidOperationException(userDataResponse.ErrorData?.Message);
+                }
 
                 userData = userDataResponse.Data;
             }
@@ -76,7 +85,9 @@ namespace Pilz.PITreader.Client
         public async Task<GenericResponse> WriteDataToTransponderAsync(TransponderDataContainer data)
         {
             if (data is null || data.StaticData is null)
+            {
                 throw new ArgumentNullException(nameof(data));
+            }
 
             var staticData = new TransponderRequest
             {
@@ -87,15 +98,23 @@ namespace Pilz.PITreader.Client
             };
 
             var dataResponse = await this.client.PostAsync<GenericResponse, TransponderRequest>(ApiEndpoints.Transponder, staticData);
-            if (!dataResponse.Success) return dataResponse.ErrorData;
+            if (!dataResponse.Success)
+            {
+                return dataResponse.ErrorData;
+            }
 
             if (data.UserData != null)
             {
                 if (data.UserData.ParameterDefintion == null)
+                {
                     throw new ArgumentException("No ParameterDefinition for user data.", nameof(data));
+                }
 
                 var genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataClear);
-                if (!genericResponse.Success) return genericResponse.ErrorData;
+                if (!genericResponse.Success)
+                {
+                    return genericResponse.ErrorData;
+                }
 
                 foreach (var group in data.UserData.Groups)
                 {
@@ -103,12 +122,18 @@ namespace Pilz.PITreader.Client
                     if (dataRequest.Values.Count > 0)
                     {
                         genericResponse = await this.client.PostAsync<GenericResponse, UserDataGroupRequest>(ApiEndpoints.TransponderUserDataAddGroupValues, dataRequest);
-                        if (!genericResponse.Success) return genericResponse.ErrorData;
+                        if (!genericResponse.Success)
+                        {
+                            return genericResponse.ErrorData;
+                        }
                     }
                 }
 
                 genericResponse = await this.client.PostAsync<GenericResponse>(ApiEndpoints.TransponderUserDataWrite);
-                if (!genericResponse.Success) return genericResponse.ErrorData;
+                if (!genericResponse.Success)
+                {
+                    return genericResponse.ErrorData;
+                }
             }
 
             return null;
@@ -123,7 +148,9 @@ namespace Pilz.PITreader.Client
         public bool ExportToFile(TransponderDataContainer data, string path)
         {
             if (data is null)
+            {
                 throw new ArgumentNullException(nameof(data));
+            }
 
             string json = PITreaderJsonSerializer.Serialize(data, pretty: true);
             using (var file = File.Open(path, FileMode.Create, FileAccess.Write))
@@ -152,8 +179,15 @@ namespace Pilz.PITreader.Client
 
         private UserDataGroupRequest GetRequest(UserDataGroupResponse entry, IList<UserDataParameter> parameters)
         {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
-            if (parameters is null) throw new ArgumentNullException(nameof(parameters));
+            if (entry is null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            if (parameters is null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
 
             var data = new UserDataGroupRequest { DeviceGroup = entry.DeviceGroup, Values = new List<UserDataValueRequest>(entry.Values.Count) };
 

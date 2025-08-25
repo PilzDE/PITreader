@@ -54,7 +54,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorTags other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.Settings == other.Settings
                 && this.BlockList == other.BlockList

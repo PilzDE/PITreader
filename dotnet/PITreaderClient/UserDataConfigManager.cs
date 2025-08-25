@@ -49,17 +49,26 @@ namespace Pilz.PITreader.Client
         /// <exception cref="System.ArgumentException">version == 0, but a comment is provided</exception>
         public async Task<ApiResponse<GenericResponse>> ApplyConfigurationAsync(ushort version, string comment, IEnumerable<UserDataParameter> parameters)
         {
-            if (version < 1 && !string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Version must be >= 1", nameof(version));
+            if (version < 1 && !string.IsNullOrWhiteSpace(comment))
+            {
+                throw new ArgumentException("Version must be >= 1", nameof(version));
+            }
 
             ApiResponse<GenericResponse> response = await this.client.PostAsync<GenericResponse>(ApiEndpoints.ConfigUserDataReset);
-            if (!response.Success) return response;
+            if (!response.Success)
+            {
+                return response;
+            }
 
             if (parameters != null)
             {
                 foreach (var parameter in parameters)
                 {
                     response = await this.client.PostAsync<GenericResponse, UserDataParameter>(ApiEndpoints.ConfigUserDataParameter, parameter);
-                    if (!response.Success) return response;
+                    if (!response.Success)
+                    {
+                        return response;
+                    }
                 }
             }
 
@@ -84,10 +93,17 @@ namespace Pilz.PITreader.Client
         /// <exception cref="System.ArgumentException">version == 0, but a comment is provided</exception>
         public async Task<ApiResponse<GenericResponse>> MigrateConfigurationAsync(ushort? version, string comment, IEnumerable<UserDataParameter> parameters, bool dontDeleteParameters = false)
         {
-            if (version < 1 && !string.IsNullOrWhiteSpace(comment)) throw new ArgumentException("Version must be >= 1", nameof(version));
+            if (version < 1 && !string.IsNullOrWhiteSpace(comment))
+            {
+                throw new ArgumentException("Version must be >= 1", nameof(version));
+            }
 
             var configResponse = await this.GetConfigurationAsync();
-            if (!configResponse.Success) return configResponse.AsGenericResponse();
+            if (!configResponse.Success)
+            {
+                return configResponse.AsGenericResponse();
+            }
+
             var config = configResponse.Data;
 
             if (!version.HasValue || version == 0)
@@ -107,7 +123,10 @@ namespace Pilz.PITreader.Client
             }
 
             ApiResponse<GenericResponse> response = await this.client.PostAsync<GenericResponse>(ApiEndpoints.ConfigUserDataReset);
-            if (!response.Success) return response;
+            if (!response.Success)
+            {
+                return response;
+            }
 
             if (parameters != null)
             {
@@ -118,7 +137,10 @@ namespace Pilz.PITreader.Client
                     if (newParameter != null || dontDeleteParameters)
                     {
                         response = await this.client.PostAsync<GenericResponse, UserDataParameter>(ApiEndpoints.ConfigUserDataParameter, newParameter ?? existing);
-                        if (!response.Success) return response;
+                        if (!response.Success)
+                        {
+                            return response;
+                        }
                     }
 
                     if (newParameter != null)
@@ -130,7 +152,10 @@ namespace Pilz.PITreader.Client
                 foreach (var parameter in remainingParameters)
                 {
                     response = await this.client.PostAsync<GenericResponse, UserDataParameter>(ApiEndpoints.ConfigUserDataParameter, parameter);
-                    if (!response.Success) return response;
+                    if (!response.Success)
+                    {
+                        return response;
+                    }
                 }
             }
 
@@ -161,7 +186,10 @@ namespace Pilz.PITreader.Client
         /// <exception cref="System.ArgumentNullException"></exception>
         public Task<ApiResponse<GenericResponse>> ApplyConfigurationAsync(UserDataParamaterDefintionResponse userDataConfig)
         {
-            if (userDataConfig is null) throw new ArgumentNullException(nameof(userDataConfig));
+            if (userDataConfig is null)
+            {
+                throw new ArgumentNullException(nameof(userDataConfig));
+            }
 
             var parameters = userDataConfig.Parameters.Select((p, i) => new UserDataParameter { Id = p.Id, Name = $"Parameter {i + 1}", Type = p.Type, Size = p.Size }).ToList();
             return this.ApplyConfigurationAsync(userDataConfig.Version, string.Empty, parameters);
@@ -175,18 +203,33 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public static bool AreConfigurationsMatching(IList<UserDataParameter> deviceParameters, UserDataParamaterDefintionResponse transponderParameters)
         {
-            if (deviceParameters is null) throw new ArgumentNullException(nameof(deviceParameters));
-            if (transponderParameters is null) throw new ArgumentNullException(nameof(transponderParameters));
+            if (deviceParameters is null)
+            {
+                throw new ArgumentNullException(nameof(deviceParameters));
+            }
 
-            if (deviceParameters.Count != (transponderParameters?.Parameters.Count ?? 0)) return false;
+            if (transponderParameters is null)
+            {
+                throw new ArgumentNullException(nameof(transponderParameters));
+            }
+
+            if (deviceParameters.Count != (transponderParameters?.Parameters.Count ?? 0))
+            {
+                return false;
+            }
 
             foreach (var parameter in deviceParameters)
             {
                 var xpndrParameter = transponderParameters.Parameters.SingleOrDefault(p => p.Id == parameter.Id);
-                if (xpndrParameter == null) return false;
+                if (xpndrParameter == null)
+                {
+                    return false;
+                }
 
                 if (parameter.Type != xpndrParameter.Type || parameter.Size != xpndrParameter.Size)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -200,7 +243,10 @@ namespace Pilz.PITreader.Client
         public async Task<bool> ExportToFile(string path)
         {
             var response = await this.client.GetUserDataConfig();
-            if (!response.Success) return false;
+            if (!response.Success)
+            {
+                return false;
+            }
 
             string json = PITreaderJsonSerializer.Serialize(response.Data, pretty: true);
             using (var file = File.OpenWrite(path))

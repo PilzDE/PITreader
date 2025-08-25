@@ -116,14 +116,12 @@ namespace Pilz.PITreader.Network
 
         private void OnMdnsAnswerReceived(object sender, MessageEventArgs e)
         {
-            if (e == null)
+            if (e == null
+                || !e.Message.Answers.Any(q => string.Equals(q.CanonicalName, DeviceServiceName, StringComparison.InvariantCultureIgnoreCase))
+                || this.DeviceDiscovered == null)
+            {
                 return;
-
-            if (!e.Message.Answers.Any(q => string.Equals(q.CanonicalName, DeviceServiceName, StringComparison.InvariantCultureIgnoreCase)))
-                return;
-
-            if (this.DeviceDiscovered == null)
-                return;
+            }
 
             var model = new PITreaderScanResult
             {
@@ -132,7 +130,10 @@ namespace Pilz.PITreader.Network
             };
 
             var srv = e.Message.AdditionalRecords.OfType<SRVRecord>().FirstOrDefault();
-            if (srv != null && srv.Name == "_https._tcp.local") model.HttpsPort = srv.Port;
+            if (srv != null && srv.Name == "_https._tcp.local")
+            {
+                model.HttpsPort = srv.Port;
+            }
 
             foreach (var ar in e.Message.AdditionalRecords.OfType<TXTRecord>())
             {
@@ -146,6 +147,7 @@ namespace Pilz.PITreader.Network
                             case "on": model.OrderNumber = parts[1]; break;
                             case "sn": model.SerialNumber = parts[1]; break;
                             case "mac": model.MacAddress = parts[1]; break;
+                            default: /* nop */ break;
                         }
                     }
                 }
@@ -157,7 +159,9 @@ namespace Pilz.PITreader.Network
         private void OnNetworkInterfaceDiscovered(object sender, Makaretu.Dns.NetworkInterfaceEventArgs e)
         {
             if (e == null)
+            {
                 return;
+            }
 
             if (this.NetworkInterfaceDiscovered != null)
             {

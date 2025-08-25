@@ -48,7 +48,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorLogEntry other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.Id == other.Id
                 && this.Timestamp == other.Timestamp

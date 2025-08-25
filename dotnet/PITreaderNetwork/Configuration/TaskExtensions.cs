@@ -44,8 +44,10 @@ namespace Pilz.PITreader.Network.Configuration
             finally
             {
                 if (registeredHandle != null)
+                {
                     registeredHandle.Unregister(null);
-                
+                }
+
                 tokenRegistration.Dispose();
             }
         }

@@ -42,7 +42,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorLed other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.FlashMode == other.FlashMode
                 && this.Colour == other.Colour;

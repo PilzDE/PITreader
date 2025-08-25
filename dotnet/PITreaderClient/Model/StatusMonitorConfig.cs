@@ -42,7 +42,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorConfig other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.DeviceGroup == other.DeviceGroup
                 && this.AuthenticationMode == other.AuthenticationMode;

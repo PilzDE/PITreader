@@ -91,8 +91,14 @@ namespace Pilz.PITreader.Tool.Commands
                     Identifier = string.Empty
                 });
 
-                if (result.Success) console.WriteLine("Coding deleted.");
-                else console.WriteError("Deleting coding failed: " + result.ErrorData?.Message);
+                if (result.Success)
+                {
+                    console.WriteLine("Coding deleted.");
+                }
+                else
+                {
+                    console.WriteError("Deleting coding failed: " + result.ErrorData?.Message);
+                }
             }
         }
     }

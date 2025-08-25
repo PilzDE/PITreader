@@ -32,9 +32,16 @@ namespace Pilz.PITreader.Tool
 
         public static void WriteError(this IConsole console, string message)
         {
-            if (!Console.IsOutputRedirected) Console.ForegroundColor = ConsoleColor.Red;
+            if (!Console.IsOutputRedirected)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+
             console.Error.Write("ERROR: " + message + Environment.NewLine);
-            if (!Console.IsOutputRedirected) Console.ResetColor();
+            if (!Console.IsOutputRedirected)
+            {
+                Console.ResetColor();
+            }
         }
     }
 }

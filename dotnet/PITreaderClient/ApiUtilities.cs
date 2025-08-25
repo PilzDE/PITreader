@@ -33,14 +33,18 @@ namespace Pilz.PITreader.Client
         public static byte[] HexStringToByteArray(this string hexString)
         {
             if (string.IsNullOrEmpty(hexString))
+            {
                 return new byte[0];
+            }
 
             hexString = hexString.Replace(":", string.Empty)
                 .Replace(" ", string.Empty)
                 .Replace("-", string.Empty);
 
             if (hexString.Length % 2 != 0 || Regex.IsMatch(hexString, "[^A-Fa-f0-9]"))
+            {
                 throw new ArgumentException("Invalid hex string", nameof(hexString));
+            }
 
             return Enumerable.Range(0, hexString.Length)
                 .Where(x => x % 2 == 0)
@@ -57,7 +61,9 @@ namespace Pilz.PITreader.Client
         public static string GetThumbprintSha2(this X509Certificate2 certificate)
         {
             if (certificate == null)
+            {
                 throw new ArgumentNullException(nameof(certificate));
+            }
 
             byte[] sha2Thumbprint = null;
             using (var sha2 = new System.Security.Cryptography.SHA256CryptoServiceProvider())
@@ -83,7 +89,9 @@ namespace Pilz.PITreader.Client
         public static string GetThumbprintSha1(this X509Certificate2 certificate)
         {
             if (certificate == null)
+            {
                 throw new ArgumentNullException(nameof(certificate));
+            }
 
             return certificate.Thumbprint;
         }
@@ -98,7 +106,9 @@ namespace Pilz.PITreader.Client
         internal static bool SafeEquals<T>(this IEquatable<T> value, IEquatable<T> other)
         {
             if (value == null)
+            {
                 return other == null;
+            }
 
             return value.Equals(other);
         }

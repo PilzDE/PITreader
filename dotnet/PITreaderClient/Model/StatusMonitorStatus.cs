@@ -49,7 +49,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorStatus other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.FirmwareVersion == other.FirmwareVersion
                 && this.SeuStatus == other.SeuStatus

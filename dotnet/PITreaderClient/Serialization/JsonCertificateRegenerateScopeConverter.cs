@@ -31,7 +31,11 @@ namespace Pilz.PITreader.Client.Serialization
             var names = Enum.GetNames(typeof(CertificateRegenerateScope)).Select(x => x.ToLowerInvariant()).ToList();
             var value = reader.GetString().ToLowerInvariant();
             var index = names.IndexOf(value);
-            if (index >= 0) return (CertificateRegenerateScope)(Enum.GetValues(typeof(CertificateRegenerateScope)).GetValue(index));
+            if (index >= 0)
+            {
+                return (CertificateRegenerateScope)(Enum.GetValues(typeof(CertificateRegenerateScope)).GetValue(index));
+            }
+
             return default;
         }
 

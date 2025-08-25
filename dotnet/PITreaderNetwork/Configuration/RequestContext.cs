@@ -40,7 +40,10 @@ namespace Pilz.PITreader.Network.Configuration
                 if (value != null)
                 {
                     this.response = value;
-                    if (!this.disposed) this.locking.Set();
+                    if (!this.disposed)
+                    {
+                        this.locking.Set();
+                    }
                 }
             }
         }
@@ -53,7 +56,9 @@ namespace Pilz.PITreader.Network.Configuration
         public bool IsMatch(ResponsePacket input)
         {
             if (input == null || this.Request == null)
+            {
                 return false;
+            }
 
             return this.Request.OrderNumber == input.OrderNumber
                 && this.Request.SerialNumber == input.SerialNumber

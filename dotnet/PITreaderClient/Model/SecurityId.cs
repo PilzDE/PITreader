@@ -85,7 +85,11 @@ namespace Pilz.PITreader.Client.Model
         /// <exception cref="System.ArgumentException">Invalid hexadecimal string</exception>
         public static SecurityId Parse(string value)
         {
-            if (string.IsNullOrEmpty(value) || value == EmptySecurityIdString) return null;
+            if (string.IsNullOrEmpty(value) || value == EmptySecurityIdString)
+            {
+                return null;
+            }
+
             return new SecurityId(value);
         }
 

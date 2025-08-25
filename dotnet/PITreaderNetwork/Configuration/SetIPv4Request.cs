@@ -60,7 +60,11 @@ namespace Pilz.PITreader.Network.Configuration
             for (int i = 0; i < 4; i++)
             {
                 byte value;
-                if (parts.Length <= i || !byte.TryParse(parts[i], out value)) value = 0;
+                if (parts.Length <= i || !byte.TryParse(parts[i], out value))
+                {
+                    value = 0;
+                }
+
                 PacketWriter.WriteUInt8(stream, value);
             }
 

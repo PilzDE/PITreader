@@ -36,10 +36,14 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorLog other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             if (this.LatestEntry == null || other.LatestEntry == null)
+            {
                 return this.LatestEntry == other.LatestEntry;
+            }
 
             return this.LatestEntry.Equals(other.LatestEntry);
         }

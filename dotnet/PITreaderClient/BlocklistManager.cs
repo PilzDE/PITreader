@@ -44,7 +44,10 @@ namespace Pilz.PITreader.Client
         {
             var result = await this.client.GetBlocklist();
 
-            if (!result.Success) throw new InvalidOperationException("Error receiving blocklist from PITreader.");
+            if (!result.Success)
+            {
+                throw new InvalidOperationException("Error receiving blocklist from PITreader.");
+            }
 
             return result.Data?.Items ?? new List<BlocklistEntry>();
         }

@@ -104,9 +104,16 @@ namespace Pilz.PITreader.CommissioningTool
 
         public void LogError(string message)
         {
-            if (!this.Invocation.Console.IsErrorRedirected) Console.ForegroundColor = ConsoleColor.Red;
+            if (!this.Invocation.Console.IsErrorRedirected)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+
             this.Invocation.Console.Error.Write(FormatLogMessage("ERROR: " + message) + Environment.NewLine);
-            if (!this.Invocation.Console.IsErrorRedirected) Console.ResetColor();
+            if (!this.Invocation.Console.IsErrorRedirected)
+            {
+                Console.ResetColor();
+            }
         }
 
         private static string FormatLogMessage(string input)

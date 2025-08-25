@@ -28,7 +28,9 @@ namespace Pilz.PITreader.CommissioningTool
             {
                 var properties = nic.GetIPProperties();
                 if (properties.UnicastAddresses.Any(a => IPNetwork.Parse(a.Address, a.IPv4Mask).Contains(targetAddress)))
-                        yield return nic;
+                {
+                    yield return nic;
+                }
             }
         }
     }

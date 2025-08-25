@@ -66,7 +66,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorResponse other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.Status.SafeEquals(other.Status)
                 && this.Led.SafeEquals(other.Led)

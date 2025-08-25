@@ -60,7 +60,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Equals(StatusMonitorAuthentication other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return this.Authenticated == other.Authenticated
                 && this.Permission == other.Permission

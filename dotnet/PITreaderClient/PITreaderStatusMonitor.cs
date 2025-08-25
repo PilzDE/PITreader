@@ -62,11 +62,13 @@ namespace Pilz.PITreader.Client
         private Task CheckChanges(StatusMonitorResponse data)
         {
             if (data == null)
+            {
                 return Task.CompletedTask;
+            }
 
             StatusMonitorFlags changes = StatusMonitorFlags.None;
 
-            // A reconnect (ConnectionChange) is signalled by
+            // A reconnect (ConnectionChange) is signaled by
             //  a) the first successful changes event,
             //  b) a successful changes event after a connection error.
             // After reconnect transponder data is retrieved again (TransponderChange).

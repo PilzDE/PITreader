@@ -88,7 +88,10 @@ namespace Pilz.PITreader.Network.Configuration
 
         private void OnUdpMessageReceived(object sender, UdpReceiveResult e)
         {
-            if (e == null || e.Buffer == null) return;
+            if (e == null || e.Buffer == null)
+            {
+                return;
+            }
 
             ResponsePacket response = null;
             using (var ms = new MemoryStream(e.Buffer))

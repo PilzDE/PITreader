@@ -130,30 +130,70 @@ namespace Pilz.PITreader.Client
                 throw new ArgumentNullException(nameof(other));
             }
 
-            if (this.Major > other.Major) return 1;
-            if (this.Major < other.Major) return -1;
+            if (this.Major > other.Major)
+            {
+                return 1;
+            }
 
-            if (this.Minor > other.Minor) return 1;
-            if (this.Minor < other.Minor) return -1;
+            if (this.Major < other.Major)
+            {
+                return -1;
+            }
 
-            if (this.Patch > other.Patch) return 1;
-            if (this.Patch < other.Patch) return -1;
+            if (this.Minor > other.Minor)
+            {
+                return 1;
+            }
+
+            if (this.Minor < other.Minor)
+            {
+                return -1;
+            }
+
+            if (this.Patch > other.Patch)
+            {
+                return 1;
+            }
+
+            if (this.Patch < other.Patch)
+            {
+                return -1;
+            }
 
             if (this.Build.HasValue && other.Build.HasValue)
             {
-                if (this.Build > other.Build) return 1;
-                if (this.Build < other.Build) return -1;
+                if (this.Build > other.Build)
+                {
+                    return 1;
+                }
+
+                if (this.Build < other.Build)
+                {
+                    return -1;
+                }
             }
 
             if (this.Released.HasValue && this.Released.Value && (!other.Released.HasValue || !other.Released.Value))
+            {
                 return 1;
+            }
+
             if (other.Released.HasValue && other.Released.Value && (!this.Released.HasValue || !this.Released.Value))
+            {
                 return -1;
+            }
 
             if (!(this.Released ?? false) && !(other.Released ?? false))
             {
-                if ((this.Build ?? 0) > (other.Build ?? 0)) return 1;
-                if ((this.Build ?? 0) < (other.Build ?? 0)) return -1;
+                if ((this.Build ?? 0) > (other.Build ?? 0))
+                {
+                    return 1;
+                }
+
+                if ((this.Build ?? 0) < (other.Build ?? 0))
+                {
+                    return -1;
+                }
             }
 
             return 0;
@@ -167,17 +207,45 @@ namespace Pilz.PITreader.Client
                 throw new ArgumentNullException(nameof(other));
             }
 
-            if (this.Major > other.Major) return 1;
-            if (this.Major < other.Major) return -1;
+            if (this.Major > other.Major)
+            {
+                return 1;
+            }
 
-            if (this.Minor > other.Minor) return 1;
-            if (this.Minor < other.Minor) return -1;
+            if (this.Major < other.Major)
+            {
+                return -1;
+            }
 
-            if (this.Patch > other.Build) return 1;
-            if (this.Patch < other.Build) return -1;
+            if (this.Minor > other.Minor)
+            {
+                return 1;
+            }
 
-            if (this.Build > other.Revision) return 1;
-            if (this.Build < other.Revision) return -1;
+            if (this.Minor < other.Minor)
+            {
+                return -1;
+            }
+
+            if (this.Patch > other.Build)
+            {
+                return 1;
+            }
+
+            if (this.Patch < other.Build)
+            {
+                return -1;
+            }
+
+            if (this.Build > other.Revision)
+            {
+                return 1;
+            }
+
+            if (this.Build < other.Revision)
+            {
+                return -1;
+            }
 
             return 0;
         }
@@ -227,8 +295,15 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator ==(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return true;
-            if (a is null || b is null) return false;
+            if (a is null && b is null)
+            {
+                return true;
+            }
+
+            if (a is null || b is null)
+            {
+                return false;
+            }
 
             return a.CompareTo(b) == 0;
         }
@@ -236,8 +311,15 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator !=(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return false;
-            if (a is null || b is null) return true;
+            if (a is null && b is null)
+            {
+                return false;
+            }
+
+            if (a is null || b is null)
+            {
+                return true;
+            }
 
             return a.CompareTo(b) != 0;
         }
@@ -245,9 +327,20 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator >(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return false;
-            if (a is null) return false;
-            if (b is null) return true;
+            if (a is null && b is null)
+            {
+                return false;
+            }
+
+            if (a is null)
+            {
+                return false;
+            }
+
+            if (b is null)
+            {
+                return true;
+            }
 
             return a.CompareTo(b) > 0;
         }
@@ -255,9 +348,20 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator <(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return false;
-            if (a is null) return true;
-            if (b is null) return false;
+            if (a is null && b is null)
+            {
+                return false;
+            }
+
+            if (a is null)
+            {
+                return true;
+            }
+
+            if (b is null)
+            {
+                return false;
+            }
 
             return a.CompareTo(b) < 0;
         }
@@ -265,9 +369,20 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator >=(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return true;
-            if (a is null) return false;
-            if (b is null) return true;
+            if (a is null && b is null)
+            {
+                return true;
+            }
+
+            if (a is null)
+            {
+                return false;
+            }
+
+            if (b is null)
+            {
+                return true;
+            }
 
             return a.CompareTo(b) >= 0;
         }
@@ -275,9 +390,20 @@ namespace Pilz.PITreader.Client
         /// <inheritdoc/>
         public static bool operator <=(FirmwareVersion a, FirmwareVersion b)
         {
-            if (a is null && b is null) return true;
-            if (a is null) return true;
-            if (b is null) return false;
+            if (a is null && b is null)
+            {
+                return true;
+            }
+
+            if (a is null)
+            {
+                return true;
+            }
+
+            if (b is null)
+            {
+                return false;
+            }
 
             return a.CompareTo(b) <= 0;
         }

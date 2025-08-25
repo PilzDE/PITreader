@@ -61,11 +61,21 @@ namespace Pilz.PITreader.Network.Configuration
         {
             var response = new ResponsePacket();
 
-            if (!PacketReader.VerifyMagic(stream)) return null;
+            if (!PacketReader.VerifyMagic(stream))
+            {
+                return null;
+            }
 
             // Version
-            if (PacketReader.ReadUInt16(stream) != Constants.PacketVersion) return null;
-            if (PacketReader.ReadUInt16(stream) != (UInt16)PacketType.Response) return null;
+            if (PacketReader.ReadUInt16(stream) != Constants.PacketVersion)
+            {
+                return null;
+            }
+
+            if (PacketReader.ReadUInt16(stream) != (UInt16)PacketType.Response)
+            {
+                return null;
+            }
 
             response.RequestId = PacketReader.ReadUInt32(stream);
 
@@ -75,7 +85,10 @@ namespace Pilz.PITreader.Network.Configuration
             response.Command = (CommandType)PacketReader.ReadUInt32(stream);
 
             // Extension
-            if (PacketReader.ReadUInt16(stream) != 0) return null;
+            if (PacketReader.ReadUInt16(stream) != 0)
+            {
+                return null;
+            }
 
             response.Status = (StatusCode)PacketReader.ReadUInt16(stream);
             response.MessageCode = PacketReader.ReadUInt32(stream);

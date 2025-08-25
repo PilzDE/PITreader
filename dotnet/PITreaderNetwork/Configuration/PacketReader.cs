@@ -57,8 +57,14 @@ namespace Pilz.PITreader.Network.Configuration
             int count0s = 0;
             for (int i = size - 1; i >= 0; i--)
             {
-                if (data[i] == 0) count0s++;
-                else break;
+                if (data[i] == 0)
+                {
+                    count0s++;
+                }
+                else
+                {
+                    break;
+                }
             }
 
             return Encoding.ASCII.GetString(data, 0, size - count0s);
