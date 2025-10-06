@@ -88,6 +88,11 @@
             OEM Coding endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigCustomKeys">
+            <summary>
+            Config custom keys endpoint.
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigPermissionList">
             <summary>
             Permission list endpoint.
@@ -298,6 +303,28 @@
             <param name="passphrase">Passphrase for the logon key stored in the device configuration.</param>
             <returns>An ApiResponse of type GenericResponse.</returns>
             <exception cref="T:System.ArgumentException">Thrown when keyData is not exactly 16 characters long.</exception>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetTransponderCryptoKey(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Get the crypto information from the transponder
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns>An ApiResponse of type TransponderCryptoInfoResponse.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.SetCustomKeys(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.CustomKeysRequest)">
+            <summary>
+            Sets the custom keys configuration on the device.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="request">The custom keys request containing the keys to set.</param>
+            <returns>An ApiResponse of type CustomKeysResponse.</returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetCustomKeys(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Get the additional custom keys information from the transponder
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns>An ApiResponse of type CustomKeysResponse.</returns>
         </member>
         <member name="M:Pilz.PITreader.Client.ApiEndpoints.TransponderCrypt(Pilz.PITreader.Client.PITreaderClient,Pilz.PITreader.Client.Model.TransponderCryptoRequest)">
             <summary>
@@ -1337,6 +1364,101 @@
         <member name="F:Pilz.PITreader.Client.Model.CrudAction.Delete">
             <summary>
             Delete an existing item.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CustomKeyDataType">
+            <summary>
+            Data type of custom key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyDataType.None">
+            <summary>
+            None/empty
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyDataType.Aes128">
+            <summary>
+            AES128 key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyDataType.Aes192">
+            <summary>
+            AES192 key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyDataType.Aes256">
+            <summary>
+            AES256 key
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey">
+            <summary>
+            Additional key object in response of API /config/customKeys
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey.Type">
+            <summary>
+            The key type (e.g., 16 for logon key)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey.DataType">
+            <summary>
+            The data type (1 = AES128, 2 = AES192, 3 = AES256)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey.Checksum">
+            <summary>
+            The checksum
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey.Data">
+            <summary>
+            The cryptographic key data
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysAdditionalKey.Passphrase">
+            <summary>
+            The passphrase for key type <see cref="F:Pilz.PITreader.Client.Model.CustomKeyType.TransponderKey"/>.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CustomKeysRequest">
+            <summary>
+            Request object for API /config/customKeys
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysRequest.AdditionalKeys">
+            <summary>
+            List of additional cryptographic keys to set
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CustomKeysResponse">
+            <summary>
+            Response object of API /config/customKeys
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.CustomKeysResponse.AdditionalKeys">
+            <summary>
+            List of additional cryptographic keys
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.CustomKeyType">
+            <summary>
+            Type of custom key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyType.None">
+            <summary>
+            None/empty
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyType.ApplicationDefaultKey">
+            <summary>
+            MIFARE DESFire Application Default key
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.CustomKeyType.TransponderKey">
+            <summary>
+            Cryptographic key to be written to a transponder (e.g. PIT Windows Logon Key)
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.DeviceUserAuthType">
@@ -2770,6 +2892,21 @@
             Returns a string that represents the current object.
             </summary>
             <returns>A string that represents the current object.</returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoResponse">
+            <summary>
+            Response of GET to /api/transponder/crypto
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoResponse.Type">
+            <summary>
+            The key type
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderCryptoResponse.KeyId">
+            <summary>
+            The key ID
+            </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.TransponderCryptoResponseData">
             <summary>

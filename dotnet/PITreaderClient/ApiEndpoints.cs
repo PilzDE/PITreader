@@ -71,6 +71,11 @@ namespace Pilz.PITreader.Client
         public const string ConfigCodingOem = "/api/config/coding/oem";
 
         /// <summary>
+        /// Config custom keys endpoint.
+        /// </summary>
+        public const string ConfigCustomKeys = "/api/config/customKeys";
+
+        /// <summary>
         /// Permission list endpoint.
         /// </summary>
         public const string ConfigPermissionList = "/api/config/permissionList";
@@ -139,6 +144,7 @@ namespace Pilz.PITreader.Client
         /// Transponder user data write endpoint.
         /// </summary>
         public const string TransponderUserDataWrite = "/api/transponder/userData/write";
+
 
         /// <summary>
         /// Transponder user data clear group data endpoint.
@@ -324,6 +330,38 @@ namespace Pilz.PITreader.Client
             return client.PostAsync<GenericResponse<TransponderCryptoResponseData>, TransponderCryptoRequest>(
                 TransponderCrypto,
                 new TransponderCryptoRequest { Key = new TransponderCryptoKeyRequestData { Type = type, Passphrase = passphrase } });
+        }
+
+
+        /// <summary>
+        /// Get the crypto information from the transponder
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns>An ApiResponse of type TransponderCryptoInfoResponse.</returns>
+        public static Task<ApiResponse<TransponderCryptoResponse>> GetTransponderCryptoKey(this PITreaderClient client)
+        {
+            return client.GetAsync<TransponderCryptoResponse>(TransponderCrypto);
+        }
+
+        /// <summary>
+        /// Sets the custom keys configuration on the device.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="request">The custom keys request containing the keys to set.</param>
+        /// <returns>An ApiResponse of type CustomKeysResponse.</returns>
+        public static Task<ApiResponse<CustomKeysResponse>> SetCustomKeys(this PITreaderClient client, CustomKeysRequest request)
+        {
+            return client.PostAsync<CustomKeysResponse, CustomKeysRequest>(ConfigCustomKeys, request);
+        }
+
+        /// <summary>
+        /// Get the additional custom keys information from the transponder
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns>An ApiResponse of type CustomKeysResponse.</returns>
+        public static Task<ApiResponse<CustomKeysResponse>> GetCustomKeys(this PITreaderClient client)
+        {
+            return client.GetAsync<CustomKeysResponse>(ConfigCustomKeys);
         }
 
         /// <summary>
