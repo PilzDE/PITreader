@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PITreaderClient\PITreaderClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Model\SettingsParamter.Ids.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>SettingsParamter.Ids.cs</LastGenOutput>

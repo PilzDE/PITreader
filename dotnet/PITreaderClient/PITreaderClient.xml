@@ -113,6 +113,21 @@
             User data configuration version endpoint.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigDeviceUsers">
+            <summary>
+            Device user list endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigDeviceUser">
+            <summary>
+            Device user endpoint.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.ApiEndpoints.ConfigDeviceUserApiToken">
+            <summary>
+            Device user API token endpoint.
+            </summary>
+        </member>
         <member name="F:Pilz.PITreader.Client.ApiEndpoints.Led">
             <summary>
             Led endpoint.
@@ -394,6 +409,55 @@
             </summary>
             <param name="client">PITreader client instance.</param>
             <param name="stream">IO stream to receive the configuration backup.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceUsers(Pilz.PITreader.Client.PITreaderClient)">
+            <summary>
+            Gets a list of all device users.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.GetDeviceUser(Pilz.PITreader.Client.PITreaderClient,System.String)">
+            <summary>
+            Gets details of a device user.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="name">Name of the device user.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.CreateDeviceUser(Pilz.PITreader.Client.PITreaderClient,System.String,Pilz.PITreader.Client.Model.DeviceUserRequestData)">
+            <summary>
+            Creates a new device user with given name.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="name">Name of the device user.</param>
+            <param name="data">Data of the new device user.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.UpdateDeviceUser(Pilz.PITreader.Client.PITreaderClient,System.String,Pilz.PITreader.Client.Model.DeviceUserRequestData)">
+            <summary>
+            Update a device user.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="name">Name of the device user.</param>
+            <param name="data">Data of the device user.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.DeleteDeviceUser(Pilz.PITreader.Client.PITreaderClient,System.String)">
+            <summary>
+            Deletes a device user.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="name">Name of the device user.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.ApiEndpoints.RenewApiToken(Pilz.PITreader.Client.PITreaderClient,System.String)">
+            <summary>
+            Renews the API token of a device user.
+            </summary>
+            <param name="client">PITreader client instance.</param>
+            <param name="name">Name of the device user.</param>
             <returns></returns>
         </member>
         <member name="T:Pilz.PITreader.Client.ApiUtilities">
@@ -706,6 +770,27 @@
             <param name="retry">Possibility to retry request.</param>
             <param name="code">Response code.</param>
             <returns></returns>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ApiTokenRenewRequest">
+            <summary>
+            Request model for /api/config/deviceUser/apiToken
+            to renew an API token.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiTokenRenewRequest.Name">
+            <summary>
+            Name of the device user.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.ApiTokenResponseData">
+            <summary>
+            Data element of <see cref="T:Pilz.PITreader.Client.Model.ApiTokenRenewRequest"/> response.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiTokenResponseData.Token">
+            <summary>
+            API token.
+            </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.AuthenticationFailureReason">
             <summary>
@@ -1252,6 +1337,191 @@
         <member name="F:Pilz.PITreader.Client.Model.CrudAction.Delete">
             <summary>
             Delete an existing item.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserAuthType">
+            <summary>
+            Authentication type of a device user.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserAuthType.None">
+            <summary>
+            None/unknown
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserAuthType.Password">
+            <summary>
+            Password based authentication (username and password).
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserAuthType.ApiToken">
+            <summary>
+            API token based authentication
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserItem">
+            <summary>
+            Device user list item.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserItem.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserItem.State">
+            <summary>
+            State
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserItem.Role">
+            <summary>
+            Role
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserItem.AuthType">
+            <summary>
+            Authentication type
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserRequest">
+            <summary>
+            Device user change request.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequest.Action">
+            <summary>
+            CRUD action
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequest.Id">
+            <summary>
+            ID (device user name)
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequest.Data">
+            <summary>
+            Request data
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserRequestData">
+            <summary>
+            Device user properties.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequestData.State">
+            <summary>
+            State
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequestData.Role">
+            <summary>
+            Role
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequestData.AuthType">
+            <summary>
+            Authentication type
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequestData.RemoteIp">
+            <summary>
+            Restricted to a remote ip
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserRequestData.Password">
+            <summary>
+            Set password
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserResponse">
+            <summary>
+            Device user properties.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.State">
+            <summary>
+            State
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.Role">
+            <summary>
+            Role
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.AuthType">
+            <summary>
+            Authentication type
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.ApiToken">
+            <summary>
+            API token
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUserResponse.RemoteIp">
+            <summary>
+            Restricted to a remote ip
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserRole">
+            <summary>
+            Role and authentication level of a device user.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserRole.None">
+            <summary>
+            None
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserRole.Readonly">
+            <summary>
+            Readonly
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserRole.TransponderManager">
+            <summary>
+            Transponder manager
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserRole.DeviceManager">
+            <summary>
+            Device managed
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserRole.Administrator">
+            <summary>
+            Administrator
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUsersResponse">
+            <summary>
+            List of device users.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.DeviceUsersResponse.Items">
+            <summary>
+            List of device users.
+            </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.Model.DeviceUserState">
+            <summary>
+            State of a device user
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserState.Inactive">
+            <summary>
+            Inactive/disabled
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.DeviceUserState.Active">
+            <summary>
+            Active
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest">
@@ -2905,6 +3175,15 @@
             <param name="url">Endpoint</param>
             <returns></returns>
         </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderClient.GetAsync``1(System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Executes an HTTP GET request to the given endpoint.
+            </summary>
+            <typeparam name="TResponse">Type of the response data object.</typeparam>
+            <param name="url">Endpoint</param>
+            <param name="requestParameters">Additional get request parameters</param>
+            <returns></returns>
+        </member>
         <member name="M:Pilz.PITreader.Client.PITreaderClient.GetFileAsync(System.String,System.IO.Stream,System.Nullable{System.TimeSpan})">
             <summary>
             Executes an HTTP GET request to the given endpoint.
@@ -3070,6 +3349,36 @@
             <summary>
             An error occured during applying the update on the device.
             </summary>
+        </member>
+        <member name="T:Pilz.PITreader.Client.PITreaderInteractiveClient">
+            <summary>
+            PITreader API client with interactive logon (i.e. username and password).
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.PITreaderInteractiveClient.DefaultUsername">
+            <summary>
+            Default user name.
+            </summary>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderInteractiveClient.#ctor(System.String,System.UInt16,Pilz.PITreader.Client.CertificateValidationDelegate)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderInteractiveClient.#ctor(System.Uri,Pilz.PITreader.Client.CertificateValidationDelegate)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderInteractiveClient.LoginAsync(System.String,System.String)">
+            <summary>
+            Perform interactive login with username and password.
+            </summary>
+            <param name="username">The username.</param>
+            <param name="password">The password.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pilz.PITreader.Client.PITreaderInteractiveClient.ExecuteRequest``1(System.Net.Http.HttpClient,System.Net.Http.HttpRequestMessage)">
+            <summary>
+            Overwrite for ExecuteRequest with implementation for XSRF-TOKEN header.
+            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Pilz.PITreader.Client.PITreaderJsonSerializer">
             <summary>

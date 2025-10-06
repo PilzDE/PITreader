@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Pilz GmbH & Co. KG
+﻿// Copyright (c) 2025 Pilz GmbH & Co. KG
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,11 +12,20 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Pilz.PITreader.Configuration.Model
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
+namespace Pilz.PITreader.Client.Model
 {
-    public enum DeviceUserState
+    /// <summary>
+    /// List of device users.
+    /// </summary>
+    public class DeviceUsersResponse
     {
-        Inactive = 0,
-        Active = 1
+        /// <summary>
+        /// List of device users.
+        /// </summary>
+        [JsonPropertyName("items")]
+        public List<DeviceUserItem> Items { get; set; }
     }
 }

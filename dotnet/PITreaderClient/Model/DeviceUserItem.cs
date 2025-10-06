@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Pilz GmbH & Co. KG
+﻿// Copyright (c) 2025 Pilz GmbH & Co. KG
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,12 +12,39 @@
 //
 // SPDX-License-Identifier: MIT
 
-namespace Pilz.PITreader.Configuration.Model
+using System.Diagnostics;
+using System.Text.Json.Serialization;
+
+namespace Pilz.PITreader.Client.Model
 {
-    public enum DeviceUserAuthType
+    /// <summary>
+    /// Device user list item.
+    /// </summary>
+    [DebuggerDisplay("{Name,nq}, {State}, {Role}, {AuthType}")]
+    public class DeviceUserItem
     {
-        None = 0,
-        Password = 1,
-        ApiToken = 2
+        /// <summary>
+        /// Name
+        /// </summary>
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// State
+        /// </summary>
+        [JsonPropertyName("state")]
+        public DeviceUserState State { get; set; }
+
+        /// <summary>
+        /// Role
+        /// </summary>
+        [JsonPropertyName("role")]
+        public DeviceUserRole Role { get; set; }
+
+        /// <summary>
+        /// Authentication type
+        /// </summary>
+        [JsonPropertyName("authType")]
+        public DeviceUserAuthType AuthType { get; set; }
     }
 }

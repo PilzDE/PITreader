@@ -14,6 +14,7 @@
 
 using System;
 using System.Security.Cryptography;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Configuration.Model
 {
@@ -47,7 +48,7 @@ namespace Pilz.PITreader.Configuration.Model
 
             var apiToken = new byte[16];
 
-            var rnd = new RNGCryptoServiceProvider();
+            using var rnd = new RNGCryptoServiceProvider();
             rnd.GetBytes(user.PasswordHash);
             rnd.GetBytes(apiToken);
 
@@ -59,7 +60,7 @@ namespace Pilz.PITreader.Configuration.Model
         {
             var apiToken = new byte[16];
 
-            var rnd = new RNGCryptoServiceProvider();
+            using var rnd = new RNGCryptoServiceProvider();
             rnd.GetBytes(apiToken);
 
             this.ApiToken = Convert.ToBase64String(apiToken);
@@ -69,7 +70,7 @@ namespace Pilz.PITreader.Configuration.Model
         {
             var salt = new byte[16];
 
-            var rnd = new RNGCryptoServiceProvider();
+            using var rnd = new RNGCryptoServiceProvider();
             rnd.GetBytes(salt);
 
             var pkbf2 = new Rfc2898DeriveBytes(password, salt, 1024, HashAlgorithmName.SHA256);

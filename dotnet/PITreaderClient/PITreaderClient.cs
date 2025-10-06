@@ -22,7 +22,6 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
 
@@ -148,6 +147,36 @@ namespace Pilz.PITreader.Client
         /// <returns></returns>
         public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string url) where TResponse : class
         {
+            ApiResponse<TResponse> response = default;
+            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                response = await this.ExecuteRequest<TResponse>(this.httpClient, request);
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Executes an HTTP GET request to the given endpoint.
+        /// </summary>
+        /// <typeparam name="TResponse">Type of the response data object.</typeparam>
+        /// <param name="url">Endpoint</param>
+        /// <param name="requestParameters">Additional get request parameters</param>
+        /// <returns></returns>
+        public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string url, IDictionary<string, string> requestParameters) where TResponse : class
+        {
+            var uriParams = new List<string>();
+            foreach (string key in requestParameters.Keys)
+            {
+                uriParams.Add($"{key}={Uri.EscapeDataString(requestParameters[key])}");
+            }
+
+            if (uriParams.Count > 0)
+            {
+                string startChar = url.Contains("?") ? "&" : "?";
+                url += startChar + string.Join("&", uriParams);
+            }
+
             ApiResponse<TResponse> response = default;
             using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {

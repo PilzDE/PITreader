@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Pilz.PITreader.Client.Model;
 
 namespace Pilz.PITreader.Configuration.Model
 {

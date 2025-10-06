@@ -12,14 +12,24 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using Pilz.PITreader.Client;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
 
-namespace Pilz.PITreader.CommissioningTool
+namespace Pilz.PITreader.Client
 {
-    internal class PITreaderInteractiveClient : PITreaderClient
+    /// <summary>
+    /// PITreader API client with interactive logon (i.e. username and password).
+    /// </summary>
+    public class PITreaderInteractiveClient : PITreaderClient
     {
+        /// <summary>
+        /// Default user name.
+        /// </summary>
         public const string DefaultUsername = "admin";
 
         private const string InteractiveLoginEndpoint = "/api/login";
@@ -27,33 +37,55 @@ namespace Pilz.PITreader.CommissioningTool
         private CookieContainer cookies = new CookieContainer();
 
         /// <inheritdoc/>
-        public PITreaderInteractiveClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate? certificateValidation = null)
+        public PITreaderInteractiveClient(string hostnameOrIp = DefaultIp, ushort portNumber = DefaultPortNumber, CertificateValidationDelegate certificateValidation = null)
             : base(hostnameOrIp, portNumber, certificateValidation)
         {
             this.httpHandler.CookieContainer = this.cookies;
             this.httpHandler.UseCookies = true;
         }
 
+        /// <inheritdoc/>
+        public PITreaderInteractiveClient(Uri uri, CertificateValidationDelegate certificateValidation = null)
+            : base(uri, certificateValidation)
+        {
+            this.httpHandler.CookieContainer = this.cookies;
+            this.httpHandler.UseCookies = true;
+        }
+
+        /// <summary>
+        /// Perform interactive login with username and password.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <returns></returns>
         public async Task<ApiResponse<GenericResponse>> LoginAsync(string username = DefaultUsername, string password = "")
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, InteractiveLoginEndpoint);
             var dict = new Dictionary<string, string>
             {
                 { "user", username },
                 { "password", password }
             };
 
-            request.Content = new FormUrlEncodedContent(dict);
-            return await this.ExecuteRequest<GenericResponse>(this.httpClient, request);
+            using (var request = new HttpRequestMessage(HttpMethod.Post, InteractiveLoginEndpoint))
+            {
+                using (var content = new FormUrlEncodedContent(dict))
+                {
+                    request.Content = content;
+                    return await this.ExecuteRequest<GenericResponse>(this.httpClient, request);
+                }
+            }
         }
 
+        /// <summary>
+        /// Overwrite for ExecuteRequest with implementation for XSRF-TOKEN header.
+        /// </summary>
+        /// <inheritdoc/>
         protected override Task<ApiResponse<T>> ExecuteRequest<T>(HttpClient client, HttpRequestMessage message)
         {
             if (message != null && message.Method == HttpMethod.Post)
             {
-                var xsrfCookie = (client.BaseAddress == null
-                    ? this.cookies.GetAllCookies()
-                    : this.cookies.GetCookies(client.BaseAddress)).FirstOrDefault(c => c.Name == "XSRF-TOKEN");
+                Cookie xsrfCookie = this.cookies.GetCookies(client.BaseAddress)
+                    .OfType<Cookie>().FirstOrDefault(c => c.Name == "XSRF-TOKEN");
 
                 if (xsrfCookie != null)
                 {

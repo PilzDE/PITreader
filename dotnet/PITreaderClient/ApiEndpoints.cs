@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Pilz.PITreader.Client.Model;
@@ -93,6 +94,21 @@ namespace Pilz.PITreader.Client
         /// User data configuration version endpoint.
         /// </summary>
         public const string ConfigUserDataVersion = "/api/config/userData/version";
+
+        /// <summary>
+        /// Device user list endpoint.
+        /// </summary>
+        public const string ConfigDeviceUsers = "/api/config/deviceUsers";
+
+        /// <summary>
+        /// Device user endpoint.
+        /// </summary>
+        public const string ConfigDeviceUser = "/api/config/deviceUser";
+
+        /// <summary>
+        /// Device user API token endpoint.
+        /// </summary>
+        public const string ConfigDeviceUserApiToken = "/api/config/deviceUser/apiToken";
 
         /// <summary>
         /// Led endpoint.
@@ -468,6 +484,102 @@ namespace Pilz.PITreader.Client
         public static Task<ApiResponse<Stream>> GetConfigurationBackup(this PITreaderClient client, Stream stream)
         {
             return client.GetFileAsync(FilesBackup, stream);
+        }
+
+        /// <summary>
+        /// Gets a list of all device users.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<DeviceUsersResponse>> GetDeviceUsers(this PITreaderClient client)
+        {
+            return client.GetAsync<DeviceUsersResponse>(ConfigDeviceUsers);
+        }
+
+        /// <summary>
+        /// Gets details of a device user.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="name">Name of the device user.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<DeviceUserResponse>> GetDeviceUser(this PITreaderClient client, string name)
+        {
+            return client.GetAsync<DeviceUserResponse>(ConfigDeviceUser, new Dictionary<string, string> { { "name", name } });
+        }
+
+        /// <summary>
+        /// Creates a new device user with given name.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="name">Name of the device user.</param>
+        /// <param name="data">Data of the new device user.</param>
+        /// <returns></returns>
+        public static async Task<ApiResponse<GenericResponse>> CreateDeviceUser(this PITreaderClient client, string name, DeviceUserRequestData data)
+        {
+            var response = await client.PostAsync<GenericResponse, DeviceUserRequest>(
+                ConfigDeviceUser,
+                new DeviceUserRequest
+                {
+                    Action = CrudAction.Create,
+                    Id = name
+                });
+
+            if (!response.Success)
+            {
+                return response;
+            }
+
+            return await client.PostAsync<GenericResponse, DeviceUserRequest>(
+                ConfigDeviceUser,
+                new DeviceUserRequest
+                {
+                    Action = CrudAction.Edit,
+                    Id = name,
+                    Data = data
+                });
+        }
+
+        /// <summary>
+        /// Update a device user.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="name">Name of the device user.</param>
+        /// <param name="data">Data of the device user.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> UpdateDeviceUser(this PITreaderClient client, string name, DeviceUserRequestData data)
+        {
+            return client.PostAsync<GenericResponse, DeviceUserRequest>(
+                ConfigDeviceUser,
+                new DeviceUserRequest
+                {
+                    Action = CrudAction.Edit,
+                    Id = name,
+                    Data = data
+                });
+        }
+
+        /// <summary>
+        /// Deletes a device user.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="name">Name of the device user.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse>> DeleteDeviceUser(this PITreaderClient client, string name)
+        {
+            return client.PostAsync<GenericResponse, DeviceUserRequest>(
+                ConfigDeviceUser,
+                new DeviceUserRequest { Action = CrudAction.Delete, Id = name });
+        }
+
+        /// <summary>
+        /// Renews the API token of a device user.
+        /// </summary>
+        /// <param name="client">PITreader client instance.</param>
+        /// <param name="name">Name of the device user.</param>
+        /// <returns></returns>
+        public static Task<ApiResponse<GenericResponse<ApiTokenResponseData>>> RenewApiToken(this PITreaderClient client, string name)
+        {
+            return client.PostAsync<GenericResponse<ApiTokenResponseData>, ApiTokenRenewRequest>(ConfigDeviceUserApiToken, new ApiTokenRenewRequest { Name = name });
         }
     }
 }
