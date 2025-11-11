@@ -369,7 +369,10 @@ namespace Pilz.PITreader.Client
             }
             catch (HttpRequestException exception)
             {
-                return ApiResponse<T>.Error("HttpRequestException calling the API: " + exception.Message, false);
+                bool certificateError = false;
+                certificateError |= exception.InnerException is WebException webException && webException.Status == WebExceptionStatus.TrustFailure;
+                certificateError |= exception.InnerException is System.Security.Authentication.AuthenticationException;
+                return ApiResponse<T>.Error("HttpRequestException calling the API: " + exception.Message, false, certificateError: certificateError);
             }
             catch (JsonException exception)
             {

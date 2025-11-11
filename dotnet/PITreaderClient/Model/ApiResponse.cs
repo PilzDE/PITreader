@@ -36,17 +36,22 @@ namespace Pilz.PITreader.Client.Model
         public bool Retryable { get; set; }
 
         /// <summary>
+        /// Indicates a problem with the TLS certificate (untrusted).
+        /// </summary>
+        public bool CertificateError { get; set; }
+
+        /// <summary>
         /// Response code returned by the PITreader.
         /// </summary>
         public ResponseCode ResponseCode { get; set; }
 
         /// <summary>
-        /// The Data element is filled with the response on successfull requests.
+        /// The Data element is filled with the response on successful requests.
         /// </summary>
         public T Data { get; set; }
 
         /// <summary>
-        /// The ErrorData element is filled with the response on not successfull requests.
+        /// The ErrorData element is filled with the response on not successful requests.
         /// It is always of type GenericResponse.
         /// </summary>
         public GenericResponse ErrorData { get; set; }
@@ -115,13 +120,15 @@ namespace Pilz.PITreader.Client.Model
         /// <param name="message">Message text.</param>
         /// <param name="retry">Possibility to retry request.</param>
         /// <param name="code">Response code.</param>
+        /// <param name="certificateError">Indicate an error with the TLS certificate (untrusted).</param>
         /// <returns></returns>
-        public static ApiResponse<T> Error(string message, bool retry, ResponseCode? code = null)
+        public static ApiResponse<T> Error(string message, bool retry, ResponseCode? code = null, bool certificateError = false)
         {
             return new ApiResponse<T>
             {
                 Success = false,
                 Retryable = retry,
+                CertificateError = certificateError,
                 ResponseCode = code ?? ResponseCode.Unknown,
                 ErrorData = new GenericResponse { Success = false, Message = message }
             };

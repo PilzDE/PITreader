@@ -43,6 +43,7 @@ namespace Pilz.PITreader.Client
         /// <summary>
         /// Accept only the certificates with the specified SHA2 thumbprint.
         /// </summary>
+        /// <exception cref="ArgumentException">thumbprint has invalid format.</exception>
         public static Func<string, CertificateValidationDelegate> AcceptThumbprintSha2 = (string thumbprint) =>
         {
             byte[] thumbprintRaw = thumbprint.HexStringToByteArray();

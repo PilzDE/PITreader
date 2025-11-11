@@ -600,6 +600,7 @@
             <summary>
             Accept only the certificates with the specified SHA2 thumbprint.
             </summary>
+            <exception cref="T:System.ArgumentException">thumbprint has invalid format.</exception>
         </member>
         <member name="T:Pilz.PITreader.Client.ExternalAuthService">
             <summary>
@@ -745,6 +746,11 @@
             Request can be retried.
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.CertificateError">
+            <summary>
+            Indicates a problem with the TLS certificate (untrusted).
+            </summary>
+        </member>
         <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.ResponseCode">
             <summary>
             Response code returned by the PITreader.
@@ -752,12 +758,12 @@
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.Data">
             <summary>
-            The Data element is filled with the response on successfull requests.
+            The Data element is filled with the response on successful requests.
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ApiResponse`1.ErrorData">
             <summary>
-            The ErrorData element is filled with the response on not successfull requests.
+            The ErrorData element is filled with the response on not successful requests.
             It is always of type GenericResponse.
             </summary>
         </member>
@@ -789,13 +795,14 @@
             <param name="data">Response data object</param>
             <returns></returns>
         </member>
-        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Error(System.String,System.Boolean,System.Nullable{Pilz.PITreader.Client.Model.ResponseCode})">
+        <member name="M:Pilz.PITreader.Client.Model.ApiResponse`1.Error(System.String,System.Boolean,System.Nullable{Pilz.PITreader.Client.Model.ResponseCode},System.Boolean)">
             <summary>
             Creates a new ApiResponse{T} instance on errors.
             </summary>
             <param name="message">Message text.</param>
             <param name="retry">Possibility to retry request.</param>
             <param name="code">Response code.</param>
+            <param name="certificateError">Indicate an error with the TLS certificate (untrusted).</param>
             <returns></returns>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.ApiTokenRenewRequest">
