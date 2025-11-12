@@ -36,9 +36,9 @@ namespace Pilz.PITreader.Client.Model
         public bool Retryable { get; set; }
 
         /// <summary>
-        /// Indicates a problem with the TLS certificate (untrusted).
+        /// Information about failed requests.
         /// </summary>
-        public bool CertificateError { get; set; }
+        public ApiResponseFailure FailureReason { get; set; }
 
         /// <summary>
         /// Response code returned by the PITreader.
@@ -105,10 +105,15 @@ namespace Pilz.PITreader.Client.Model
         /// <returns></returns>
         public static ApiResponse<T> Error(HttpStatusCode statusCode, bool retry, GenericResponse data)
         {
+            ApiResponseFailure failureReason = ((int)statusCode >= 400 && (int)statusCode <= 599)
+                ? ApiResponseFailure.StatusCode
+                : ApiResponseFailure.Unspecified;
+
             return new ApiResponse<T>
             {
                 Success = false,
                 Retryable = retry,
+                FailureReason = failureReason,
                 ResponseCode = Enum.IsDefined(typeof(ResponseCode), ((int)statusCode)) ? (ResponseCode)statusCode : ResponseCode.Unknown,
                 ErrorData = data
             };
@@ -120,15 +125,15 @@ namespace Pilz.PITreader.Client.Model
         /// <param name="message">Message text.</param>
         /// <param name="retry">Possibility to retry request.</param>
         /// <param name="code">Response code.</param>
-        /// <param name="certificateError">Indicate an error with the TLS certificate (untrusted).</param>
+        /// <param name="failureReason">Provides details about the failure</param>
         /// <returns></returns>
-        public static ApiResponse<T> Error(string message, bool retry, ResponseCode? code = null, bool certificateError = false)
+        public static ApiResponse<T> Error(string message, bool retry, ResponseCode? code = null, ApiResponseFailure failureReason = ApiResponseFailure.Unspecified)
         {
             return new ApiResponse<T>
             {
                 Success = false,
                 Retryable = retry,
-                CertificateError = certificateError,
+                FailureReason = failureReason,
                 ResponseCode = code ?? ResponseCode.Unknown,
                 ErrorData = new GenericResponse { Success = false, Message = message }
             };

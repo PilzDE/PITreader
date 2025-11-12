@@ -372,23 +372,23 @@ namespace Pilz.PITreader.Client
                 bool certificateError = false;
                 certificateError |= exception.InnerException is WebException webException && webException.Status == WebExceptionStatus.TrustFailure;
                 certificateError |= exception.InnerException is System.Security.Authentication.AuthenticationException;
-                return ApiResponse<T>.Error("HttpRequestException calling the API: " + exception.Message, false, certificateError: certificateError);
+                return ApiResponse<T>.Error("HttpRequestException calling the API: " + exception.Message, false, failureReason: ApiResponseFailure.Certificate);
             }
             catch (JsonException exception)
             {
-                return ApiResponse<T>.Error("Error in JSON deserialization: " + exception.Message, true);
+                return ApiResponse<T>.Error("Error in JSON deserialization: " + exception.Message, true, failureReason: ApiResponseFailure.ContentEncoding);
             }
             catch (NotImplementedException exception)
             {
-                return ApiResponse<T>.Error("Error in JSON deserialization: " + exception.Message, true);
+                return ApiResponse<T>.Error("Error in JSON deserialization: " + exception.Message, true, failureReason: ApiResponseFailure.ContentEncoding);
             }
             catch (TimeoutException exception)
             {
-                return ApiResponse<T>.Error("TimeoutException during call to API: " + exception.Message, true);
+                return ApiResponse<T>.Error("TimeoutException during call to API: " + exception.Message, true, failureReason: ApiResponseFailure.Timeout);
             }
             catch (OperationCanceledException exception)
             {
-                return ApiResponse<T>.Error("Task was canceled during call to API: " + exception.Message, true);
+                return ApiResponse<T>.Error("Task was canceled during call to API: " + exception.Message, true, failureReason: ApiResponseFailure.Timeout);
             }
             catch (Exception exception)
             {
@@ -431,23 +431,26 @@ namespace Pilz.PITreader.Client
             }
             catch (HttpRequestException exception)
             {
-                return ApiResponse<Stream>.Error("HttpRequestException calling the API: " + exception.Message, false);
+                bool certificateError = false;
+                certificateError |= exception.InnerException is WebException webException && webException.Status == WebExceptionStatus.TrustFailure;
+                certificateError |= exception.InnerException is System.Security.Authentication.AuthenticationException;
+                return ApiResponse<Stream>.Error("HttpRequestException calling the API: " + exception.Message, false, failureReason: ApiResponseFailure.Certificate);
             }
             catch (JsonException exception)
             {
-                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true);
+                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true, failureReason: ApiResponseFailure.ContentEncoding);
             }
             catch (NotImplementedException exception)
             {
-                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true);
+                return ApiResponse<Stream>.Error("Error in JSON deserialization: " + exception.Message, true, failureReason: ApiResponseFailure.ContentEncoding);
             }
             catch (TimeoutException exception)
             {
-                return ApiResponse<Stream>.Error("TimeoutException during call to API: " + exception.Message, true);
+                return ApiResponse<Stream>.Error("TimeoutException during call to API: " + exception.Message, true, failureReason: ApiResponseFailure.Timeout);
             }
             catch (OperationCanceledException exception)
             {
-                return ApiResponse<Stream>.Error("Task was canceled during call to API: " + exception.Message, true);
+                return ApiResponse<Stream>.Error("Task was canceled during call to API: " + exception.Message, true, failureReason: ApiResponseFailure.Timeout);
             }
             catch (Exception exception)
             {
