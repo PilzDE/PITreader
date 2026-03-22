@@ -1,21 +1,23 @@
-[![PILZ](doc/pilz-logo.png)](https://www.pilz.com)
+[![PILZ](images/pilz-logo.png)](https://www.pilz.com)
 
 # PILZ PITreader Client Libraries and Examples
 
 PILZ [PITreader](https://www.pilz.com/en-INT/iam) devices are RFID based authentication systems for implementation of industrial access management.
 
-[![PILZ PITreader](doc/pitreader_ptm.png)](https://www.pilz.com/en-INT/iam)
+[![PILZ PITreader](images/pitreader_ptm.png)](https://www.pilz.com/en-INT/iam)
 
 The devices implement three interfaces for integration into other systems:
 - REST API (HTTPS)
 - Modbus/TCP
-- OPC UA Server (only "PITreader S" and "PIT gb RLLE" variants)
+- OPC UA Server (only "PITreader S" and "PIT gb RLLE/QLLE" variants)
 
 This repository contains libraries to connect to the device using the HTTPS REST API and example client applications.
 
 ## Documentation
 
-Documentation about the features of the device and publicly available APIs is available in the download section:
+[doc/](doc/) contains information about all APIs of the device with [OPC UA](doc/opcua.md) [xml namespace files](doc/opcua/), an [OpenAPI yaml](doc/restapi_openapi.yaml) file for the [REST API](doc/restapi.md) and a description of the [Modbus/TCP Server](doc/modbustcp.md).
+
+Additionally the offical documentation about the features of the device and publicly available APIs is available in the download section on pilz.com:
 
 - [Operating Manual for PITreader devices](https://www.pilz.com/en-INT/search#SEARCH=1004806&pilz_group_type=download)
 - [Operating Manual for the REST API of PITreader devices](https://www.pilz.com/en-INT/search#SEARCH=1005365&pilz_group_type=download)

@@ -1,0 +1,3708 @@
+openapi: 3.0.3
+
+info:
+  title: Pilz PITreader REST API
+  description: |
+    REST API for the Pilz PITreader transponder reader device.
+    Firmware Version: 02.03.00
+
+    ## Authentication
+    All requests must include a Bearer token in the `Authorization` header:
+    ```
+    Authorization: Bearer <16-byte API token>
+    ```
+    API tokens are generated in the PITreader web application under *User -> Device users*.
+    An API Client corresponds to a device user with the authentication type "API token".
+    The token is a random 16-byte value whose function corresponds to that of a password
+    and must be handled with the same level of care.
+
+    ## Roles
+    A role must be assigned to every API Client. The role determines its access rights.
+
+    | Role Name           | Role Number | Remark                     |
+    |---------------------|-------------|----------------------------|
+    | Administrator       | 500         | Full access                |
+    | Device manager      | 400         | Configuration access       |
+    | Transponder manager | 200         | Transponder/list access    |
+    | Guest (read-only)   | 10          | Read access only           |
+
+    If the role number of the API Client is lower than the minimum required by an endpoint,
+    the web server responds with HTTP 403.
+
+    ## Response format
+    All responses use `Content-Type: application/json`.
+
+    **GET 200 responses** return only the endpoint-specific fields documented for that
+    endpoint — there is no `msg`/`success`/`data` wrapper.
+
+    **POST 200 responses** return exclusively the three generic fields:
+    - `msg` (string) - empty string `""` on success, may contain an error code on failure
+    - `data` (object|null) - additional result detail or `null`; endpoint-specific content
+      is documented per endpoint
+    - `success` (boolean) - `true`
+
+    **Error responses (400 / 403 / 500)** always use the generic fields regardless of method,
+    with `success: false`. The `msg` field may contain an `API.error*` code string
+    for certain endpoints (documented per endpoint).
+
+    ## Connections
+    Only HTTPS connections are accepted (default port 443).
+    HTTP connections on port 80 are redirected to HTTPS via HTTP 301.
+    The recommended maximum request rate is 2 requests per second.
+
+    ## Compatibility
+    If the major firmware version (first digit of the three-part version number) does not
+    change, a firmware update is downward-compatible: all existing endpoints, request
+    parameters and response fields remain available.
+
+  version: "02.03.00"
+  contact:
+    name: Pilz GmbH & Co. KG
+    url: https://www.pilz.com
+
+servers:
+  - url: https://192.168.0.12:443
+    description: Default PITreader device address (factory default IP)
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: >
+        API token generated in the PITreader web application
+        (User -> Device users). Treat the token with the same care as a password.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Shared schemas
+  # ────────────────────────────────────────────────────────────────────────────
+  schemas:
+
+    # ── POST / error response ─────────────────────────────────────────────────
+
+    GenericResponse:
+      description: >
+        Standard body returned by all POST endpoints on success (HTTP 200) and
+        by all endpoints on error (HTTP 400, 403, 500).
+      type: object
+      properties:
+        msg:
+          type: string
+          description: >
+            Empty string on success. On HTTP 400 certain endpoints populate this
+            field with a specific API error code string (e.g. `API.errorInvalidSecurityId`);
+            see individual endpoint descriptions for the possible values.
+        data:
+          nullable: true
+          description: >
+            Additional result data specific to the endpoint, or `null`.
+            POST /api/config uses this field to signal whether a device reboot occurred.
+            All other POST endpoints return `null` here on success.
+        success:
+          type: boolean
+          description: "`true` on HTTP 200, `false` on HTTP 400 / 403 / 500."
+
+    GenericResponseWithReboot:
+      description: >
+        Response body for POST /api/config. Identical to GenericResponse except
+        that the `data` field carries a reboot indicator on HTTP 200.
+      type: object
+      properties:
+        msg:
+          type: string
+          description: >
+            Empty string on success.
+            On HTTP 400 one of the following error codes is returned:
+            `API.errorLocation`, `API.errorDeviceGroup`,
+            `API.errorEvaluateTimeLimitation`, `API.errorTimeZone`,
+            `API.errorRealTimeClock`.
+        data:
+          nullable: true
+          description: >
+            On HTTP 200 contains `{"reboot": true}` if the configuration change
+            caused an automatic device reboot, or `{"reboot": false}` if no reboot
+            was necessary. `null` on error responses.
+          type: object
+          properties:
+            reboot:
+              type: boolean
+              description: >
+                `true` if the device rebooted as a result of the configuration change;
+                `false` if the change was applied without a reboot.
+        success:
+          type: boolean
+          description: "`true` on HTTP 200, `false` on HTTP 400 / 403 / 500."
+
+    # ── Reusable sub-schemas ──────────────────────────────────────────────────
+
+    UserDataParameterValue:
+      description: >
+        A single user-data parameter value as returned in authentication status
+        and transponder userData responses.
+      type: object
+      properties:
+        id:
+          type: number
+          description: >
+            Parameter ID as defined in the user data configuration (1 … 65535).
+        numericValue:
+          type: number
+          description: >
+            Numeric value of the parameter. Present only for numeric type IDs:
+            10 (INT8U), 11 (INT8S), 12 (INT16U), 13 (INT16S), 14 (INT32U),
+            15 (INT32S), or 30 (PERMISSION).
+        stringValue:
+          type: string
+          description: >
+            String value of the parameter. Present only for type ID 1 (STRING)
+            or type ID 20 (DATETIME). DATETIME values use RFC 3339 UTC format
+            (e.g. `2018-06-28T00:00:00Z`); an empty string represents an unset date.
+
+    UserDataParameterDefinition:
+      description: A single parameter definition entry in the user data configuration.
+      type: object
+      properties:
+        id:
+          type: number
+          description: >
+            Parameter ID (1 … 65535). Pre-defined system IDs have fixed type
+            requirements (e.g. ID 1 must always be type 30 PERMISSION;
+            IDs 2 and 3 must be type 20 DATETIME).
+        name:
+          type: string
+          description: >
+            Human-readable parameter name. UTF-8 string, 1 … 63 characters.
+        type:
+          type: number
+          enum: [1, 10, 11, 12, 13, 14, 15, 20, 30, 31]
+          description: >
+            Type ID (data type identifier).
+            1=STRING (2…255 bytes), 10=INT8U (0…255), 11=INT8S (-128…127),
+            12=INT16U (0…65535), 13=INT16S (-32768…32767),
+            14=INT32U (0…4294967295), 15=INT32S (-2147483648…2147483647),
+            20=DATETIME (RFC 3339 UTC string or empty), 30=PERMISSION (Hamming-coded 0…64),
+            31=BIT (0 or 1).
+        size:
+          type: number
+          description: >
+            Maximum storage length in bytes for a STRING parameter (type ID 1).
+            Value range: 2 … 255. The value equals the maximum number of UTF-8
+            characters plus 1 for the null terminator. Only present for type ID 1.
+
+    # ── GET response schemas ──────────────────────────────────────────────────
+
+    StatusResponse:
+      description: >
+        Response body for GET /api/status (HTTP 200).
+        When the request is made without a valid API token (no authentication),
+        a reduced field set is returned: `serialNo`, `fwVersion`, `hwVersion`,
+        and `realTimeClock` are absent. All other fields are present in both cases.
+      type: object
+      properties:
+        hostName:
+          type: string
+          description: Hostname / name of the device as configured in the web application.
+        ipAddress:
+          type: string
+          description: Currently active IP address of the device.
+        orderNo:
+          type: string
+          description: Order number (article number) of the device.
+        productType:
+          type: string
+          description: Product name of the device (e.g. "PITreader S").
+        serialNo:
+          type: number
+          description: >
+            Serial number of the device.
+            Only present when authenticated with role ≥ 10 (Guest).
+        macAddress:
+          type: string
+          description: >
+            MAC address of the device network interface.
+            Format: `00:00:00:00:00:00`.
+        seuStatus:
+          type: boolean
+          description: >
+            Connection status between a PIT m4SEU safety evaluation unit and this PITreader.
+            `true` = an active connection exists; `false` = no connection.
+        coded:
+          type: boolean
+          description: >
+            Basic coding status of the PITreader.
+            `true` = a basic coding identifier is stored on the device;
+            `false` = no basic coding identifier is stored.
+        codedOem:
+          type: boolean
+          description: >
+            OEM coding status of the PITreader.
+            `true` = an OEM coding identifier is stored on the device;
+            `false` = no OEM coding identifier is stored.
+        transponderAuthenticated:
+          type: boolean
+          description: >
+            Current authentication status of the transponder in the read area.
+            `true` = the transponder was successfully authenticated;
+            `false` = the transponder was not authenticated or no transponder is present.
+        fwVersion:
+          type: string
+          description: >
+            Firmware version of the device. Format: `MM.mm.pp` (e.g. `02.03.00`).
+            Only present when authenticated with role ≥ 10 (Guest).
+        hwVersion:
+          type: string
+          description: >
+            Hardware version of the PITreader. Format: `MM.mm` (e.g. `01.00`).
+            Only present when authenticated with role ≥ 10 (Guest).
+        hwVariant:
+          type: number
+          description: Hardware variant / type identifier of the PITreader.
+        realTimeClock:
+          type: string
+          description: >
+            Current date and time of the device stated in UTC format (RFC 3339).
+            Example: `2018-06-28T00:39:53Z`.
+            Only present when authenticated with role ≥ 10 (Guest).
+        released:
+          type: boolean
+          description: >
+            `true` if the firmware is an officially released version;
+            `false` for pre-release or development firmware.
+        ioPortMode:
+          type: string
+          enum: [input, output]
+          description: >
+            Current configuration of the 24 V I/O port.
+            `input` = port is configured as an input (block authentication signal);
+            `output` = port is configured as an output (authentication status signal).
+        ioPortValue:
+          type: number
+          enum: [0, 1]
+          description: >
+            Current signal level at the 24 V I/O port.
+            `0` = low signal (0 V); `1` = high signal (24 V).
+        tlsFingerprintVerification:
+          type: number
+          description: >
+            TLS certificate fingerprint verification code. Used to verify the
+            server certificate during initial connection setup.
+
+    ConfigResponse:
+      description: Response body for GET /api/config (HTTP 200). Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        hostName:
+          type: string
+          description: >
+            Hostname / name of the device. Valid characters: a-z, A-Z, 0-9, `-`.
+            First character must be a letter; last character may not be a hyphen.
+            Length: 1 … 63 bytes.
+        location:
+          type: string
+          description: >
+            Free-text location description of the device (e.g. "Machine hall A, line 3").
+            UTF-8 or printable ASCII; max 47 bytes (multi-byte UTF-8 characters reduce
+            the effective character limit).
+        domain:
+          type: string
+          description: >
+            Domain name used in the HTTPS server certificate.
+            Valid characters: a-z, A-Z, 0-9, `-`, `.`.
+            First character must be a letter; last character may not be a hyphen or dot.
+            Length: 0 … 63 bytes.
+        ipAddress:
+          type: string
+          description: >
+            IP address of the device. Not in the reserved ranges
+            0.0.0.0/8, 127.0.0.0/8 or 224.0.0.0/4.
+        subnetMask:
+          type: string
+          description: >
+            Subnet mask of the device in dotted-decimal notation.
+            Must be a valid contiguous mask (starts with 1-bits, ends with 0-bits,
+            switches from 1 to 0 exactly once in binary representation).
+        defaultGateway:
+          type: string
+          description: >
+            IP address of the standard gateway. Must be in the same subnet as `ipAddress`.
+            Not in the reserved ranges 0.0.0.0/8, 127.0.0.0/8 or 224.0.0.0/4.
+        httpPort:
+          type: number
+          description: >
+            HTTP port number. Default: 80. Range: 1 … 65535.
+            Must differ from `httpsPort` and `modbusTcpPort`.
+        httpEnabled:
+          type: boolean
+          description: >
+            HTTP port status. `true` = HTTP port is enabled on the device;
+            `false` = HTTP port is disabled. Note: HTTP connections are always
+            redirected to HTTPS regardless of this setting.
+        httpsPort:
+          type: number
+          description: >
+            HTTPS port number. Default: 443. Range: 1 … 65535.
+            Must differ from `httpPort` and `modbusTcpPort`.
+        networkDiscoveryEnabled:
+          type: boolean
+          description: >
+            Multicast DNS (mDNS) network discovery.
+            `true` = enabled (device is discoverable on the local network via mDNS);
+            `false` = disabled.
+        multicastConfEnabled:
+          type: boolean
+          description: >
+            Network configuration via Multicast protocol.
+            `true` = enabled; `false` = disabled.
+        sntpEnabled:
+          type: boolean
+          description: >
+            SNTP time synchronisation status.
+            `true` = SNTP is enabled and the device polls an NTP server;
+            `false` = SNTP is disabled.
+        sntpServer:
+          type: string
+          description: >
+            IP address of the SNTP (NTP) server used for time synchronisation.
+        sntpPort:
+          type: number
+          description: >
+            Port number of the SNTP server. Range: 1 … 65535. Standard NTP port is 123.
+        sntpRefreshRate:
+          type: number
+          description: >
+            Interval in minutes at which the PITreader polls the SNTP server.
+            Range: 5 … 10080 (1 week).
+        modbusTcpEnabled:
+          type: boolean
+          description: >
+            Modbus/TCP Slave status.
+            `true` = Modbus/TCP Slave is enabled on the device;
+            `false` = Modbus/TCP Slave is disabled.
+        modbusTcpPort:
+          type: number
+          description: >
+            Port number of the Modbus/TCP Slave. Range: 1 … 65535.
+            Must differ from `httpPort` and `httpsPort`.
+        supportThirdParty:
+          type: boolean
+          description: >
+            Third-party transponder support.
+            `true` = the device reads transponders from third-party manufacturers
+            in addition to Pilz transponders; `false` = only Pilz transponders.
+        rfidProtocols:
+          type: array
+          items:
+            type: number
+            enum: [0, 2, 3, 16]
+          description: >
+            RFID protocol(s) used to detect third-party transponders.
+            Only one value may be set at a time.
+            `0` = ISO/IEC 14443-A; `2` = ISO/IEC 15693; `3` = FeliCa (ISO 18092);
+            `16` = MIFARE DESFire with PITreader data structure.
+            If `supportThirdParty` is `false`, this array must contain `[0]`.
+        authenticationMode:
+          type: number
+          enum: [0, 1, 2, 3]
+          description: >
+            Active authentication mode of the device.
+            `0` = External (permission set via REST API by an external client);
+            `1` = Transponder data (permission read from transponder memory);
+            `2` = Permission list (permission looked up in the device's permission list);
+            `3` = Fixed permission (all authenticated transponders receive the same
+            fixed permission value).
+        fixedPermission:
+          type: number
+          description: >
+            Fixed permission value used when `authenticationMode` = 3 ("Fixed permission").
+            Hamming-coded (HD9); valid permission codes are listed in section 7 of the manual.
+        allowExternalOverride:
+          type: boolean
+          description: >
+            Allow external overwrite of the authentication result via the REST API.
+            `true` = regardless of the active authentication mode, the permission for
+            the device group and the user data can be overwritten externally via
+            POST /api/status/authentication; `false` = overwrite is not permitted.
+        syncMonitoringEnabled:
+          type: boolean
+          description: >
+            Synchronisation monitoring with external data sources (e.g. PIT User Authentication Service).
+            `true` = the device monitors that synchronisation occurs within `syncTimeout` minutes;
+            `false` = synchronisation is not monitored.
+        syncTimeout:
+          type: number
+          description: >
+            Maximum permitted interval between two synchronisations in minutes.
+            If no synchronisation occurs within this timeout and `syncMonitoringEnabled` is `true`,
+            authentication is locked. Range: 5 … 4320 (3 days).
+        deviceGroup:
+          type: number
+          description: >
+            Device group number of this device, used in authentication mode `1`
+            (Transponder data). The transponder's permission for this device group
+            determines whether access is granted. Range: 0 … 9999.
+        ioPortFunction:
+          type: number
+          enum: [0, 1, 2]
+          description: >
+            Configured function of the 24 V I/O port.
+            `0` = no function (port unused);
+            `1` = authentication status output (port goes high when transponder is authenticated
+            with permission ≥ `ioPortPermission`);
+            `2` = block authentication input (a high signal on the port prevents authentication).
+        ioPortPermission:
+          type: number
+          description: >
+            Minimum transponder permission required to activate the 24 V I/O output
+            (only relevant when `ioPortFunction` = 1).
+            If the transponder's permission is equal to or greater than this value,
+            the output assumes the high state.
+            Hamming-coded (HD9); range: 1 … 64.
+        evaluateTimeLimitation:
+          type: boolean
+          description: >
+            Controls whether the transponder's validity period (start date "Valid from"
+            and end date "Valid until") is evaluated during authentication.
+            `true` = dates are evaluated; a transponder outside its validity period
+            is not authenticated;
+            `false` = validity dates are ignored.
+        timeZone:
+          type: string
+          description: >
+            Name of the active time zone as used in the web application
+            (e.g. `Europe/Berlin`). The full list of valid values is in section 9 of
+            the operating manual.
+        logPersonalData:
+          type: boolean
+          description: >
+            Controls recording of personal data (transponder security IDs and serial numbers)
+            in the diagnostic list and diagnostic log.
+            `true` = personal data is recorded; `false` = personal data is not recorded.
+        authenticationType:
+          type: number
+          enum: [0, 1, 2]
+          description: >
+            Active authentication type.
+            `0` = Basic (standard single-transponder authentication);
+            `1` = Single authentication (a transponder locks the reader once authenticated;
+            a second presentation of the same transponder unlocks it);
+            `2` = 2-person rule (two different transponders must be presented within a
+            defined time window for authentication to succeed).
+
+    CodingResponse:
+      description: >
+        Response body for GET /api/config/coding and GET /api/config/coding/oem (HTTP 200).
+        Returns the current coding status of the device.
+      type: object
+      properties:
+        activated:
+          type: boolean
+          description: >
+            Coding status of the device.
+            For /api/config/coding: `true` = a basic coding identifier is stored;
+            `false` = no basic coding identifier is stored.
+            For /api/config/coding/oem: `true` = an OEM coding identifier is stored;
+            `false` = no OEM coding identifier is stored.
+        checksum:
+          type: string
+          description: >
+            Checksum of the stored coding identifier as a 16-byte hexadecimal string.
+            Format: `00:00.00:00` (colon- and dot-separated hex byte pairs).
+            Can be used to verify that the correct coding identifier is configured
+            without exposing the identifier itself.
+        comment:
+          type: string
+          description: >
+            Optional human-readable comment about the coding identifier,
+            as set via the corresponding POST endpoint.
+
+    BlocklistItem:
+      description: A single entry in the transponder block list.
+      type: object
+      properties:
+        id:
+          type: string
+          description: >
+            Security ID of the locked (blocked) transponder.
+            Hexadecimal string (e.g. `309A68BACCA44C30`).
+        comment:
+          type: string
+          description: >
+            Optional free-text comment explaining why this transponder was blocked
+            (e.g. "Lost 2021-01-19"). Max 32 bytes (UTF-8).
+
+    BlocklistResponse:
+      description: >
+        Response body for GET /api/config/blocklist (HTTP 200).
+        Returns all entries currently in the device's block list.
+        Requires role ≥ 200 (Transponder manager).
+      type: object
+      properties:
+        items:
+          type: array
+          description: >
+            Array of all blocked transponder entries. Empty array if no transponders
+            are blocked. The list may contain at most 1000 entries.
+          items:
+            $ref: '#/components/schemas/BlocklistItem'
+
+    PermissionListItem:
+      description: A single entry in the transponder permission list.
+      type: object
+      properties:
+        id:
+          type: string
+          description: >
+            Security ID of the transponder.
+            Hexadecimal string (e.g. `309A68BACCA44C30`).
+        permission:
+          type: number
+          description: >
+            Permission assigned to this transponder.
+            Hamming-coded (HD9); valid permission codes are listed in section 7
+            of the operating manual.
+
+    PermissionListResponse:
+      description: >
+        Response body for GET /api/config/permissionList (HTTP 200).
+        Returns all entries currently in the device's permission list.
+        Requires role ≥ 200 (Transponder manager).
+      type: object
+      properties:
+        items:
+          type: array
+          description: >
+            Array of all permission list entries. Empty array if no entries exist.
+            The list may contain at most 1000 entries; each security ID may appear only once.
+          items:
+            $ref: '#/components/schemas/PermissionListItem'
+
+    DeviceGroupItem:
+      description: A single device group name entry.
+      type: object
+      properties:
+        name:
+          type: string
+          description: >
+            Name of the device group (e.g. "Lathes, Hall 15"), or the group index
+            number as a string if no name has been assigned.
+            UTF-8 string, max 47 bytes.
+
+    DeviceGroupsResponse:
+      description: >
+        Response body for GET /api/config/devicegroups (HTTP 200).
+        Returns the names of the device groups to which this device is assigned.
+        Requires role ≥ 10 (Guest).
+        Note: this endpoint cannot assign the device to groups; it only reads/sets names.
+      type: object
+      properties:
+        items:
+          type: array
+          description: >
+            Array of up to 32 device group entries (G0 … G31), each containing
+            the group name or its index number.
+          items:
+            $ref: '#/components/schemas/DeviceGroupItem'
+
+    CustomKeyEntry:
+      description: >
+        An AES key entry as returned by GET /api/config/customKeys.
+        The actual key material is never returned; only the checksum and diversification
+        string are readable.
+      type: object
+      properties:
+        type:
+          type: integer
+          description: >
+            Key type identifier.
+            `0` = None (no key configured);
+            `1` = Application Master Key;
+            `2` = Application User Key;
+            `4` = PICC Master Key;
+            `16` = Transport Key.
+        checksum:
+          type: string
+          description: >
+            Checksum of the AES key as a 16-byte hexadecimal string.
+            Format: `00:00..00:00`. Used to verify the correct key is loaded.
+        div:
+          type: string
+          description: >
+            Diversification string used for dynamic key generation from the base key.
+            Up to 62 characters, hexadecimal (0-9, A-F, a-f).
+            May contain the placeholder `$UID` which is replaced at runtime with
+            the transponder's UID to create a unique per-transponder key.
+
+    AdditionalKeyEntry:
+      description: >
+        An additional AES key entry (Application Default Key) as returned by
+        GET /api/config/customKeys.
+      type: object
+      properties:
+        type:
+          type: integer
+          description: >
+            Key type. Currently only `1` = Application Default Key is supported.
+        checksum:
+          type: string
+          description: >
+            Checksum of the Application Default Key as a 16-byte hexadecimal string.
+            Format: `00:00..00:00`.
+
+    CustomKeysResponse:
+      description: >
+        Response body for GET /api/config/customKeys (HTTP 200).
+        Returns checksum and diversification data for all configured custom AES keys.
+        The actual key material is never exposed. Requires role ≥ 400 (Device manager).
+      type: object
+      properties:
+        key1:
+          description: >
+            Primary custom AES key (memory area 1). Used as Application Master Key,
+            Application User Key, PICC Master Key, or Transport Key depending on `type`.
+          $ref: '#/components/schemas/CustomKeyEntry'
+        key2:
+          description: >
+            Secondary custom AES key (memory area 2). Can only be set together with key1;
+            setting key1 alone automatically deletes key2.
+          $ref: '#/components/schemas/CustomKeyEntry'
+        additionalKeys:
+          type: array
+          description: >
+            Array of additional keys (Application Default Keys). At most one entry
+            with type 1 is currently supported.
+          items:
+            $ref: '#/components/schemas/AdditionalKeyEntry'
+
+    AuthStatusResponse:
+      description: >
+        Response body for GET /api/status/authentication (HTTP 200).
+        Returns the current authentication status of the transponder in the read area.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+          description: >
+            Overall authentication result.
+            `true` = the transponder was successfully authenticated;
+            `false` = authentication failed or no transponder is present.
+        permission:
+          type: number
+          description: >
+            The authenticated permission value (Hamming-coded, HD9).
+            This is the permission that was granted to the transponder after
+            successful authentication. `0` if not authenticated.
+        authenticationStatus:
+          type: number
+          enum: [0, 1, 2]
+          description: >
+            Current state of the authentication process.
+            `0` = no transponder in the read area;
+            `1` = authentication process completed (result in `authenticated`);
+            `2` = waiting for external authentication
+            (authentication mode "External" and no POST to /api/status/authentication yet).
+        failureReason:
+          type: number
+          enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+          description: >
+            Reason code for a failed authentication. `0` if authentication succeeded.
+            `1` = no transponder positioned in the read area;
+            `2` = permission is 0 (transponder has no permissions for any device group);
+            `3` = transponder validity period exceeded (current date outside "Valid from"/"Valid until");
+            `4` = transponder security ID is in the block list;
+            `5` = no permission stored for this security ID yet (External authentication mode);
+            `6` = authentication blocked by the 24 V I/O input port;
+            `7` = Single authentication type active and authentication locked by another registered transponder;
+            `8` = 2-person rule active and a second transponder is still required;
+            `9` = no entry for this security ID in the permission list (Permission list mode);
+            `10` = authentication locked because a synchronisation timeout occurred.
+        securityId:
+          type: string
+          description: >
+            Security ID of the transponder currently in the read area.
+            Hexadecimal string (e.g. `309A68BACCA44C30`).
+            Empty string if no transponder is present.
+        orderNo:
+          type: number
+          description: Order number (article number) of the transponder.
+        salesVersion:
+          type: string
+          description: >
+            Sales version suffix of the transponder order number (distribution version),
+            indicating the hardware/firmware variant of the transponder.
+        serialNo:
+          type: string
+          description: Serial number of the transponder.
+        transponderUid:
+          type: string
+          description: >
+            UID (unique identifier) of the transponder chip, as read from the RFID chip.
+            This is the chip-level identifier, distinct from the PITreader security ID.
+        userData:
+          type: array
+          description: >
+            User data parameter values read from the transponder during authentication.
+            Only present if a user data configuration is defined and the transponder
+            carries user data.
+          items:
+            $ref: '#/components/schemas/UserDataParameterValue'
+
+    TransponderResponse:
+      description: >
+        Response body for GET /api/transponder (HTTP 200).
+        Returns transponder data such as group permissions, validity dates and lock status
+        for the transponder currently in the read area.
+        If no transponder is present, all fields contain their default values.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        teachInId:
+          type: string
+          description: >
+            Unique transponder identifier required for the teach-in coding procedure.
+            This value must be passed as `teachInId` to POST /api/transponder/teachIn
+            to verify that the correct transponder is still in the read area when
+            writing the coding identifier.
+            Hexadecimal string. Empty string if no transponder is present.
+        securityId:
+          type: string
+          description: >
+            Security ID of the transponder in the read area.
+            Hexadecimal string (e.g. `309A68BACCA44C30`).
+            Empty string if no transponder is present.
+        transponderUid:
+          type: string
+          description: >
+            UID of the transponder chip as read from the RFID chip.
+            Empty string if no transponder is present.
+        permissions:
+          type: array
+          items:
+            type: number
+          description: >
+            Array of exactly 32 Hamming-coded (HD9) permission values, one per
+            device group (groups 0 … 31). Index 0 corresponds to device group G0,
+            index 31 to G31. Value `0` means no permission for that group.
+            All zeros if no transponder is present.
+        timeLimitationStart:
+          type: string
+          description: >
+            "Valid from" start date for the transponder's validity period, in UTC format
+            (RFC 3339, e.g. `2019-06-01T08:30:59Z`). The time component is always
+            `00:00:00` as stored on the transponder.
+            Empty string `""` = no start date configured (default, transponder is always valid
+            from the past).
+        timeLimitationEnd:
+          type: string
+          description: >
+            "Valid until" end date for the transponder's validity period, in UTC format
+            (RFC 3339, e.g. `2019-06-30T00:00:00Z`). The time component is always
+            `00:00:00` as stored on the transponder.
+            Empty string `""` = no end date configured (default, transponder never expires).
+        lockedPermissions:
+          type: boolean
+          description: >
+            Permission area lock status of the transponder.
+            `true` = the permission area on the transponder is locked and can only be
+            written after a teach-in coding procedure;
+            `false` = permissions are not locked and can be written freely.
+        codingLock:
+          type: boolean
+          description: >
+            Coding lock status. `true` = the transponder is limited to PITreaders that
+            carry the same basic coding identifier (the transponder will only authenticate
+            on identically coded readers); `false` = no coding restriction (default).
+
+    UserDataConfigResponse:
+      description: >
+        Response body for GET /api/config/userData (HTTP 200).
+        Returns the user data configuration (parameter definitions and version information)
+        stored on the PITreader. Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        version:
+          type: number
+          description: >
+            Version number of the user data configuration (1 … 65535).
+            `0` indicates an empty/reset configuration.
+            Should be incremented whenever the configuration is changed so that
+            transponders carrying data from an older configuration version can be detected.
+        comment:
+          type: string
+          description: >
+            Optional free-text comment describing this version of the user data configuration.
+            UTF-8 string, max 63 bytes.
+        parameters:
+          type: array
+          description: >
+            List of parameter definitions that make up the user data configuration.
+            Each entry defines a named, typed data field that can be stored on transponders.
+          items:
+            $ref: '#/components/schemas/UserDataParameterDefinition'
+
+    TransponderUserDataResponse:
+      description: >
+        Response body for GET /api/transponder/userData (HTTP 200).
+        Returns the user data currently held in the PITreader RAM.
+        The RAM must first be populated via POST /api/transponder/userData/read
+        (load from transponder) or POST /api/transponder/userData/clear
+        (initialise empty from configuration).
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        parameterDefinition:
+          type: object
+          description: >
+            The parameter definition snapshot that was active when the RAM was last
+            loaded or cleared.
+          properties:
+            version:
+              type: number
+              description: >
+                Version number of the parameter definition (0 … 65535).
+                `0` if the configuration was reset.
+            parameters:
+              type: array
+              description: Parameter definitions describing the structure of the user data.
+              items:
+                $ref: '#/components/schemas/UserDataParameterDefinition'
+        groups:
+          type: array
+          description: >
+            Parameter values organised by device group. Each entry contains the values
+            valid for a specific device group, or the default values if no `deviceGroup`
+            field is present (default values apply to all groups that have no specific entry).
+          items:
+            type: object
+            properties:
+              deviceGroup:
+                type: number
+                description: >
+                  Device group number for which these parameter values are stored (0 … 9999).
+                  Absent if this entry contains the default values (valid for all device groups
+                  that have no specific override).
+              values:
+                type: array
+                description: Parameter values for this device group.
+                items:
+                  $ref: '#/components/schemas/UserDataParameterValue'
+
+    LedResponse:
+      description: >
+        Response body for GET /api/led (HTTP 200).
+        Returns the current LED colour and flash mode, plus the "LED overwrite" settings.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        colour:
+          type: number
+          enum: [0, 1, 2, 3, 4]
+          description: >
+            Current LED colour as driven by the internal device state (before overwrite).
+            `0` = switched off; `1` = blue; `2` = yellow; `3` = red; `4` = green.
+        flashMode:
+          type: number
+          enum: [0, 1]
+          description: >
+            Current LED flash mode as driven by the internal device state.
+            `0` = static (continuous); `1` = flashing at 1 Hz.
+        overwrite:
+          type: object
+          description: >
+            "LED overwrite" settings. When `activated` is `true`, the LED colour and
+            flash mode are forced to the values in this object, overriding the internal
+            device state (e.g. to indicate an application-level status).
+          properties:
+            colour:
+              type: number
+              enum: [0, 1, 2, 3, 4]
+              description: >
+                LED colour to apply when overwrite is active.
+                `0` = switched off; `1` = blue; `2` = yellow; `3` = red; `4` = green.
+            flashMode:
+              type: number
+              enum: [0, 1]
+              description: >
+                LED flash mode to apply when overwrite is active.
+                `0` = static (continuous); `1` = flashing at 1 Hz.
+            activated:
+              type: boolean
+              description: >
+                `true` = LED overwrite is currently active; the LED colour and flash mode
+                are forced to the values above, ignoring the internal device state.
+                `false` = LED overwrite is inactive; the LED reflects the internal device state.
+
+    SingleAuthResponse:
+      description: >
+        Response body for GET /api/status/authentication/singleAuth (HTTP 200).
+        Returns whether the "Single authentication" type has set an authentication lock,
+        and if so, which transponder holds the lock.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        securityId:
+          type: string
+          description: >
+            Security ID of the transponder that is currently holding the authentication lock.
+            Empty string `""` if no lock is set (no transponder has registered itself
+            or the same transponder has been presented a second time to release the lock).
+
+    MeResponse:
+      description: >
+        Response body for GET /api/me (HTTP 200).
+        Returns information about the currently authenticated API Client or user.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        id:
+          type: number
+          description: >
+            Internal ID of the currently logged-in user or API Client,
+            as assigned by the PITreader.
+        name:
+          type: string
+          description: >
+            Name of the currently logged-in user or API Client,
+            as configured in the web application.
+        level:
+          type: number
+          description: >
+            Role number (access permission level) of the currently logged-in user:
+            10 = Guest, 200 = Transponder manager, 400 = Device manager, 500 = Administrator.
+        type:
+          type: number
+          enum: [1, 2]
+          description: >
+            User type. `1` = regular user (authenticated via web application login);
+            `2` = API Client (authenticated via API token / Bearer header).
+
+    MonitorResponse:
+      description: >
+        Response body for GET /api/status/monitor (HTTP 200).
+        Returns a comprehensive status snapshot of the PITreader including device state,
+        LED status, configuration, current authentication result and diagnostic log tail.
+        Requires role ≥ 10 (Guest). Using the `syncStatus` query parameter requires role ≥ 200.
+      type: object
+      properties:
+        status:
+          type: object
+          description: Current hardware and I/O status of the PITreader.
+          properties:
+            fwVersion:
+              type: string
+              description: >
+                Firmware version of the PITreader. Format: `xx.xx.xx` (e.g. `02.03.00`).
+            ioPortValue:
+              type: number
+              enum: [0, 1]
+              description: >
+                Current signal level at the 24 V I/O port.
+                `0` = 0 V (low); `1` = 24 V (high).
+            seuStatus:
+              type: boolean
+              description: >
+                `true` = the PITreader is connected to a safety evaluation unit (SEU)
+                and the connection is active; `false` = no SEU connected.
+        led:
+          type: object
+          description: Current LED state of the PITreader.
+          properties:
+            colour:
+              type: number
+              enum: [0, 1, 2, 3, 4]
+              description: >
+                Current LED colour. `0` = off; `1` = blue; `2` = yellow;
+                `3` = red; `4` = green.
+            flashMode:
+              type: number
+              enum: [0, 1]
+              description: >
+                Current LED flash mode. `0` = static (continuous); `1` = flashing at 1 Hz.
+        config:
+          type: object
+          description: Relevant configuration parameters for the current authentication context.
+          properties:
+            deviceGroup:
+              type: number
+              description: >
+                Device group number of this device, used in authentication mode 1
+                ("Transponder data") to select which permission slot on the transponder
+                is evaluated.
+            authenticationMode:
+              type: number
+              enum: [0, 1, 2, 3]
+              description: >
+                Currently active authentication mode.
+                `0` = External; `1` = Transponder data;
+                `2` = Permission list; `3` = Fixed permission.
+        authentication:
+          type: object
+          description: Current authentication result for the transponder in the read area.
+          properties:
+            securityId:
+              type: string
+              description: >
+                Security ID of the transponder currently in the read area.
+                Empty string if no transponder is present.
+            authenticated:
+              type: boolean
+              description: >
+                `true` = the transponder was successfully authenticated;
+                `false` = authentication failed or no transponder present.
+            authenticationStatus:
+              type: number
+              enum: [0, 1, 2]
+              description: >
+                Current state of the authentication process.
+                `0` = no transponder; `1` = process completed; `2` = awaiting external authentication.
+            permission:
+              type: number
+              description: >
+                The permission granted to the transponder after successful authentication
+                (Hamming-coded). `0` if not authenticated.
+            failureReason:
+              type: number
+              enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+              description: >
+                Reason for a failed authentication (same codes as in AuthStatusResponse).
+                `0` = no error; `1` = no transponder; `2` = permission 0;
+                `3` = outside validity period; `4` = in block list;
+                `5` = no permission stored (External mode); `6` = I/O port block;
+                `7` = Single authentication lock; `8` = 2-person rule pending;
+                `9` = not in permission list; `10` = sync timeout lock.
+            transponderUid:
+              type: string
+              description: UID of the transponder chip. Empty string if no transponder present.
+        log:
+          type: object
+          description: Diagnostic log tail — the most recent entry in the diagnostic log.
+          properties:
+            latestEntry:
+              type: object
+              description: The most recent diagnostic log entry.
+              properties:
+                id:
+                  type: number
+                  description: >
+                    Diagnostic event ID identifying the type of event that was logged.
+                timestamp:
+                  type: string
+                  description: >
+                    Timestamp of the log entry in UTC format (RFC 3339).
+                    Example: `2018-06-28T00:39:53Z`.
+                Index:
+                  type: number
+                  description: >
+                    Incremental Lamport clock index. Monotonically increasing counter
+                    that allows clients to detect whether new log entries have appeared
+                    since the last poll.
+        tags:
+          type: object
+          description: >
+            Change counters for key data objects. Each counter is incremented whenever
+            the corresponding data changes (some changes may increment a counter by more
+            than one). Counters are set to a random value on device reboot; clients should
+            store the previous value and compare to detect changes, not rely on absolute values.
+          properties:
+            settings:
+              type: number
+              description: >
+                Counter for device configuration changes
+                (incremented by changes to /api/config, /api/config/coding, etc.).
+            blockList:
+              type: number
+              description: >
+                Counter for changes to the block list
+                (incremented by POST /api/config/blocklist).
+            permissionList:
+              type: number
+              description: >
+                Counter for changes to the permission list
+                (incremented by POST /api/config/permissionList).
+            userDataConfig:
+              type: number
+              description: >
+                Counter for changes to the user data configuration
+                (incremented by POST /api/config/userData/*).
+
+  # ── Device user management schemas ───────────────────────────────────────
+
+    DeviceUserItem:
+      description: A single device user list entry.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique name of the device user.
+        state:
+          type: number
+          enum: [0, 1]
+          description: >
+            State of the device user.
+            `0` = inactive (disabled); `1` = active (enabled).
+        role:
+          type: number
+          enum: [10, 200, 400, 500]
+          description: >
+            Role of the device user.
+            `10` = Guest (read-only); `200` = Transponder manager;
+            `400` = Device manager; `500` = Administrator.
+        authType:
+          type: number
+          enum: [1, 2]
+          description: >
+            Authentication type of the device user.
+            `1` = password-based (username + password);
+            `2` = API token (Bearer token).
+
+    DeviceUsersResponse:
+      description: >
+        Response body for GET /api/config/deviceUsers (HTTP 200).
+        Returns the list of all device users visible to the caller.
+        Role ≥ 400 (Device manager) sees users with role < 400;
+        role ≥ 500 (Administrator) sees all users.
+      type: object
+      properties:
+        items:
+          type: array
+          description: Array of device user entries visible to the caller.
+          items:
+            $ref: '#/components/schemas/DeviceUserItem'
+
+    DeviceUserResponse:
+      description: >
+        Response body for GET /api/config/deviceUser (HTTP 200).
+        Returns detailed properties for the specified device user.
+        Role ≥ 400 can read users with role < 400; role ≥ 500 can read all users.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device user.
+        state:
+          type: number
+          enum: [0, 1]
+          description: >
+            State of the device user. `0` = inactive (disabled); `1` = active (enabled).
+        role:
+          type: number
+          enum: [10, 200, 400, 500]
+          description: >
+            Role of the device user.
+            `10` = Guest; `200` = Transponder manager;
+            `400` = Device manager; `500` = Administrator.
+        authType:
+          type: number
+          enum: [1, 2]
+          description: >
+            Authentication type. `1` = password; `2` = API token.
+        apiToken:
+          type: string
+          description: >
+            API token (Bearer token) assigned to this device user.
+            Only populated immediately after token generation; not returned in normal GET responses.
+        remoteIp:
+          type: string
+          description: >
+            IP address restriction. If set, the device user can only authenticate
+            from this specific IP address. Empty string = no restriction.
+
+    DeviceUserRequestData:
+      description: Properties to set when creating or editing a device user.
+      type: object
+      properties:
+        state:
+          type: number
+          enum: [0, 1]
+          description: >
+            Desired state. `0` = inactive (disabled); `1` = active (enabled).
+        role:
+          type: number
+          enum: [10, 200, 400, 500]
+          description: >
+            Desired role. `10` = Guest; `200` = Transponder manager;
+            `400` = Device manager; `500` = Administrator.
+            A Device manager (role 400) can only assign roles up to 400.
+        authType:
+          type: number
+          enum: [1, 2]
+          description: >
+            Authentication type. `1` = password-based; `2` = API token.
+        remoteIp:
+          type: string
+          description: >
+            IP address restriction for this device user. If set, authentication
+            is only accepted from this IP address. Empty string = no restriction.
+        password:
+          type: string
+          description: >
+            Password for password-type users (write-only). Not returned by GET.
+            Only applicable when `authType` = 1.
+
+    DeviceUserRequest:
+      description: Request body for POST /api/config/deviceUser.
+      type: object
+      required:
+        - action
+        - id
+      properties:
+        action:
+          type: string
+          enum: [create, edit, delete]
+          description: >
+            CRUD action to perform.
+            `create` = add a new device user; `edit` = update an existing device user;
+            `delete` = remove an existing device user.
+        id:
+          type: string
+          description: >
+            Name of the device user to create, edit, or delete.
+        data:
+          description: >
+            Device user properties to set. Required for `action` = 0 (create)
+            and `action` = 1 (edit). Not required for `action` = 2 (delete).
+          $ref: '#/components/schemas/DeviceUserRequestData'
+
+    ApiTokenRenewRequest:
+      description: Request body for POST /api/config/deviceUser/apiToken.
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Name of the device user for whom the API token is to be renewed.
+
+    # ── Transponder crypto schemas ─────────────────────────────────────────────
+
+    TransponderCryptoResponse:
+      description: >
+        Response body for GET /api/transponder/crypto (HTTP 200).
+        Returns the type and identifier of the AES key currently stored on the
+        transponder in the read area. Returns `type` = 0 if no transponder is
+        present or no AES key is stored on it.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        type:
+          type: number
+          enum: [0, 1, 2, 3]
+          description: >
+            Key type of the AES key stored on the transponder.
+            `0` = unknown/none (no key or no transponder);
+            `1` = AES-128; `2` = AES-192; `3` = AES-256.
+        keyId:
+          type: string
+          description: >
+            Key identifier of the AES key stored on the transponder.
+            Hexadecimal string. Empty string if no key is stored or no transponder is present.
+
+    TransponderCryptoKeyRequest:
+      description: >
+        Sub-object for writing an AES key to the transponder in the read area.
+        Include this under the `key` property of POST /api/transponder/crypto.
+        Requires role ≥ 200 (Transponder manager).
+      type: object
+      properties:
+        type:
+          type: number
+          enum: [0, 1, 2, 3]
+          description: >
+            Key type to write to the transponder.
+            `0` = none (clear key); `1` = AES-128; `2` = AES-192; `3` = AES-256.
+        data:
+          type: string
+          format: byte
+          description: >
+            AES key material, Base64-encoded. Length must match the key type:
+            16 bytes for AES-128, 24 bytes for AES-192, 32 bytes for AES-256.
+        passphrase:
+          type: string
+          description: >
+            Passphrase for applying the logon key from the device configuration
+            to the transponder. Used for specific key authentication procedures.
+
+    TransponderCryptoEncryptRequest:
+      description: >
+        Sub-object for encrypting data using the AES key stored on the transponder.
+        Include this under the `encrypt` property of POST /api/transponder/crypto.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        type:
+          type: number
+          description: >
+            Crypto operation type.
+            `0` = none; `1` = AES-GCM (key size from device config);
+            `257` = AES-128-GCM; `513` = AES-192-GCM; `769` = AES-256-GCM.
+        iv:
+          type: string
+          format: byte
+          description: Initialization vector (IV) for AES-GCM, Base64-encoded.
+        data:
+          type: string
+          format: byte
+          description: Plaintext data to encrypt, Base64-encoded.
+
+    TransponderCryptoDecryptRequest:
+      description: >
+        Sub-object for decrypting data using the AES key stored on the transponder.
+        Include this under the `decrypt` property of POST /api/transponder/crypto.
+        Requires role ≥ 10 (Guest).
+      type: object
+      properties:
+        type:
+          type: number
+          description: >
+            Crypto operation type.
+            `0` = none; `1` = AES-GCM; `257` = AES-128-GCM;
+            `513` = AES-192-GCM; `769` = AES-256-GCM.
+        iv:
+          type: string
+          format: byte
+          description: Initialization vector (IV) for AES-GCM, Base64-encoded.
+        tag:
+          type: string
+          format: byte
+          description: AES-GCM authentication tag, Base64-encoded.
+        data:
+          type: string
+          format: byte
+          description: Ciphertext data to decrypt, Base64-encoded.
+
+    TransponderCryptoRequest:
+      description: >
+        Request body for POST /api/transponder/crypto.
+        The request may contain any combination of the optional sub-objects `key`,
+        `encrypt`, and `decrypt`. If `key` is present, role ≥ 200 is required;
+        otherwise role ≥ 10.
+      type: object
+      properties:
+        key:
+          description: >
+            Write an AES key to the transponder. Requires role ≥ 200 (Transponder manager).
+          $ref: '#/components/schemas/TransponderCryptoKeyRequest'
+        encrypt:
+          description: Encrypt data using the AES key stored on the transponder.
+          $ref: '#/components/schemas/TransponderCryptoEncryptRequest'
+        decrypt:
+          description: Decrypt data using the AES key stored on the transponder.
+          $ref: '#/components/schemas/TransponderCryptoDecryptRequest'
+
+    # ── Certificate and firmware schemas ──────────────────────────────────────
+
+    CertificateRegenerateRequest:
+      description: Request body for POST /api/config/certificate/regenerate.
+      type: object
+      required:
+        - scope
+      properties:
+        scope:
+          type: string
+          enum: [certonly, all]
+          description: >
+            Scope of the certificate regeneration operation.
+            `certonly` = renew certificate, keep existing private key;
+            `all` = generate new private key and certificate.
+
+    FirmwareUpdateRequest:
+      description: Request body for POST /api/firmware/update.
+      type: object
+      required:
+        - action
+        - hash
+      properties:
+        action:
+          type: string
+          enum: [confirm, cancel]
+          description: >
+            Action to perform with the previously uploaded firmware package.
+            `confirm` = apply the firmware update (device will reboot);
+            `cancel` = discard the uploaded firmware package without updating.
+        hash:
+          type: string
+          description: >
+            Hash of the firmware package as returned in the `data` field of the
+            POST /api/files/firmware upload response. Used to verify that the
+            correct package is being applied.
+
+  # ── Reusable responses ────────────────────────────────────────────────────
+  responses:
+    BadRequest:
+      description: >
+        Bad request (HTTP 400). The request body contained invalid or missing parameters.
+        The `msg` field may contain a specific `API.error*` code for endpoints that
+        document error codes; otherwise `msg` is an empty string.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericResponse'
+    Forbidden:
+      description: >
+        Forbidden (HTTP 403). Either the `Authorization` header is missing or the API token
+        is invalid, or the API Client's role number is lower than the minimum required
+        by this endpoint.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericResponse'
+    InternalError:
+      description: >
+        Internal server error (HTTP 500). An unexpected error occurred on the device.
+        Certain endpoints document specific 500 error causes in the `msg` field.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericResponse'
+
+# ════════════════════════════════════════════════════════════════════════════
+# Paths
+# ════════════════════════════════════════════════════════════════════════════
+paths:
+
+  /api/status:
+    get:
+      summary: Read general device status
+      description: >
+        Reads current status information and properties of the device.
+        The endpoint can be called without authentication; in that case a reduced
+        set of fields is returned (serialNo, fwVersion, hwVersion, realTimeClock
+        are absent). With role ≥ 10 (Guest) the full field set is returned.
+      operationId: getStatus
+      tags: [General Device Information]
+      security:
+        - BearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Device status information (field set depends on authentication).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config:
+    get:
+      summary: Read device configuration
+      description: >
+        Reads the full general device configuration including network settings,
+        authentication mode, I/O port configuration and synchronisation parameters.
+        Requires role ≥ 10 (Guest).
+      operationId: getConfig
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Full device configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Update device configuration
+      description: >
+        Sets one or more device configuration parameters. At least one valid parameter
+        must be present in the request body.
+
+        Parameters available to role ≥ 400 (Device manager):
+        `location`, `deviceGroup`, `evaluateTimeLimitation`, `timeZone`, `realTimeClock`.
+
+        Parameters restricted to role 500 (Administrator) only:
+        `hostName`, `domain`, `ipAddress`, `subnetMask`, `defaultGateway`, `httpPort`,
+        `httpEnabled`, `httpsPort`, `networkDiscoveryEnabled`, `multicastConfEnabled`,
+        `sntpEnabled`, `sntpServer`, `sntpPort`, `sntpRefreshRate`, `modbusTcpEnabled`,
+        `modbusTcpPort`, `supportThirdPartyTransponders`, `rfidProtocols`,
+        `authenticationMode`, `fixedPermission`, `allowExternalOverride`,
+        `syncMonitoringEnabled`, `syncTimeout`, `logPersonalData`, `ioPortFunction`,
+        `ioPortPermission`, `authenticationType`.
+
+        Some changes (e.g. IP address, hostname) trigger an automatic device reboot;
+        this is indicated in the response `data.reboot` field.
+      operationId: postConfig
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  maxLength: 47
+                  description: >
+                    Location description of the device. UTF-8 or printable ASCII,
+                    max 47 bytes. Multi-byte UTF-8 characters reduce the effective limit.
+                deviceGroup:
+                  type: number
+                  minimum: 0
+                  maximum: 9999
+                  description: >
+                    Device group number for authentication mode 1 (Transponder data).
+                    Range: 0 … 9999.
+                evaluateTimeLimitation:
+                  type: boolean
+                  description: >
+                    `true` = evaluate the transponder's "Valid from"/"Valid until" dates;
+                    `false` = ignore validity dates.
+                timeZone:
+                  type: string
+                  maxLength: 31
+                  description: >
+                    Name of the time zone (e.g. `Europe/Berlin`). Must be one of the
+                    valid values listed in section 9 of the operating manual.
+                    Max 31 bytes.
+                realTimeClock:
+                  type: string
+                  description: >
+                    Date and time to set on the device. RFC 3339 UTC format,
+                    minimum 2000-01-01T00:00:00Z. Example: `2018-06-28T00:00:00Z`.
+                hostName:
+                  type: string
+                  minLength: 1
+                  maxLength: 63
+                  description: >
+                    Hostname of the device. Valid characters: a-z, A-Z, 0-9, `-`.
+                    First character must be a letter; last must not be a hyphen.
+                    Role 500 only.
+                domain:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    Domain name for HTTPS certificates. Valid characters: a-z, A-Z, 0-9, `-`, `.`.
+                    First character must be a letter; last must not be a hyphen or dot.
+                    Role 500 only.
+                ipAddress:
+                  type: string
+                  description: >
+                    IP address of the device. Not in ranges 0.0.0.0/8, 127.0.0.0/8, 224.0.0.0/4.
+                    Role 500 only.
+                subnetMask:
+                  type: string
+                  description: >
+                    Subnet mask in dotted-decimal notation. Must be a valid contiguous mask.
+                    Role 500 only.
+                defaultGateway:
+                  type: string
+                  description: >
+                    IP address of the standard gateway. Must be in the same subnet as `ipAddress`.
+                    Role 500 only.
+                httpPort:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: >
+                    HTTP port number (default 80). Must differ from `httpsPort` and `modbusTcpPort`.
+                    Role 500 only.
+                httpEnabled:
+                  type: boolean
+                  description: "`true` = enable HTTP port; `false` = disable. Role 500 only."
+                httpsPort:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: >
+                    HTTPS port number (default 443). Must differ from `httpPort` and `modbusTcpPort`.
+                    Role 500 only.
+                networkDiscoveryEnabled:
+                  type: boolean
+                  description: >
+                    `true` = enable Multicast DNS (mDNS) network discovery;
+                    `false` = disable. Role 500 only.
+                multicastConfEnabled:
+                  type: boolean
+                  description: >
+                    `true` = enable network configuration via Multicast protocol;
+                    `false` = disable. Role 500 only.
+                sntpEnabled:
+                  type: boolean
+                  description: "`true` = enable SNTP time sync; `false` = disable. Role 500 only."
+                sntpServer:
+                  type: string
+                  description: >
+                    IP address of the SNTP server. Not in reserved ranges.
+                    Role 500 only.
+                sntpPort:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: "Port number of the SNTP server. Role 500 only."
+                sntpRefreshRate:
+                  type: number
+                  minimum: 5
+                  maximum: 10080
+                  description: >
+                    SNTP poll interval in minutes (5 … 10080). Role 500 only.
+                modbusTcpEnabled:
+                  type: boolean
+                  description: >
+                    `true` = enable Modbus/TCP Slave; `false` = disable. Role 500 only.
+                modbusTcpPort:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: >
+                    Port number of the Modbus/TCP Slave. Must differ from HTTP and HTTPS ports.
+                    Role 500 only.
+                supportThirdPartyTransponders:
+                  type: boolean
+                  description: >
+                    `true` = support third-party transponders; `false` = Pilz transponders only.
+                    Role 500 only.
+                rfidProtocols:
+                  type: array
+                  items:
+                    type: number
+                    enum: [0, 2, 3, 16]
+                  description: >
+                    RFID protocol for third-party transponders. Only one value at a time.
+                    Must be `[0]` if `supportThirdPartyTransponders` is `false`.
+                    Role 500 only.
+                authenticationMode:
+                  type: number
+                  enum: [0, 1, 2, 3]
+                  description: >
+                    Authentication mode: `0`=External, `1`=Transponder data,
+                    `2`=Permission list, `3`=Fixed permission. Role 500 only.
+                fixedPermission:
+                  type: number
+                  minimum: 0
+                  maximum: 64
+                  description: >
+                    Fixed permission for authentication mode 3. Hamming-coded (HD9).
+                    Role 500 only.
+                allowExternalOverride:
+                  type: boolean
+                  description: >
+                    `true` = allow external overwrite of authentication result via REST API;
+                    `false` = disallow. Role 500 only.
+                syncMonitoringEnabled:
+                  type: boolean
+                  description: >
+                    `true` = monitor synchronisation with external data;
+                    `false` = do not monitor. Role 500 only.
+                syncTimeout:
+                  type: number
+                  minimum: 5
+                  maximum: 4320
+                  description: >
+                    Synchronisation timeout in minutes (5 … 4320).
+                    Maximum permitted interval between two synchronisations.
+                    Role 500 only.
+                logPersonalData:
+                  type: boolean
+                  description: >
+                    `true` = record personal data (security IDs, serial numbers) in diagnostic log;
+                    `false` = do not record. Role 500 only.
+                ioPortFunction:
+                  type: number
+                  enum: [0, 1, 2]
+                  description: >
+                    Mode of the 24 V I/O port: `0`=no function, `1`=authentication status output,
+                    `2`=block authentication input. Role 500 only.
+                ioPortPermission:
+                  type: number
+                  minimum: 1
+                  maximum: 64
+                  description: >
+                    Minimum permission to activate the I/O output (only when `ioPortFunction`=1).
+                    Hamming-coded (HD9). Role 500 only.
+                authenticationType:
+                  type: number
+                  enum: [0, 1, 2]
+                  description: >
+                    Authentication type: `0`=Basic, `1`=Single authentication,
+                    `2`=2-person rule. Role 500 only.
+            example:
+              location: "Ostfildern A20"
+              deviceGroup: 10
+              evaluateTimeLimitation: false
+      responses:
+        '200':
+          description: >
+            Configuration updated successfully. Check `data.reboot` to determine
+            whether the device rebooted as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponseWithReboot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/coding:
+    get:
+      summary: Read basic coding configuration
+      description: >
+        Reads the basic coding status and checksum of the device.
+        The basic coding identifier itself is never returned; only its checksum
+        and an optional comment.
+        Requires role ≥ 10 (Guest).
+      operationId: getCoding
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Basic coding configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set basic coding identifier
+      description: >
+        Defines the basic coding identifier of the device and/or updates the comment.
+        At least one of `identifier` or `comment` must be supplied.
+        The identifier is not required if only the comment is being changed.
+        Requires role ≥ 400 (Device manager).
+      operationId: postCoding
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifier:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    Basic coding identifier to store on the device.
+                    UTF-8 string, max 63 bytes (multi-byte characters reduce the limit).
+                    Omit if only the comment should be changed.
+                comment:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    Human-readable comment about the basic identifier (e.g. "Production line A").
+                    UTF-8 string, max 63 bytes.
+            example:
+              identifier: "Secret Coding ID 123"
+              comment: "My coding #1"
+      responses:
+        '200':
+          description: Basic coding identifier set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/coding/oem:
+    get:
+      summary: Read OEM coding configuration
+      description: >
+        Reads the OEM coding status and checksum of the device.
+        The OEM coding identifier itself is never returned; only its checksum
+        and an optional comment.
+        Requires role ≥ 500 (Administrator).
+      operationId: getOemCoding
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: OEM coding configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set OEM coding identifier
+      description: >
+        Defines the OEM coding identifier of the device and/or updates the comment.
+        To change the identifier, `oldIdentifier` and `newIdentifier` must both be supplied.
+        To delete the identifier, pass an empty string for `newIdentifier`.
+        To change only the comment without touching the identifier, omit both identifier fields.
+        Requires role ≥ 500 (Administrator).
+      operationId: postOemCoding
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldIdentifier:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    The OEM coding identifier currently stored on the device.
+                    Pass an empty string if no OEM identifier is currently configured.
+                    Must be supplied together with `newIdentifier`.
+                newIdentifier:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    The new OEM coding identifier to store on the device.
+                    Pass an empty string to delete the current OEM identifier.
+                    Must be supplied together with `oldIdentifier`.
+                comment:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    Human-readable comment about the OEM identifier.
+                    Optional. UTF-8 string, max 63 bytes.
+            example:
+              oldIdentifier: "Secret Coding ID 123"
+              newIdentifier: "Secret Coding ID 456"
+              comment: "My coding #1"
+      responses:
+        '200':
+          description: OEM coding identifier set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/blocklist:
+    get:
+      summary: Read block list
+      description: >
+        Returns all entries in the device's block list. A transponder whose security ID
+        appears in the block list will not be authenticated, regardless of other settings.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: getBlocklist
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Current block list contents.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlocklistResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create, edit or delete a block list entry
+      description: >
+        Manages the device's block list. The `action` field selects the operation.
+
+        **create**: Add a new entry. `action`, `id` and `data` are required.
+        The list may contain at most 1000 entries; each security ID may appear only once.
+
+        **edit**: Change the comment of an existing entry. `action`, `id`, `data`
+        and `data.comment` are required.
+
+        **delete**: Remove an entry. Only `action` and `id` are required.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorMaximumSize` (list full),
+        `API.errorDuplicateSecurityId` (ID already exists),
+        `API.errorInvalidSecurityId` (ID format invalid).
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postBlocklist
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, id]
+              properties:
+                action:
+                  type: string
+                  enum: [create, edit, delete]
+                  description: >
+                    Operation to perform: `create` = add new entry;
+                    `edit` = update comment of existing entry;
+                    `delete` = remove entry.
+                id:
+                  type: string
+                  description: >
+                    Security ID of the transponder to create, edit or delete.
+                    Hexadecimal string (e.g. `309A68BACCA44C30`).
+                data:
+                  type: object
+                  description: >
+                    Required for `create` and `edit`. Contains the comment field.
+                  properties:
+                    comment:
+                      type: string
+                      maxLength: 32
+                      description: >
+                        Optional comment explaining why this transponder is blocked
+                        (e.g. "Lost 2021-01-19"). UTF-8 string, max 32 bytes.
+            example:
+              action: "create"
+              id: "309A68BACCA44C30"
+              data:
+                comment: "Lost 2021-01-19"
+      responses:
+        '200':
+          description: Block list updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/permissionList:
+    get:
+      summary: Read permission list
+      description: >
+        Returns all entries in the device's permission list. Used in authentication
+        mode 2 ("Permission list"): when a transponder is presented, its security ID
+        is looked up in this list and the stored permission is used for the authentication result.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: getPermissionList
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Current permission list contents.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create, edit or delete a permission list entry
+      description: >
+        Manages the device's permission list. The `action` field selects the operation.
+
+        **create**: Add a new entry. `action`, `id`, `data` and `data.permission` are required.
+        The list may contain at most 1000 entries; each security ID may appear only once.
+
+        **edit**: Change the permission of an existing entry. `action`, `id`, `data`
+        and `data.permission` are required.
+
+        **delete**: Remove an entry. Only `action` and `id` are required.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorMaximumSize` (list full),
+        `API.errorDuplicateSecurityId` (ID already exists — create only),
+        `API.errorInvalidSecurityId` (ID invalid or not found — edit/delete only),
+        `API.errorPermission` (permission value invalid).
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postPermissionList
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, id]
+              properties:
+                action:
+                  type: string
+                  enum: [create, edit, delete]
+                  description: >
+                    Operation to perform: `create` = add new entry;
+                    `edit` = change permission of existing entry;
+                    `delete` = remove entry.
+                id:
+                  type: string
+                  description: >
+                    Security ID of the transponder. Hexadecimal string
+                    (e.g. `309A68BACCA44C30`).
+                data:
+                  type: object
+                  description: Required for `create` and `edit`.
+                  properties:
+                    permission:
+                      type: number
+                      description: >
+                        Permission to assign to this transponder. Hamming-coded (HD9).
+                        Valid codes are listed in section 7 of the operating manual.
+            example:
+              action: "create"
+              id: "309A68BACCA44C30"
+              data:
+                permission: 116684
+      responses:
+        '200':
+          description: Permission list updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/devicegroups:
+    get:
+      summary: Read device group names
+      description: >
+        Returns the names assigned to the device groups (G0 … G31) to which this device
+        is assigned. The device can be a member of up to 32 device groups.
+        Note: this endpoint only reads and writes group names; it cannot assign
+        the device to a group (group assignment is done via the web application).
+        Requires role ≥ 10 (Guest).
+      operationId: getDeviceGroups
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Device group names for all groups the device belongs to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGroupsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set a device group name
+      description: >
+        Creates or updates the name of a device group by index.
+        Note: this endpoint does not assign the device to the group; the device must
+        already be a member of the group.
+
+        Error codes returned in `msg` on HTTP 400:
+        `""` (empty string) if no data was received,
+        `API.errorDevicegroupFormat` if `name` has invalid content,
+        `API.errorInvalidDevicegroupIndex` if `number` is out of range.
+
+        Requires role ≥ 400 (Device manager).
+      operationId: postDeviceGroups
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [number, name]
+              properties:
+                number:
+                  type: number
+                  minimum: 0
+                  maximum: 31
+                  description: >
+                    Index of the device group whose name is to be created or changed
+                    (0 = G0, 31 = G31).
+                name:
+                  type: string
+                  maxLength: 47
+                  description: >
+                    Name to assign to the device group. UTF-8 string, max 47 bytes.
+                    Multi-byte characters reduce the effective character limit.
+            example:
+              number: 0
+              name: "Lathes, Hall 15"
+      responses:
+        '200':
+          description: Device group name updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/customKeys:
+    get:
+      summary: Read custom AES key configuration
+      description: >
+        Returns checksum and diversification data for all configured custom AES keys
+        (key1, key2, additionalKeys). The actual key material is never returned.
+        Custom AES keys are used when reading MIFARE DESFire transponders
+        from third-party manufacturers.
+        Requires role ≥ 400 (Device manager).
+      operationId: getCustomKeys
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: Custom AES key checksums and diversification strings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomKeysResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set custom AES keys
+      description: >
+        Configures custom AES keys for MIFARE DESFire transponder authentication.
+        At least one object must be supplied. Valid combinations:
+        `key1` + `key2` + one `additionalKey`; `key1` + `key2`; `key1` + one `additionalKey`;
+        or only one `additionalKey`.
+
+        Important: key1 and key2 cannot be changed independently. Setting key1 alone
+        automatically deletes any existing key2. key2 can only be set together with key1.
+
+        Error code returned in `msg` on HTTP 400:
+        `API.errorInvalidDiversificationInput` if the `div` string is invalid.
+
+        Requires role ≥ 400 (Device manager).
+      operationId: postCustomKeys
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key1:
+                  type: object
+                  description: >
+                    Primary AES key (memory area 1). Setting this alone deletes key2.
+                  properties:
+                    type:
+                      type: integer
+                      enum: [0, 1, 2, 4, 16]
+                      description: >
+                        Key type: `0`=None, `1`=Application Master Key,
+                        `2`=Application User Key, `4`=PICC Master Key, `16`=Transport Key.
+                    data:
+                      type: string
+                      minLength: 32
+                      maxLength: 32
+                      description: >
+                        AES key as exactly 32 hexadecimal characters (0-9, A-F, a-f).
+                        Represents 16 bytes of key material.
+                    div:
+                      type: string
+                      maxLength: 62
+                      description: >
+                        Diversification string for per-transponder key derivation.
+                        Hexadecimal characters (0-9, A-F, a-f), up to 62 characters.
+                        May contain the placeholder `$UID` which is substituted with the
+                        transponder's UID at runtime to produce a unique key per transponder.
+                key2:
+                  type: object
+                  description: >
+                    Secondary AES key (memory area 2). Can only be set together with key1.
+                  properties:
+                    type:
+                      type: integer
+                      enum: [0, 1, 2, 4, 16]
+                      description: >
+                        Key type: `0`=None, `1`=Application Master Key,
+                        `2`=Application User Key, `4`=PICC Master Key, `16`=Transport Key.
+                    data:
+                      type: string
+                      minLength: 32
+                      maxLength: 32
+                      description: AES key as exactly 32 hexadecimal characters.
+                    div:
+                      type: string
+                      maxLength: 62
+                      description: >
+                        Diversification string. Hexadecimal, up to 62 characters.
+                        May contain `$UID` placeholder.
+                additionalKeys:
+                  type: array
+                  description: >
+                    Additional keys (Application Default Keys). Currently at most one entry
+                    with type 1 is supported.
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: integer
+                        enum: [1]
+                        description: "Key type: `1` = Application Default Key."
+                      data:
+                        type: string
+                        minLength: 32
+                        maxLength: 32
+                        description: AES key as exactly 32 hexadecimal characters.
+            example:
+              key1:
+                type: 1
+                data: "C963EC29964DE3399BDE34E478014963"
+                div: "A1B9F0$UID03"
+              additionalKeys:
+                - type: 1
+                  data: "C963EC29964DE3399BDE34E478014963"
+      responses:
+        '200':
+          description: Custom AES keys set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/status/authentication:
+    get:
+      summary: Read transponder authentication status
+      description: >
+        Returns the current authentication status, permission, failure reason and
+        transponder identification data for the transponder in the read area.
+        Also returns any user data parameters read from the transponder during authentication.
+        Requires role ≥ 10 (Guest).
+      operationId: getAuthStatus
+      tags: [Authentication Status]
+      responses:
+        '200':
+          description: Current transponder authentication status and details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set external authentication result for a transponder
+      description: >
+        Sets the permission and/or user data for a specific transponder in
+        authentication mode 0 ("External"). The device must be configured for
+        External authentication mode, or `allowExternalOverride` must be `true`.
+
+        `securityId` is mandatory. At least one of `permission` or `userData` must also
+        be provided. The security ID must match the transponder currently in the read area.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorInvalidPermission` (invalid permission value),
+        `API.errorEmptyData` (`userData` present but empty),
+        `API.errorInvalidSecurityId` (ID invalid or doesn't match current transponder),
+        `API.errorInvalidState` (device not in External mode and override not allowed),
+        `API.errorInvalidDataFormat` (userData structure invalid),
+        `API.errorInvalidGroupValue` (userData value out of range or string too long).
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postAuthStatus
+      tags: [External Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [securityId]
+              properties:
+                securityId:
+                  type: string
+                  description: >
+                    Security ID of the transponder for which the authentication result
+                    is being set. Must match the security ID of the transponder currently
+                    in the read area.
+                permission:
+                  type: number
+                  description: >
+                    Permission to grant to the transponder. Hamming-coded (HD9).
+                    Valid permission codes are listed in section 7 of the operating manual.
+                userData:
+                  type: array
+                  description: >
+                    User data parameter values to apply to the transponder during this
+                    authentication. Optional. Each entry specifies a parameter ID and
+                    its value (numeric or string depending on type).
+                  items:
+                    $ref: '#/components/schemas/UserDataParameterValue'
+            example:
+              securityId: "309A68BACCA44C30"
+              permission: 116684
+      responses:
+        '200':
+          description: External authentication result set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/status/authentication/singleAuth:
+    get:
+      summary: Read single authentication lock status
+      description: >
+        Returns whether the "Single authentication" authentication type has set a lock
+        and, if so, the security ID of the transponder holding the lock.
+        In Single authentication mode, the first transponder presented registers itself
+        and locks further authentications; presenting the same transponder again releases
+        the lock.
+        Requires role ≥ 10 (Guest).
+      operationId: getSingleAuth
+      tags: [Authentication Status]
+      responses:
+        '200':
+          description: Single authentication lock status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleAuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder:
+    get:
+      summary: Read transponder data
+      description: >
+        Reads data from the transponder currently in the read area: group permissions
+        for all 32 device groups, validity start/end dates, permission lock status,
+        coding lock status, and identification fields.
+        If no transponder is present, all fields return their default/empty values.
+        Requires role ≥ 10 (Guest).
+      operationId: getTransponder
+      tags: [Transponder Data]
+      responses:
+        '200':
+          description: Transponder data (default values if no transponder is present).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransponderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Write data to transponder
+      description: >
+        Writes group permissions and/or validity dates and coding lock to the transponder
+        in the read area. `timeLimitationStart`, `timeLimitationEnd` and `codingLock`
+        can be set independently of `lockedPermissions`.
+        The time component of date fields is always set to `00:00:00` when stored.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponder
+      tags: [Transponder Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  items:
+                    type: number
+                  minItems: 32
+                  maxItems: 32
+                  description: >
+                    Array of exactly 32 Hamming-coded (HD9) permission values for
+                    device groups 0 … 31. Each value must be a valid Hamming code.
+                timeLimitationStart:
+                  type: string
+                  description: >
+                    "Valid from" start date in UTC (RFC 3339, e.g. `2018-06-28T00:00:00Z`).
+                    Minimum date: 2000-01-01. The time component is reset to `00:00:00`
+                    before writing to the transponder.
+                    Pass an empty string `""` to delete the start date.
+                timeLimitationEnd:
+                  type: string
+                  description: >
+                    "Valid until" end date in UTC (RFC 3339, e.g. `2025-12-31T00:00:00Z`).
+                    Minimum date: 2000-01-01. The time component is reset to `00:00:00`
+                    before writing to the transponder.
+                    Pass an empty string `""` to delete the end date.
+                codingLock:
+                  type: boolean
+                  description: >
+                    `true` = activate coding lock (transponder will only authenticate on
+                    PITreaders with the same basic coding identifier);
+                    `false` = no coding restriction (default).
+            example:
+              permissions: [511, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+              timeLimitationStart: ""
+              timeLimitationEnd: "2025-12-31T00:00:00Z"
+              codingLock: false
+      responses:
+        '200':
+          description: Transponder data written successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/teachIn:
+    post:
+      summary: Teach coding identifier to transponder
+      description: >
+        Teaches the device's basic coding identifier to a transponder whose permission
+        area is locked (codingLock=true). The `teachInId` must exactly match the value
+        returned in the `teachInId` field of GET /api/transponder, ensuring that the
+        correct transponder is still in the read area at the time of writing.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTeachIn
+      tags: [Transponder Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [teachInId]
+              properties:
+                teachInId:
+                  type: string
+                  description: >
+                    The unique identifier of the transponder to teach.
+                    Must match the `teachInId` value returned by the most recent call to
+                    GET /api/transponder. This acts as a guard to confirm the correct
+                    transponder is still present in the read area.
+            example:
+              teachInId: "5B7111F84328AB81"
+      responses:
+        '200':
+          description: Coding identifier taught to transponder successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/initialize:
+    post:
+      summary: Initialize a third-party MIFARE DESFire transponder
+      description: >
+        Programs a third-party MIFARE DESFire transponder with the PITreader
+        application data structure. Requires custom AES keys to be configured
+        (POST /api/config/customKeys) and the MIFARE DESFire RFID protocol to be selected.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorInvalidSerialNumber` (serial number missing or invalid),
+        `API.errorInvalidOrderNumber` (order number contains invalid characters).
+
+        Error codes returned in `msg` on HTTP 500:
+        `API.errorMissingAppMasterKey`, `API.errorInsuficientMemory`,
+        `API.errorMissingPiccMasterKey`, `API.errorInvalidTransponder`,
+        `API.errorCreatingPITreaderApp`, `API.errorInvalidAppMasterKey`,
+        `API.errorInvalidPiccMasterKey`, `API.errorMissingCoding`,
+        `API.errorThirdPartySupport`, `API.errorInvalidAppDefaultKey`.
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderInitialize
+      tags: [Transponder Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [serialNumber]
+              properties:
+                serialNumber:
+                  type: number
+                  minimum: 0
+                  maximum: 9999999
+                  description: >
+                    Serial number to program onto the transponder (0 … 9,999,999).
+                    This becomes the transponder's serial number within the PITreader
+                    application structure.
+                orderNumber:
+                  type: number
+                  minimum: 0
+                  maximum: 4294967295
+                  description: >
+                    Optional order number to program onto the transponder
+                    (0 … 4,294,967,295).
+            example:
+              serialNumber: 1023
+              orderNumber: 0
+      responses:
+        '200':
+          description: Transponder initialized successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: >
+            Hardware or key configuration error. The `msg` field contains a specific
+            `API.error*` code indicating the cause.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+
+  /api/config/userData:
+    get:
+      summary: Read user data configuration
+      description: >
+        Returns the user data configuration (version, comment, and all parameter definitions)
+        currently stored on the PITreader.
+        User data configuration defines which parameters can be stored on transponders
+        (e.g. name, access level, expiry date). The version number allows clients to detect
+        whether the configuration on the device matches the one used to program the transponders.
+        Requires role ≥ 10 (Guest).
+      operationId: getUserDataConfig
+      tags: [User Data]
+      responses:
+        '200':
+          description: User data configuration with parameter definitions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/userData/reset:
+    post:
+      summary: Reset user data configuration
+      description: >
+        Deletes the user data configuration on the PITreader and replaces it with
+        an empty configuration (version = 0, no parameters).
+        No request body is required.
+
+        After a reset the user data on any transponders programmed with the old
+        configuration becomes inaccessible until the transponders are re-programmed
+        with the new configuration.
+
+        Requires role ≥ 400 (Device manager).
+      operationId: postUserDataReset
+      tags: [User Data]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: No body required; send an empty body or omit entirely.
+      responses:
+        '200':
+          description: User data configuration reset to empty state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/userData/version:
+    post:
+      summary: Set user data configuration version
+      description: >
+        Sets the version number and optional comment of the user data configuration.
+        Should be called after modifying parameters to stamp the configuration with a
+        new version number so that transponders can be identified as carrying data from
+        an older configuration version.
+        Requires role ≥ 400 (Device manager).
+      operationId: postUserDataVersion
+      tags: [User Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version]
+              properties:
+                version:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: >
+                    Version number of the user data configuration (1 … 65535).
+                    Increment this whenever the parameter definitions change.
+                comment:
+                  type: string
+                  maxLength: 63
+                  description: >
+                    Optional human-readable description of this configuration version
+                    (e.g. "Added language field"). UTF-8 string, max 63 bytes.
+            example:
+              version: 1
+              comment: "First draft"
+      responses:
+        '200':
+          description: User data configuration version set successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/userData/parameter:
+    post:
+      summary: Create or update a user data parameter definition
+      description: >
+        Creates a new parameter in the user data configuration or updates an existing one.
+        If the `id` is not yet in the configuration, a new parameter is created.
+        If it already exists, the parameter is updated in place.
+
+        Pre-defined system parameter IDs have fixed type requirements:
+        ID 1 must be type 30 (PERMISSION); IDs 2 and 3 must be type 20 (DATETIME).
+        See the PITreader operating manual for the full list of system parameters.
+
+        The `size` field is only required for type ID 1 (STRING):
+        `size` = required_character_count_in_bytes + 1 (for null terminator). Max 255.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorPredefinedId` (reserved ID used with wrong type or invalid size),
+        `""` (empty string) for other validation errors.
+
+        Requires role ≥ 400 (Device manager).
+      operationId: postUserDataParameter
+      tags: [User Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, name, type]
+              properties:
+                id:
+                  type: number
+                  minimum: 1
+                  maximum: 65535
+                  description: >
+                    Parameter ID (1 … 65535). IDs below 1000 are reserved for system
+                    parameters with fixed type requirements.
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 63
+                  description: >
+                    Human-readable parameter name (e.g. "EmployeeID", "AccessLevel").
+                    UTF-8 string, 1 … 63 characters.
+                type:
+                  type: number
+                  enum: [1, 10, 11, 12, 13, 14, 15, 20, 30, 31]
+                  description: >
+                    Type ID of the parameter's data type:
+                    `1`=STRING, `10`=INT8U, `11`=INT8S, `12`=INT16U, `13`=INT16S,
+                    `14`=INT32U, `15`=INT32S, `20`=DATETIME, `30`=PERMISSION, `31`=BIT.
+                size:
+                  type: number
+                  minimum: 2
+                  maximum: 255
+                  description: >
+                    Maximum storage size in bytes for a STRING parameter (type ID 1 only).
+                    Must be set to (maximum_characters_in_bytes + 1) to accommodate the
+                    null terminator. Range: 2 … 255.
+            example:
+              id: 1
+              name: "Permission"
+              type: 30
+      responses:
+        '200':
+          description: Parameter created or updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/userData:
+    get:
+      summary: Read user data from PITreader RAM
+      description: >
+        Returns the user data currently held in the PITreader's RAM buffer,
+        organised by parameter definition and device group.
+
+        The RAM buffer must be populated before calling this endpoint, either by:
+        - POST /api/transponder/userData/read (load from a transponder), or
+        - POST /api/transponder/userData/clear (initialise empty from configuration).
+
+        Requires role ≥ 10 (Guest).
+      operationId: getTransponderUserData
+      tags: [User Data]
+      responses:
+        '200':
+          description: User data currently held in the PITreader RAM.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransponderUserDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/userData/read:
+    post:
+      summary: Load user data from transponder into RAM
+      description: >
+        Reads the user data stored on the transponder currently in the read area
+        and loads it into the PITreader's RAM buffer. If the RAM already contains data,
+        it is overwritten.
+
+        After this call, use GET /api/transponder/userData to read the loaded data,
+        and POST /api/transponder/userData/write to write it back after modification.
+
+        HTTP 400: transponder not positioned in the read area.
+        HTTP 500: data on the transponder is missing or corrupt; use
+        POST /api/transponder/userData/clear to initialise a fresh buffer instead.
+
+        No request body required.
+        Requires role ≥ 10 (Guest).
+      operationId: postTransponderUserDataRead
+      tags: [User Data]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: No body required.
+      responses:
+        '200':
+          description: User data loaded from transponder into RAM successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          description: Bad request — transponder not positioned in the read area.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: >
+            Could not read data from the transponder — data missing or invalid.
+            Use POST /api/transponder/userData/clear to initialise the RAM instead.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+
+  /api/transponder/userData/clear:
+    post:
+      summary: Initialise user data RAM from configuration
+      description: >
+        Reinitialises the PITreader's user data RAM buffer based on the current user data
+        configuration (parameter definitions). A copy of the parameter definitions is made
+        and all parameter values are cleared to their initial values (0 for numeric types,
+        empty string for STRING/DATETIME).
+
+        Use this endpoint to prepare the RAM before writing user data to a transponder
+        for the first time, or to discard loaded transponder data and start fresh.
+
+        No request body required.
+        HTTP 400: transponder not positioned in the read area.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderUserDataClear
+      tags: [User Data]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: No body required.
+      responses:
+        '200':
+          description: RAM initialised to empty user data successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          description: Bad request — transponder not positioned in the read area.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/userData/write:
+    post:
+      summary: Write user data from RAM to transponder
+      description: >
+        Writes the user data currently in the PITreader's RAM buffer to the transponder
+        in the read area.
+
+        Before calling this endpoint the RAM must have been prepared by either:
+        - POST /api/transponder/userData/read (load from transponder then modify), or
+        - POST /api/transponder/userData/clear (initialise empty, then populate).
+
+        No request body required.
+        HTTP 400: transponder not positioned, or RAM was not prepared beforehand.
+        HTTP 500: write failed because the user data exceeds the transponder's memory capacity.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderUserDataWrite
+      tags: [User Data]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: No body required.
+      responses:
+        '200':
+          description: User data written from RAM to transponder successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          description: >
+            Bad request — transponder not positioned, or RAM was not initialised
+            via /clear or /read beforehand.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: >
+            Write failed — the user data in the RAM exceeds the transponder's memory capacity.
+            Reduce the number or size of parameters and try again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+
+  /api/transponder/userData/clearGroup:
+    post:
+      summary: Clear user data for a specific device group in RAM
+      description: >
+        Deletes the parameter values for a specific device group from the PITreader RAM buffer.
+        If `deviceGroup` is omitted, the default values (valid for all groups without a
+        specific override) are deleted.
+
+        Error code returned in `msg` on HTTP 400:
+        `API.errorInvalidDevicegroupIndex` if `deviceGroup` is out of range.
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderUserDataClearGroup
+      tags: [User Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceGroup:
+                  type: number
+                  minimum: 0
+                  maximum: 9999
+                  description: >
+                    Device group number whose parameter data should be deleted from RAM
+                    (0 … 9999). Optional — if omitted, the default values (applicable
+                    to all groups without a specific entry) are deleted.
+            example:
+              deviceGroup: 105
+      responses:
+        '200':
+          description: Device group data cleared from RAM successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/userData/addGroupValues:
+    post:
+      summary: Add user data values for a device group in RAM
+      description: >
+        Adds or replaces parameter values for a specific device group in the PITreader
+        RAM buffer. If `deviceGroup` is omitted, the values become the default values
+        (valid for all groups that have no specific override).
+
+        The total size of the JSON request body must not exceed 1100 bytes.
+        For larger datasets split the data across multiple requests.
+
+        The request is rejected if: the number of parameters exceeds the maximum;
+        a parameter ID does not exist in the configuration; a type ID does not match
+        the parameter definition; or a `size` value differs from the definition.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorInvalidDeviceGroupIndex`, `API.errorEmptyData` (values missing/empty),
+        `API.errorInvalidDataFormat` (unknown type or structure mismatch),
+        `API.errorInvalidGroupValue` (numeric out of range or string too long).
+
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderUserDataAddGroupValues
+      tags: [User Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [values]
+              properties:
+                deviceGroup:
+                  type: number
+                  minimum: 0
+                  maximum: 9999
+                  description: >
+                    Device group number for which these values are valid (0 … 9999).
+                    Optional — omit if the values should be the default (apply to all
+                    groups without a specific entry).
+                values:
+                  type: array
+                  description: >
+                    Array of parameter values to add for this device group.
+                    Each entry must reference a parameter ID that exists in the user data
+                    configuration, and the type and size must match the definition.
+                    Total JSON body size must not exceed 1100 bytes.
+                  items:
+                    type: object
+                    required: [id, type]
+                    properties:
+                      id:
+                        type: number
+                        minimum: 1
+                        maximum: 65535
+                        description: >
+                          Parameter ID. Must exist in the current user data configuration.
+                      type:
+                        type: number
+                        enum: [1, 10, 11, 12, 13, 14, 15, 20, 30, 31]
+                        description: >
+                          Type ID of the parameter. Must match the type in the configuration.
+                      size:
+                        type: number
+                        minimum: 2
+                        maximum: 255
+                        description: >
+                          Maximum storage size for STRING parameters (type ID 1).
+                          Must match the `size` in the parameter definition.
+                          Not required for other types.
+                      numericValue:
+                        type: number
+                        description: >
+                          Value for numeric parameter types (10-15, 30).
+                          Must be within the valid range for the type.
+                      stringValue:
+                        type: string
+                        description: >
+                          Value for STRING (type 1) or DATETIME (type 20) parameters.
+                          For DATETIME: RFC 3339 UTC format (e.g. `2018-06-28T00:00:00Z`);
+                          the value `"0"` is treated as an unset/empty date.
+                          For STRING: UTF-8, max length = `size` - 1 bytes.
+            example:
+              deviceGroup: 105
+              values:
+                - id: 10001
+                  type: 1
+                  size: 40
+                  stringValue: "James Pilz"
+      responses:
+        '200':
+          description: Group values added to RAM successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/led:
+    get:
+      summary: Read LED status and overwrite settings
+      description: >
+        Returns the current LED colour and flash mode (as driven by the device's internal
+        state) and the "LED overwrite" settings (externally forced colour/mode and whether
+        the overwrite is currently active).
+        Requires role ≥ 10 (Guest).
+      operationId: getLed
+      tags: [External Authentication]
+      responses:
+        '200':
+          description: Current LED state and overwrite configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Set LED overwrite settings
+      description: >
+        Configures the "LED overwrite" feature to force the LED to a specific colour
+        and flash mode, independent of the device's internal authentication state.
+        This is useful for external application-level signalling (e.g. indicating that
+        a door is unlocked).
+        At least one parameter must be supplied.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postLed
+      tags: [External Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                colour:
+                  type: number
+                  enum: [0, 1, 2, 3, 4]
+                  description: >
+                    LED colour to force when overwrite is active.
+                    `0`=off, `1`=blue, `2`=yellow, `3`=red, `4`=green.
+                flashMode:
+                  type: number
+                  enum: [0, 1]
+                  description: >
+                    LED flash mode to force when overwrite is active.
+                    `0`=static (continuous), `1`=flashing at 1 Hz.
+                activated:
+                  type: boolean
+                  description: >
+                    `true` = activate LED overwrite (LED will show `colour`/`flashMode`
+                    instead of the internal device state);
+                    `false` = deactivate LED overwrite (LED returns to reflecting
+                    the internal device state).
+            example:
+              colour: 2
+              flashMode: 0
+              activated: true
+      responses:
+        '200':
+          description: LED overwrite settings applied successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/me:
+    get:
+      summary: Read current user / API Client information
+      description: >
+        Returns the ID, name, role level and type of the API Client or user
+        whose Bearer token was used to authenticate the request.
+        Useful for verifying that a token is valid and checking the assigned role.
+        Requires role ≥ 10 (Guest).
+      operationId: getMe
+      tags: [Current User]
+      responses:
+        '200':
+          description: Information about the currently authenticated user or API Client.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/status/monitor:
+    get:
+      summary: Read comprehensive PITreader status
+      description: >
+        Returns a comprehensive snapshot of the device's current state including hardware
+        status, LED state, active configuration, current authentication result, the most
+        recent diagnostic log entry, and change counters (tags).
+
+        The change counters (`tags`) allow efficient polling: a client can compare the
+        counter values with those from a previous call to detect which data has changed
+        without reading all endpoints individually.
+
+        The optional `syncStatus` query parameter allows restarting the synchronisation
+        monitoring timeout (requires role ≥ 200). If synchronisation monitoring is not
+        active, the parameter is silently ignored.
+
+        Requires role ≥ 10 (Guest). Using `syncStatus` requires role ≥ 200.
+      operationId: getStatusMonitor
+      tags: [PITreader Status]
+      parameters:
+        - name: syncStatus
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            Restart synchronisation monitoring timeout.
+            `true` (default when supplied) = restart the monitoring timer with the
+            configured `syncTimeout`; `false` = do not restart.
+            If synchronisation monitoring (`syncMonitoringEnabled`) is not active,
+            this parameter is ignored.
+            Requires role ≥ 200 (Transponder manager).
+      responses:
+        '200':
+          description: Comprehensive PITreader status snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/deviceUsers:
+    get:
+      summary: Read list of device users
+      description: >
+        Returns a list of all device users configured on the device.
+        Role ≥ 400 (Device manager) can read users with a role lower than their own.
+        Role ≥ 500 (Administrator) can read all device users.
+      operationId: getDeviceUsers
+      tags: [Device User Management]
+      responses:
+        '200':
+          description: List of device users.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceUsersResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/deviceUser:
+    get:
+      summary: Read a single device user
+      description: >
+        Returns the detailed properties of the device user identified by the `name`
+        query parameter.
+        Role ≥ 400 (Device manager) can read users with a role lower than their own.
+        Role ≥ 500 (Administrator) can read all device users.
+      operationId: getDeviceUser
+      tags: [Device User Management]
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Name of the device user to read.
+      responses:
+        '200':
+          description: Device user properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceUserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Create, edit, or delete a device user
+      description: >
+        Creates, edits, or deletes a device user depending on the `action` field
+        in the request body.
+        Role ≥ 400 (Device manager) can manage users with roles lower than their own.
+        Role ≥ 500 (Administrator) can manage all device users.
+      operationId: updateDeviceUser
+      tags: [Device User Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUserRequest'
+      responses:
+        '200':
+          description: Operation result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/deviceUser/apiToken:
+    post:
+      summary: Renew API token for a device user
+      description: >
+        Generates a new API token for the specified device user.
+        The device user must have `authType` = 2 (API token). The old token is
+        immediately invalidated. The new token is returned in `data.token`.
+        Role ≥ 400 (Device manager) can renew tokens for users with roles lower
+        than their own. Role ≥ 500 (Administrator) can renew tokens for all users.
+      operationId: renewApiToken
+      tags: [Device User Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiTokenRenewRequest'
+      responses:
+        '200':
+          description: >
+            Token renewal result. On success, `data` contains `{ "token": "<new-token>" }`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/crypto:
+    get:
+      summary: Read transponder AES key info
+      description: >
+        Returns the type and identifier of the AES key currently stored on the
+        transponder in the read area. Returns `type` = 0 if no transponder is
+        present or no AES key is stored on the transponder.
+        Requires role ≥ 10 (Guest).
+      operationId: getTransponderCrypto
+      tags: [Transponder Data]
+      responses:
+        '200':
+          description: Transponder AES key information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransponderCryptoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Write AES key to transponder or perform crypto operation
+      description: >
+        Performs one or more cryptographic operations on the transponder in the
+        read area. The request body may contain any combination of the optional
+        sub-objects `key`, `encrypt`, and `decrypt`.
+
+        - **`key`**: Writes an AES key to the transponder. Requires role ≥ 200
+          (Transponder manager).
+        - **`encrypt`**: Encrypts data using the AES key stored on the transponder.
+          Requires role ≥ 10 (Guest).
+        - **`decrypt`**: Decrypts data using the AES key stored on the transponder.
+          Requires role ≥ 10 (Guest).
+
+        If `key` is present in the request, role ≥ 200 is required; otherwise role ≥ 10.
+        On success, `data` contains result sub-objects corresponding to each requested
+        operation (`data.key`, `data.encrypt`, `data.decrypt`), each with a `success`
+        field and operation-specific result data.
+      operationId: postTransponderCrypto
+      tags: [Transponder Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransponderCryptoRequest'
+      responses:
+        '200':
+          description: Crypto operation result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/certificate/regenerate:
+    post:
+      summary: Regenerate device TLS certificate
+      description: >
+        Generates a new self-signed TLS certificate for the device, optionally
+        also generating a new private key. The new certificate takes effect
+        immediately. Requires role ≥ 500 (Administrator).
+      operationId: regenerateCertificate
+      tags: [Certificate Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificateRegenerateRequest'
+      responses:
+        '200':
+          description: Certificate regeneration result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/backup:
+    get:
+      summary: Download configuration backup
+      description: >
+        Downloads the current device configuration as a binary backup file.
+        Role ≥ 400 (Device manager) receives a partial backup (network and
+        security-sensitive settings may be excluded).
+        Role ≥ 500 (Administrator) receives the full backup.
+      operationId: getFilesBackup
+      tags: [Files]
+      responses:
+        '200':
+          description: Configuration backup file (binary).
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/restore:
+    post:
+      summary: Restore configuration from backup file
+      description: >
+        Uploads a configuration backup file (previously obtained from
+        GET /api/files/backup) to restore the device configuration.
+        Role ≥ 400 (Device manager) can restore a partial backup (network and
+        security-sensitive settings are not restored from the file).
+        Role ≥ 500 (Administrator) can perform a full restore.
+        The device reboots automatically if the restored configuration requires it.
+      operationId: postFilesRestore
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                restore.config:
+                  type: string
+                  format: binary
+                  description: The configuration backup file to restore.
+      responses:
+        '200':
+          description: Restore operation result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/certificate:
+    post:
+      summary: Upload TLS certificate
+      description: >
+        Uploads a new TLS certificate (and optionally its private key) to the device.
+        The certificate replaces the existing device certificate immediately.
+        Requires role ≥ 500 (Administrator).
+      operationId: postFilesCertificate
+      tags: [Certificate Management]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                certFile:
+                  type: string
+                  format: binary
+                  description: PEM-encoded certificate file (optionally including private key).
+      responses:
+        '200':
+          description: Certificate upload result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/firmware:
+    post:
+      summary: Upload firmware package
+      description: >
+        Uploads a firmware update package to the device. The device validates the
+        package but does not apply it immediately. After a successful upload, call
+        POST /api/firmware/update with `action` = 0 (confirm) and the `hash` value
+        returned in `data.hash` to apply the update, or `action` = 1 (cancel) to
+        discard the package. Requires role ≥ 400 (Device manager).
+      operationId: postFilesFirmware
+      tags: [Firmware]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The firmware update package file.
+      responses:
+        '200':
+          description: >
+            Upload result. On success, `data` contains `{ "hash": "<package-hash>" }`.
+            Pass the hash to POST /api/firmware/update to confirm the update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/opcua/server:
+    get:
+      summary: Download OPC UA server certificate
+      description: >
+        Downloads the OPC UA server certificate of the device as a binary file.
+        Requires role ≥ 400 (Device manager).
+      operationId: getFilesOpcuaServer
+      tags: [Files]
+      responses:
+        '200':
+          description: OPC UA server certificate (binary).
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/firmware/update:
+    post:
+      summary: Confirm or cancel firmware update
+      description: >
+        Confirms or cancels a previously uploaded firmware package (see
+        POST /api/files/firmware). Use `action` = 0 (confirm) with the `hash`
+        returned by the upload to apply the firmware; the device reboots to
+        complete the update. Use `action` = 1 (cancel) to discard the uploaded
+        package without updating. Requires role ≥ 400 (Device manager).
+      operationId: postFirmwareUpdate
+      tags: [Firmware]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirmwareUpdateRequest'
+      responses:
+        '200':
+          description: Firmware update/cancel result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+tags:
+  - name: General Device Information
+    description: >
+      Device status, general configuration, basic and OEM coding, block list,
+      permission list, device group names, and custom AES key management.
+  - name: Authentication Status
+    description: >
+      Read the current transponder authentication status and single-authentication
+      lock state.
+  - name: Transponder Data
+    description: >
+      Read and write transponder permissions, validity dates, coding lock, teach-in,
+      and third-party transponder initialisation.
+  - name: User Data
+    description: >
+      Manage the user data configuration (parameter definitions) stored on the PITreader,
+      and perform RAM operations to load, modify and write user data on transponders.
+  - name: External Authentication
+    description: >
+      Set external authentication results (permission and user data) for transponders
+      in External mode, and control LED overwrite.
+  - name: Current User
+    description: Retrieve information about the currently authenticated API Client or user.
+  - name: PITreader Status
+    description: >
+      Comprehensive device status monitor with change counters for efficient polling
+      and synchronisation monitoring control.
+  - name: Device User Management
+    description: >
+      Manage device users: list, read, create, edit, and delete device users,
+      and renew API tokens.
+  - name: Certificate Management
+    description: >
+      Manage TLS certificates: regenerate the device certificate and upload
+      externally signed certificates.
+  - name: Files
+    description: >
+      File transfer operations: download configuration backups, restore
+      configuration from a backup file, and download the OPC UA server certificate.
+  - name: Firmware
+    description: >
+      Firmware update workflow: upload a firmware package and then confirm
+      or cancel the update.

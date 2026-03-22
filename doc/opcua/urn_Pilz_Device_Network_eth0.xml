@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <NamespaceUris>
+    <Uri>urn:Pilz:Device:Network:eth0</Uri>
+  </NamespaceUris>
+  <Aliases>
+    <Alias Alias="Boolean">i=1</Alias>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="DateTime">i=13</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+  </Aliases>
+  <UAObject BrowseName="1:Network" NodeId="ns=1;i=1001" ParentNodeId="i=85">
+    <DisplayName>Network</DisplayName>
+    <Description>The base type for all object nodes.</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="Organizes">i=85</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2002</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2003</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2007</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2009</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2010</Reference>
+    </References>
+  </UAObject>
+  <UAVariable BrowseName="1:IPAddressV4" DataType="String" NodeId="ns=1;i=2001" ParentNodeId="ns=1;i=1001">
+    <DisplayName>IPAddressV4</DisplayName>
+    <Description>IPAddressV4</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable BrowseName="1:SubnetMaskV4" DataType="String" NodeId="ns=1;i=2002" ParentNodeId="ns=1;i=1001">
+    <DisplayName>SubnetMaskV4</DisplayName>
+    <Description>SubnetMaskV4</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable BrowseName="1:MACAddress" DataType="String" NodeId="ns=1;i=2007" ParentNodeId="ns=1;i=1001">
+    <DisplayName>MACAddress</DisplayName>
+    <Description>MACAddress</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable BrowseName="1:SNTPV4" DataType="String" NodeId="ns=1;i=2009" ParentNodeId="ns=1;i=1001">
+    <DisplayName>SNTPV4</DisplayName>
+    <Description>SNTPV4</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable BrowseName="1:GatewayV4" DataType="String" NodeId="ns=1;i=2003" ParentNodeId="ns=1;i=1001">
+    <DisplayName>GatewayV4</DisplayName>
+    <Description>GatewayV4</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable BrowseName="1:RealTimeClock" DataType="DateTime" NodeId="ns=1;i=2010" ParentNodeId="ns=1;i=1001">
+    <DisplayName>RealTimeClock</DisplayName>
+    <Description>RealTimeClock</Description>
+    <References>
+      <Reference IsForward="false" ReferenceType="HasComponent">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:DateTime>2020-01-31T12:00:00</uax:DateTime>
+    </Value>
+  </UAVariable>
+</UANodeSet>

@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet LastModified="2021-07-15T06:23:08.009Z" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns:si="http://www.siemens.com/OPCUA/2017/SimaticNodeSetExtensions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <NamespaceUris>
+        <Uri>urn:Pilz:PITreader</Uri>
+        <Uri>urn:Pilz:PITreader:UserData</Uri>
+    </NamespaceUris>
+    <Models>
+        <Model ModelUri="urn:Pilz:PITreader" PublicationDate="2021-07-15T00:00:00Z" Version="1.00">
+            <RequiredModel ModelUri="http://opcfoundation.org/UA/" PublicationDate="2020-07-15T00:00:00Z" Version="1.04.7"/>
+        </Model>
+        <Model ModelUri="urn:Pilz:PITreader:UserData" PublicationDate="2021-07-15T00:00:00Z" Version="1.00"/>
+    </Models>
+    <Aliases>
+        <Alias Alias="Boolean">i=1</Alias>
+        <Alias Alias="Byte">i=3</Alias>
+        <Alias Alias="UInt16">i=5</Alias>
+        <Alias Alias="UInt32">i=7</Alias>
+        <Alias Alias="DateTime">i=13</Alias>
+        <Alias Alias="String">i=12</Alias>
+        <Alias Alias="HasComponent">i=47</Alias>
+        <Alias Alias="Organizes">i=35</Alias>
+        <Alias Alias="HasTypeDefinition">i=40</Alias>
+    </Aliases>
+    <Extensions>
+        <Extension>
+            <si:Generator Product="SiOME" Edition="Standard" Version="2.2.0"/>
+        </Extension>
+        <Extension>
+            <si:GeneratorExtension Hash="61ef1c380435c84ad64d364e6d5ee11a"/>
+        </Extension>
+    </Extensions>
+    <UAObject NodeId="ns=1;i=1001" BrowseName="1:PITreader" ParentNodeId="i=85">
+        <DisplayName>PITreader</DisplayName>
+        <Description>The base type for all object nodes.</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1002" BrowseName="1:Device" ParentNodeId="ns=1;i=1001">
+        <DisplayName>Device</DisplayName>
+        <Description>Device</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1003" BrowseName="1:Transponder" ParentNodeId="ns=1;i=1001">
+        <DisplayName>Transponder</DisplayName>
+        <Description>Transponder</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1004" BrowseName="1:LED" ParentNodeId="ns=1;i=1001">
+        <DisplayName>LED</DisplayName>
+        <Description>LED</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1005" BrowseName="1:Configuration" ParentNodeId="ns=1;i=1002">
+        <DisplayName>Configuration</DisplayName>
+        <Description>Configuration</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1002</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1006" BrowseName="1:State" ParentNodeId="ns=1;i=1003">
+        <DisplayName>State</DisplayName>
+        <Description>State</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1003</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1007" BrowseName="1:Product" ParentNodeId="ns=1;i=1003">
+        <DisplayName>Product</DisplayName>
+        <Description>Product</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1003</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAObject NodeId="ns=1;i=1008" BrowseName="1:Data" ParentNodeId="ns=1;i=1003">
+        <DisplayName>Data</DisplayName>
+        <Description>Data</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1003</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="String" NodeId="ns=1;i=2003" BrowseName="1:DeviceName" ParentNodeId="ns=1;i=1005">
+        <DisplayName>DeviceName</DisplayName>
+        <Description>DeviceName</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt16" NodeId="ns=1;i=2004" BrowseName="1:HTTPPort" ParentNodeId="ns=1;i=1005">
+        <DisplayName>HTTPPort</DisplayName>
+        <Description>HTTPPort</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt16>0</uax:UInt16>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt16" NodeId="ns=1;i=2005" BrowseName="1:HTTPSPort" ParentNodeId="ns=1;i=1005">
+        <DisplayName>HTTPSPort</DisplayName>
+        <Description>HTTPSPort</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt16>0</uax:UInt16>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2006" BrowseName="1:HTTPEnabled" ParentNodeId="ns=1;i=1005">
+        <DisplayName>HTTPEnabled</DisplayName>
+        <Description>HTTPEnabled</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt16" NodeId="ns=1;i=2007" BrowseName="1:ModbusTCPPort" ParentNodeId="ns=1;i=1005">
+        <DisplayName>ModbusTCPPort</DisplayName>
+        <Description>ModbusTCPPort</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt16>0</uax:UInt16>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2008" BrowseName="1:ModbusTCPEnabled" ParentNodeId="ns=1;i=1005">
+        <DisplayName>ModbusTCPEnabled</DisplayName>
+        <Description>ModbusTCPEnabled</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2009" BrowseName="1:DeviceGroup" ParentNodeId="ns=1;i=1005">
+        <DisplayName>DeviceGroup</DisplayName>
+        <Description>DeviceGroup</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2010" BrowseName="1:AuthenticationMode" ParentNodeId="ns=1;i=1005">
+        <DisplayName>AuthenticationMode</DisplayName>
+        <Description>AuthenticationMode</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2011" BrowseName="1:IOPortFunction" ParentNodeId="ns=1;i=1005">
+        <DisplayName>IOPortFunction</DisplayName>
+        <Description>IOPortFunction</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2012" BrowseName="1:EvaluateTimeLimitation" ParentNodeId="ns=1;i=1005">
+        <DisplayName>EvaluateTimeLimitation</DisplayName>
+        <Description>EvaluateTimeLimitation</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2013" BrowseName="1:Authenticated" ParentNodeId="ns=1;i=1006">
+        <DisplayName>Authenticated</DisplayName>
+        <Description>Authenticated</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2014" BrowseName="1:OrderNumber" ParentNodeId="ns=1;i=1007">
+        <DisplayName>OrderNumber</DisplayName>
+        <Description>OrderNumber</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1007</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2015" BrowseName="1:SerialNumber" ParentNodeId="ns=1;i=1007">
+        <DisplayName>SerialNumber</DisplayName>
+        <Description>SerialNumber</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1007</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2017" BrowseName="1:Permission" ParentNodeId="ns=1;i=1006">
+        <DisplayName>Permission</DisplayName>
+        <Description>Permission</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2050" BrowseName="1:LockedPermissions" ParentNodeId="ns=1;i=1006">
+        <DisplayName>LockedPermissions</DisplayName>
+        <Description>LockedPermissions</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="DateTime" NodeId="ns=1;i=2051" BrowseName="1:TimeLimitationStart" ParentNodeId="ns=1;i=1008">
+        <DisplayName>TimeLimitationStart</DisplayName>
+        <Description>TimeLimitationStart</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1008</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:DateTime>2020-01-31T12:00:00</uax:DateTime>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="DateTime" NodeId="ns=1;i=2052" BrowseName="1:TimeLimitationEnd" ParentNodeId="ns=1;i=1008">
+        <DisplayName>TimeLimitationEnd</DisplayName>
+        <Description>TimeLimitationEnd</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1008</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:DateTime>2020-01-31T12:00:00</uax:DateTime>
+        </Value>
+    </UAVariable>
+    <UAObject NodeId="ns=1;i=1009" BrowseName="1:State" ParentNodeId="ns=1;i=1004">
+        <DisplayName>State</DisplayName>
+        <Description>State</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1004</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2053" BrowseName="1:Colour" ParentNodeId="ns=1;i=1009">
+        <DisplayName>Colour</DisplayName>
+        <Description>Colour</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1009</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2054" BrowseName="1:FlashMode" ParentNodeId="ns=1;i=1009">
+        <DisplayName>FlashMode</DisplayName>
+        <Description>FlashMode</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1009</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAObject NodeId="ns=1;i=1010" BrowseName="1:Overwrite" ParentNodeId="ns=1;i=1004">
+        <DisplayName>Overwrite</DisplayName>
+        <Description>Overwrite</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1004</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2055" BrowseName="1:Colour" ParentNodeId="ns=1;i=1010" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Colour</DisplayName>
+        <Description>Colour</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1010</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2056" BrowseName="1:FlashMode" ParentNodeId="ns=1;i=1010" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>FlashMode</DisplayName>
+        <Description>FlashMode</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1010</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2057" BrowseName="1:Activated" ParentNodeId="ns=1;i=1010" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Activated</DisplayName>
+        <Description>Activated</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1010</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" ValueRank="1" NodeId="ns=1;i=2058" BrowseName="1:Permissions" ParentNodeId="ns=1;i=1008">
+        <DisplayName>Permissions</DisplayName>
+        <Description>Permissions</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1008</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:ListOfUInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+                <uax:UInt32>0</uax:UInt32>
+            </uax:ListOfUInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2018" BrowseName="1:SecurityIdString" ParentNodeId="ns=1;i=1007">
+        <DisplayName>SecurityIdString</DisplayName>
+        <Description>SecurityIdString</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1007</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAObject NodeId="ns=1;i=1011" BrowseName="1:State" ParentNodeId="ns=1;i=1001">
+        <DisplayName>State</DisplayName>
+        <Description>State</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2001" BrowseName="1:SEUStatus" ParentNodeId="ns=1;i=1011">
+        <DisplayName>SEUStatus</DisplayName>
+        <Description>SEUStatus</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2002" BrowseName="1:TimeZone" ParentNodeId="ns=1;i=1005">
+        <DisplayName>TimeZone</DisplayName>
+        <Description>TimeZone</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2016" BrowseName="1:AuthenticationStatus" ParentNodeId="ns=1;i=1006">
+        <DisplayName>AuthenticationStatus</DisplayName>
+        <Description>AuthenticationStatus</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAObject NodeId="ns=1;i=1012" BrowseName="1:ExternalAuth" ParentNodeId="ns=1;i=1001">
+        <DisplayName>ExternalAuth</DisplayName>
+        <Description>ExternalAuth</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2019" BrowseName="1:Permission" ParentNodeId="ns=1;i=1012" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Permission</DisplayName>
+        <Description>Permission</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1012</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2020" BrowseName="1:SecurityId" ParentNodeId="ns=1;i=1012" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>SecurityId</DisplayName>
+        <Description>SecurityId</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1012</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2021" BrowseName="1:Apply" ParentNodeId="ns=1;i=1012" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Apply</DisplayName>
+        <Description>Apply</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1012</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>true</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2022" BrowseName="1:Location" ParentNodeId="ns=1;i=1005">
+        <DisplayName>Location</DisplayName>
+        <Description>Location</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2023" BrowseName="1:UserDataConfigVersion" ParentNodeId="ns=1;i=1005">
+        <DisplayName>UserDataConfigVersion</DisplayName>
+        <Description>UserDataConfigVersion</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2024" BrowseName="1:UserDataConfigComment" ParentNodeId="ns=1;i=1005">
+        <DisplayName>UserDataConfigComment</DisplayName>
+        <Description>UserDataConfigComment</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2025" BrowseName="1:IOPortMode" ParentNodeId="ns=1;i=1011">
+        <DisplayName>IOPortMode</DisplayName>
+        <Description>IOPortMode</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2026" BrowseName="1:IOPortValue" ParentNodeId="ns=1;i=1011">
+        <DisplayName>IOPortValue</DisplayName>
+        <Description>IOPortValue</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAObject NodeId="ns=1;i=1013" BrowseName="1:UserData" ParentNodeId="ns=1;i=1006">
+        <DisplayName>UserData</DisplayName>
+        <Description>UserData</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=61</Reference>
+        </References>
+    </UAObject>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2059" BrowseName="1:AuthenticationType" ParentNodeId="ns=1;i=1005">
+        <DisplayName>AuthenticationType</DisplayName>
+        <Description>AuthenticationType</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Byte" ValueRank="1" NodeId="ns=1;i=2060" BrowseName="1:CodingChecksumBasic" ParentNodeId="ns=1;i=1011">
+        <DisplayName>CodingChecksumBasic</DisplayName>
+        <Description>CodingChecksumBasic</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:ListOfByte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+            </uax:ListOfByte>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Byte" ValueRank="1" NodeId="ns=1;i=2061" BrowseName="1:CodingChecksumOem" ParentNodeId="ns=1;i=1011">
+        <DisplayName>CodingChecksumOem</DisplayName>
+        <Description>CodingChecksumOem</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:ListOfByte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+                <uax:Byte>0</uax:Byte>
+            </uax:ListOfByte>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2062" BrowseName="1:SingleAuthSecurityIdString" ParentNodeId="ns=1;i=1011">
+        <DisplayName>SingleAuthSecurityIdString</DisplayName>
+        <Description>SingleAuthSecurityIdString</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Byte" NodeId="ns=1;i=2063" BrowseName="1:PermissionDisplay" ParentNodeId="ns=1;i=1006">
+        <DisplayName>PermissionDisplay</DisplayName>
+        <Description>PermissionDisplay</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Byte>0</uax:Byte>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="UInt32" NodeId="ns=1;i=2064" BrowseName="1:FailureReason" ParentNodeId="ns=1;i=1006">
+        <DisplayName>FailureReason</DisplayName>
+        <Description>FailureReason</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:UInt32>0</uax:UInt32>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2065" BrowseName="1:TransponderUidString" ParentNodeId="ns=1;i=1007">
+        <DisplayName>TransponderUidString</DisplayName>
+        <Description>TransponderUidString</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1007</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+</UANodeSet>

@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='utf-8'?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>urn:Pilz:Device:Nameplate</Uri>
+  </NamespaceUris>
+  <Aliases>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+  </Aliases>
+  <UAObject NodeId="ns=1;i=1001" BrowseName="1:Nameplate" ParentNodeId="i=85">
+    <DisplayName>Nameplate</DisplayName>
+    <Description>The base type for all object nodes.</Description>
+    <References>
+      <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2004</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2007</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2002</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2003</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2005</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2008</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2009</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2010</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2011</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2012</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=2013</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=2004" BrowseName="1:FirmwareVersion" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>FirmwareVersion</DisplayName>
+    <Description>FirmwareVersion</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2007" BrowseName="1:HardwareVersion" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>HardwareVersion</DisplayName>
+    <Description>HardwareVersion</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2001" BrowseName="1:SerialNumber" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>SerialNumber</DisplayName>
+    <Description>SerialNumber</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2002" BrowseName="1:OrderNumber" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>OrderNumber</DisplayName>
+    <Description>OrderNumber</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2003" BrowseName="1:ProductType" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>ProductType</DisplayName>
+    <Description>ProductType</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2005" BrowseName="1:FirmwareBuild" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>FirmwareBuild</DisplayName>
+    <Description>FirmwareBuild</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2008" BrowseName="1:PtRevision" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>PtRevision</DisplayName>
+    <Description>PtRevision</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2009" BrowseName="1:SalesVersion" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>SalesVersion</DisplayName>
+    <Description>SalesVersion</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Null</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2010" BrowseName="1:DocumentationUri" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>DocumentationUri</DisplayName>
+    <Description>DocumentationUri</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>https://www.pilz.com/manuals</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2011" BrowseName="1:Manufacturer" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>Manufacturer</DisplayName>
+    <Description>Manufacturer</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Pilz GmbH &amp; Co. KG</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2012" BrowseName="1:ManufacturerUri" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>ManufacturerUri</DisplayName>
+    <Description>ManufacturerUri</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>pilz.com</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=2013" BrowseName="1:ManufacturerAddress" ParentNodeId="ns=1;i=1001" DataType="String">
+    <DisplayName>ManufacturerAddress</DisplayName>
+    <Description>ManufacturerAddress</Description>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+    </References>
+    <Value>
+      <uax:String>Felix-Wankel-Straße 2
+73760 Ostfildern
+Germany</uax:String>
+    </Value>
+  </UAVariable>
+</UANodeSet>
