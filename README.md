@@ -17,6 +17,8 @@ This repository contains libraries to connect to the device using the HTTPS REST
 
 [doc/](doc/) contains information about all APIs of the device with [OPC UA](doc/opcua.md) [xml namespace files](doc/opcua/), an [OpenAPI yaml](doc/restapi_openapi.yaml) file for the [REST API](doc/restapi.md) and a description of the [Modbus/TCP Server](doc/modbustcp.md).
 
+The [PTM file format](doc/ptm.md) used by PIT Transponder Manager and PIT User Authentication Service (UAS) is documented with a [JSON Schema](doc/ptm.json) (base) and a [strict v1.2 profile](doc/ptm-v1.2-strict.json). This format is used for exchanging transponder data, user profiles, permissions, and device group configurations between PTM, Myzel Lifecycle Platform (MLP), and UAS.
+
 Additionally the offical documentation about the features of the device and publicly available APIs is available in the download section on pilz.com:
 
 - [Operating Manual for PITreader devices](https://www.pilz.com/en-INT/search#SEARCH=1004806&pilz_group_type=download)
@@ -35,6 +37,17 @@ In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example applicat
 - setting the basic coding
 - monitoring a device for change
 - updating the firmware of a device
+
+## PIT Transponder Manager Support Tools
+
+[ptm-support/](ptm-support/) contains .NET tools for working with PIT Transponder Manager (PTM):
+
+- **PITTransponderManager** — shared library with the [PTM data model](doc/ptm.md), serialization, and PTM REST API client
+- **PITTransponderManager.Import** — CLI tool to import third-party RFID transponder UIDs from CSV into PTM (computes Security IDs, auto-detects UID byte order)
+- **PITTransponderManager.LdapExport** — CLI tool to synchronize user data from Active Directory / LDAP into PTM
+- **PITTransponderManager.Service** — Windows service wrapper for the PTM server process
+
+See [ptm-support/README.md](ptm-support/README.md) for details.
 
 ## Commissioning and Setup Tool
 

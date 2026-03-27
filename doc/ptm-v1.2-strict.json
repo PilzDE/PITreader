@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema#",
+  "$id": "https://pilz.com/schemas/import/ptm-v1.2-strict.json",
+  "title": "PTM file format - strict v1.2 profile",
+  "description": "Strict schema profile for PTM v1.2 consumption. PTM requires version 1.2, all sections present, and all transponder fields populated. Extends the base ptm.json schema.",
+  "allOf": [
+    { "$ref": "ptm.json" },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "array",
+          "items": {
+            "const": "1.2"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "required": [
+        "transponders",
+        "groups",
+        "blocklists",
+        "users",
+        "userDefinedDataFields",
+        "permissions",
+        "templates",
+        "version"
+      ]
+    }
+  ]
+}

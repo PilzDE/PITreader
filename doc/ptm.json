@@ -1,0 +1,462 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema#",
+  "$id": "https://pilz.com/schemas/import/ptm.json",
+  "title": "PTM file format",
+  "description": "Schema for .ptm files produced and consumed by PIT Transponder Manager (PTM), Myzel Lifecycle Platform (MLP), and UAS. This is the permissive base schema accepting the union of all valid files from any producer.",
+  "$defs": {
+    "version": {
+      "type": "string",
+      "description": "PTM file format version, corresponding to the PIT Transponder Manager version that produced the file.",
+      "enum": ["1.1", "1.2"]
+    },
+    "user": {
+      "type": "object",
+      "description": "A transponder holder profile. Not to be confused with PITreader device users (Guest/Transponder manager/Device manager/Administrator).",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email address of the transponder holder. In MLP, must be a valid email; in PTM, can be any string. Used as primary key for transponder-to-user mapping. Can be empty."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name."
+        },
+        "surname": {
+          "type": "string",
+          "description": "Last name."
+        },
+        "role": {
+          "type": ["string", "null"],
+          "description": "Role identifier, or null. In PTM: human-readable role string (e.g., 'Maintenance Lead'); in MLP: opaque ID string. Not related to PITreader device user roles."
+        },
+        "userID": {
+          "type": ["string", "null"],
+          "description": "Unique user identifier. In MLP: opaque ID used as transponder-to-user mapping key. In PTM: typically empty or null."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether this transponder holder account is active. PTM-specific field."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Holder validity start date (format: YYYY-M-D, non-zero-padded), or empty string if unset. PTM-specific field."
+        },
+        "endDate": {
+          "type": "string",
+          "description": "Holder validity end date (format: YYYY-M-D, non-zero-padded), or empty string if unset. PTM-specific field."
+        },
+        "company": {
+          "type": ["string", "null"],
+          "description": "Company or organization name, or null. PTM-specific field."
+        },
+        "phoneNumber": {
+          "type": ["string", "null"],
+          "description": "Phone number with country code (e.g., '+49 123 456 7890'), or null. PTM-specific field."
+        },
+        "description": {
+          "type": ["string", "null"],
+          "description": "Free-text description, or null. PTM-specific field."
+        },
+        "image": {
+          "type": ["string", "null"],
+          "description": "Base64-encoded PNG profile image, or null. PTM-specific field."
+        }
+      },
+      "required": [
+        "firstName",
+        "surname"
+      ]
+    },
+    "blocklist": {
+      "type": "object",
+      "description": "A list of transponders denied access regardless of their permission level.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Blocklist name."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Blocklist description."
+        },
+        "entries": {
+          "type": "array",
+          "description": "Array of blocked transponder entries.",
+          "items": {
+            "$ref": "#/$defs/blocklist_entry"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "comment",
+        "entries"
+      ]
+    },
+    "permission": {
+      "type": "object",
+      "description": "A permission level definition. Determines authorization levels for transponders.",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "description": "Permission level (0-64). 0 = no permission; 1-64 = increasing authorization.",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "If true, this permission level is hidden from selection in the PTM UI."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable permission name. Can be empty."
+        }
+      },
+      "required": [
+        "number",
+        "hidden",
+        "name"
+      ]
+    },
+    "group": {
+      "type": "object",
+      "description": "A device group definition. Transponders store per-group permissions and validity dates.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable group name (e.g., 'Lathes, Hall 15'). Can be empty."
+        },
+        "number": {
+          "type": "integer",
+          "description": "Device group number (0-9999).",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "image": {
+          "type": ["string", "null"],
+          "description": "Base64-encoded PNG group image, or null. PTM-specific field; absent in MLP exports."
+        }
+      },
+      "required": [
+        "name",
+        "number"
+      ]
+    },
+    "template": {
+      "type": "object",
+      "description": "A reusable transponder configuration template with default permissions, dates, and user data values.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Template name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Template description."
+        },
+        "groupPermissions": {
+          "type": "array",
+          "description": "Default per-group permission assignments.",
+          "items": {
+            "$ref": "#/$defs/group_permission"
+          }
+        },
+        "groupDates": {
+          "type": "array",
+          "description": "Default per-group validity dates.",
+          "items": {
+            "$ref": "#/$defs/group_date"
+          }
+        },
+        "userDefinedDataKeyValues": {
+          "type": "array",
+          "description": "Default user data parameter values.",
+          "items": {
+            "$ref": "#/$defs/user_defined_data_key_value"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "groupPermissions",
+        "groupDates",
+        "userDefinedDataKeyValues"
+      ]
+    },
+    "transponder": {
+      "type": "object",
+      "description": "An RFID transponder configuration (key, card, sticker, or third-party).",
+      "properties": {
+        "secureId": {
+          "type": "string",
+          "description": "Security ID - unique transponder identifier (16-char hex). Called 'securityId' in REST API. Empty string if not yet assigned.",
+          "pattern": "^([0-9A-Fa-f]{16})?$"
+        },
+        "serialNo": {
+          "type": "string",
+          "description": "Transponder serial number (9-digit numeric string). Internal structure: 2-digit prefix (top byte) + 7-digit consecutive number (lower 3 bytes). Empty string for third-party transponders.",
+          "pattern": "^([0-9]{9})?$"
+        },
+        "transponderId": {
+          "type": ["string", "null"],
+          "description": "Alternative transponder identifier, empty string, or null."
+        },
+        "orderNo": {
+          "type": "string",
+          "description": "Article/order number of the transponder product (e.g., '402260'), or empty string."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Validity period start date (format: YYYY-M-D, non-zero-padded). Called 'timeLimitationStart' in REST API. Empty string if unset."
+        },
+        "endDate": {
+          "type": "string",
+          "description": "Validity period end date (format: YYYY-M-D, non-zero-padded). Called 'timeLimitationEnd' in REST API. Empty string means no expiry."
+        },
+        "user": {
+          "type": "string",
+          "description": "Assigned transponder holder identifier. In PTM exports, this is the user's email; in MLP exports, this is the user's userID. Consumers resolve to users[] by matching email first, then falling back to userID."
+        },
+        "groupPermissions": {
+          "type": "array",
+          "description": "Per-device-group permission assignments for this transponder.",
+          "items": {
+            "$ref": "#/$defs/group_permission"
+          }
+        },
+        "groupDates": {
+          "type": "array",
+          "description": "Per-device-group validity date overrides for this transponder.",
+          "items": {
+            "$ref": "#/$defs/group_date"
+          }
+        },
+        "userDefinedDataKeyValues": {
+          "type": "array",
+          "description": "User data parameter values stored on this transponder. Called 'user data' in REST API.",
+          "items": {
+            "$ref": "#/$defs/user_defined_data_key_value"
+          }
+        },
+        "type": {
+          "type": "string",
+          "description": "Transponder hardware type: PILZ_KEY (key fob), PILZ_CARD (card), PILZ_STICKER (sticker), or THIRD_PARTY_TRANSPONDER (non-Pilz RFID).",
+          "enum": ["PILZ_KEY", "PILZ_CARD", "PILZ_STICKER", "THIRD_PARTY_TRANSPONDER"]
+        }
+      },
+      "required": [
+        "serialNo",
+        "orderNo",
+        "startDate",
+        "endDate",
+        "secureId",
+        "groupDates",
+        "groupPermissions",
+        "userDefinedDataKeyValues",
+        "user"
+      ]
+    },
+    "blocklist_entry": {
+      "type": "object",
+      "description": "A blocked transponder entry.",
+      "properties": {
+        "key": {
+          "type": "object",
+          "description": "Transponder identifier for the blocked entry.",
+          "properties": {
+            "serialNo": {
+              "type": "string",
+              "description": "Serial number of the blocked transponder."
+            },
+            "secureId": {
+              "type": "string",
+              "description": "Security ID of the blocked transponder.",
+              "pattern": "^[0-9A-Fa-f]{16}$"
+            }
+          },
+          "required": [
+            "serialNo"
+          ]
+        },
+        "comment": {
+          "type": "string",
+          "description": "Reason for blocking (max 32 bytes UTF-8)."
+        }
+      },
+      "required": [
+        "key",
+        "comment"
+      ]
+    },
+    "user_defined_data_key_value": {
+      "type": "object",
+      "description": "A user data parameter value. Associates a parameter (by deviceId) with a value, optionally scoped to a device group.",
+      "properties": {
+        "groupNo": {
+          "type": ["integer", "null"],
+          "description": "Device group number (0-9999) this value applies to, or null for group-independent default value.",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "The parameter value as a string."
+        },
+        "deviceId": {
+          "type": "integer",
+          "description": "Parameter ID (1-65535) referencing a userDefinedDataFields entry by its deviceId. Called 'parameterId' in REST API.",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "groupNo",
+        "defaultValue",
+        "deviceId"
+      ]
+    },
+    "user_defined_field": {
+      "type": "object",
+      "description": "A user data parameter definition. Defines a custom parameter that can be stored on transponders. Called 'user data configuration' in REST API.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parameter name (1-63 UTF-8 characters). Called 'parameter name' in REST API."
+        },
+        "type": {
+          "type": "integer",
+          "description": "Data type ID: 1=STRING, 10=INT8U, 11=INT8S, 12=INT16U, 13=INT16S, 14=INT32U, 15=INT32S, 20=DATETIME, 30=PERMISSION, 31=BIT.",
+          "enum": [1, 10, 11, 12, 13, 14, 15, 20, 30, 31]
+        },
+        "size": {
+          "type": "integer",
+          "description": "Field size in bytes. Relevant for STRING type (2-255); 0 for fixed-size types.",
+          "minimum": 0
+        },
+        "deviceId": {
+          "type": "integer",
+          "description": "Parameter ID (1-65535). Called 'parameterId' in REST API. Referenced by deviceId in userDefinedDataKeyValues.",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "size",
+        "deviceId"
+      ]
+    },
+    "group_date": {
+      "type": "object",
+      "description": "A per-device-group validity date range. Groups 0-31 store dates directly on transponder; groups >31 use user data parameters 2 and 3.",
+      "properties": {
+        "groupNumber": {
+          "type": "integer",
+          "description": "Device group number (0-9999).",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Group-specific validity start (format: YYYY-M-D, non-zero-padded), or empty string."
+        },
+        "endDate": {
+          "type": "string",
+          "description": "Group-specific validity end (format: YYYY-M-D, non-zero-padded), or empty string."
+        }
+      },
+      "required": [
+        "groupNumber",
+        "startDate",
+        "endDate"
+      ]
+    },
+    "group_permission": {
+      "type": "object",
+      "description": "A per-device-group permission assignment. Groups 0-31 store permissions directly on transponder; groups >31 use user data parameter ID 1 (type PERMISSION).",
+      "properties": {
+        "groupNumber": {
+          "type": "integer",
+          "description": "Device group number (0-9999).",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "groupPermission": {
+          "type": "integer",
+          "description": "Permission level (0-64) for this group, as plain integer (not Hamming-coded).",
+          "minimum": 0,
+          "maximum": 64
+        }
+      },
+      "required": [
+        "groupNumber",
+        "groupPermission"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "transponders": {
+      "type": "array",
+      "description": "Array of RFID transponder configurations (keys, cards, stickers).",
+      "items": {
+        "$ref": "#/$defs/transponder"
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Device group definitions (0-9999). Permissions for groups 0-31 are stored directly on transponders; groups >31 use user data parameters.",
+      "items": {
+        "$ref": "#/$defs/group"
+      }
+    },
+    "blocklists": {
+      "type": "array",
+      "description": "Lists of transponders denied access regardless of permission level.",
+      "items": {
+        "$ref": "#/$defs/blocklist"
+      }
+    },
+    "users": {
+      "type": "array",
+      "description": "Transponder holder profiles (people assigned transponders). Not to be confused with PITreader device users.",
+      "items": {
+        "$ref": "#/$defs/user"
+      }
+    },
+    "userDefinedDataFields": {
+      "type": "array",
+      "description": "User data configuration: defines custom parameters stored on transponders. Called 'user data configuration' in REST API.",
+      "items": {
+        "$ref": "#/$defs/user_defined_field"
+      }
+    },
+    "version": {
+      "type": "array",
+      "description": "PTM file format version, corresponding to the PIT Transponder Manager version. '1.1' from PTM 1.1, '1.2' from PTM 1.2.",
+      "items": {
+        "$ref": "#/$defs/version"
+      },
+      "uniqueItems": true
+    },
+    "templates": {
+      "type": "array",
+      "description": "Reusable transponder configuration templates with default permissions, dates, and user data values.",
+      "items": {
+        "$ref": "#/$defs/template"
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "description": "Permission level definitions (0-64). Determines authorization levels for transponders.",
+      "items": {
+        "$ref": "#/$defs/permission"
+      }
+    }
+  },
+  "required": [
+    "version"
+  ]
+}

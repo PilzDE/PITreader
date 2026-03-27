@@ -133,9 +133,9 @@ The PITreader hardware is part of a broader product ecosystem. The following sof
 
 | Component | Type | Role |
 |-----------|------|------|
-| **PIT Transponder Manager (PTM)** | Desktop application (Windows) | Central management of users, transponders, permissions, and time restrictions (validity dates). Can write permissions directly onto transponders for use with the *Transponder data* authentication mode. Exports a `.ptm` configuration file for use with UAS. |
-| **Myzel Lifecycle Platform (MLP) with myAccessControl** | Cloud service (Pilz) | Cloud-based alternative to PTM with equivalent user and transponder management capabilities. Also exports a `.ptm` file. Can directly send data to one or multiple UAS instances. |
-| **PIT User Authentication Service (UAS)** | Background service (Windows / Linux / Revolution Pi) | Reads a `.ptm` file and synchronizes the configuration to all managed PITreader devices via their REST API. Continuously distributes permissions, block lists, user data configuration, and validity dates. Manages firmware updates across the device fleet. Collects device audit trails into a central database. PITreader devices should be configured with authentication mode *Permission list* - the device operates from a locally cached list and remains functional during network outages, while UAS takes care of syncing data. |
+| **PIT Transponder Manager (PTM)** | Desktop application (Windows) | Central management of users, transponders, permissions, and time restrictions (validity dates). Can write permissions directly onto transponders for use with the *Transponder data* authentication mode. Exports a [`.ptm` configuration file](ptm.md) for use with UAS. |
+| **Myzel Lifecycle Platform (MLP) with myAccessControl** | Cloud service (Pilz) | Cloud-based alternative to PTM with equivalent user and transponder management capabilities. Also exports a [`.ptm` file](ptm.md). Can directly send data to one or multiple UAS instances. |
+| **PIT User Authentication Service (UAS)** | Background service (Windows / Linux / Revolution Pi) | Reads a [`.ptm` file](ptm.md) and synchronizes the configuration to all managed PITreader devices via their REST API. Continuously distributes permissions, block lists, user data configuration, and validity dates. Manages firmware updates across the device fleet. Collects device audit trails into a central database. PITreader devices should be configured with authentication mode *Permission list* - the device operates from a locally cached list and remains functional during network outages, while UAS takes care of syncing data. |
 | **PIT Windows Logon** | Desktop application (Windows) | Adapter that enables Windows login using a PITreader with transponders. |
 
 ### Data Flow
@@ -150,8 +150,8 @@ flowchart LR
     WIN["Windows PC"]
     XPNDR(["User / Transponder"])
 
-    PTM -- ".ptm file" --> UAS
-    MLP -- ".ptm file" --> UAS
+    PTM -- ".ptm file\n(ptm.md)" --> UAS
+    MLP -- ".ptm file\n(ptm.md)" --> UAS
     PTM -. "write permissions\n(Transponder data mode)" .-> XPNDR
     UAS -- "REST API\npermissions, blocklist,\nuser data, firmware" --> PIT
     PIT -- "Audit trail" --> UAS
