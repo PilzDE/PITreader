@@ -918,6 +918,26 @@
             Authentication mode "permission list" is used but the transponder is not part of the permission list on the device.
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.SyncTimeoutLock">
+            <summary>
+            Authentication locked because a synchronisation timeout occurred.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.InvalidSecondFactorPin">
+            <summary>
+            The entered two-factor PIN is invalid.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.NoSufficientSecondFactorPin">
+            <summary>
+            The transponder has no PIN or the PIN is shorter than the configured minimum length.
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationFailureReason.LockedSecondFactorAttempts">
+            <summary>
+            Two-factor authentication locked due to too many failed PIN attempts.
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.AuthenticationMode">
             <summary>
             Device's authentication mode
@@ -958,6 +978,11 @@
             Waiting for external authentication
             </summary>
         </member>
+        <member name="F:Pilz.PITreader.Client.Model.AuthenticationStatus.SecondFactorRequired">
+            <summary>
+            Second factor required (PIN input needed for two-factor authentication)
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.AuthenticationStatusResponse">
             <summary>
             Current information on a transponder key’s authentication status
@@ -981,6 +1006,11 @@
         <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.FailureReason">
             <summary>
             Reason for failed authentication
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.Pin">
+            <summary>
+            True if the transponder has a stored PIN for two-factor authentication.
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.AuthenticationStatusResponse.SecurityId">
@@ -1388,6 +1418,16 @@
             Active authentication type
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.TransponderSecondFactorRequired">
+            <summary>
+            Two-factor authentication required for transponders.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ConfigResponse.TransponderSecondFactorMinLength">
+            <summary>
+            Minimum required PIN length for two-factor authentication (4-6).
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.CrudAction">
             <summary>
             Action for <see cref="T:Pilz.PITreader.Client.Model.GenericCrudRequest`2"/>
@@ -1701,6 +1741,11 @@
         <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.Permission">
             <summary>
             Permission that is to be set for the stated transponder key
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.Pin">
+            <summary>
+            PIN for two-factor authentication with the current transponder (4-6 digits).
             </summary>
         </member>
         <member name="P:Pilz.PITreader.Client.Model.ExternalAuthenticationRequest.UserData">
@@ -2285,6 +2330,16 @@
         <member name="F:Pilz.PITreader.Client.Model.RfidProtocol.Iso15693">
             <summary>
             ISO 15693
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.RfidProtocol.FeliCa">
+            <summary>
+            FeliCa (ISO 18092)
+            </summary>
+        </member>
+        <member name="F:Pilz.PITreader.Client.Model.RfidProtocol.MifareDESFire">
+            <summary>
+            MIFARE DESFire with PITreader data structure
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.SecurityId">
@@ -3016,6 +3071,11 @@
             If <c>true</c>, data on that transponder is only readable on PITreader devices with a matching coding.
             </summary>
         </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderRequest.Pin">
+            <summary>
+            PIN for two-factor authentication. "0" or empty string to delete; 4-6 digits to set.
+            </summary>
+        </member>
         <member name="T:Pilz.PITreader.Client.Model.TransponderResponse">
             <summary>
             Data stored on a transponder key.
@@ -3034,6 +3094,11 @@
         <member name="P:Pilz.PITreader.Client.Model.TransponderResponse.LockedPermissions">
             <summary>
             <c>true</c>, if permissions are locked and can not be edited, anymore.
+            </summary>
+        </member>
+        <member name="P:Pilz.PITreader.Client.Model.TransponderResponse.Pin">
+            <summary>
+            True if a PIN for two-factor authentication is stored on the transponder.
             </summary>
         </member>
         <member name="T:Pilz.PITreader.Client.Model.UserDataConfigResponse">

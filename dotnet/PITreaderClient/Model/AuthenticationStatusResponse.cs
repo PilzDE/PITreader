@@ -47,6 +47,12 @@ namespace Pilz.PITreader.Client.Model
         public AuthenticationFailureReason FailureReason { get; set; }
 
         /// <summary>
+        /// True if the transponder has a stored PIN for two-factor authentication.
+        /// </summary>
+        [JsonPropertyName("pin")]
+        public bool Pin { get; set; }
+
+        /// <summary>
         /// Security ID
         /// </summary>
         [JsonPropertyName("securityId")]

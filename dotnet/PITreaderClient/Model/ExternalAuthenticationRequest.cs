@@ -35,6 +35,12 @@ namespace Pilz.PITreader.Client.Model
         public Permission? Permission { get; set; }
 
         /// <summary>
+        /// PIN for two-factor authentication with the current transponder (4-6 digits).
+        /// </summary>
+        [JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Pin { get; set; }
+
+        /// <summary>
         /// User data values
         /// </summary>
         [JsonPropertyName("userData"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

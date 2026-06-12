@@ -27,6 +27,16 @@ namespace Pilz.PITreader.Client.Model
         /// <summary>
         /// ISO 15693
         /// </summary>
-        Iso15693 = 2
+        Iso15693 = 2,
+
+        /// <summary>
+        /// FeliCa (ISO 18092)
+        /// </summary>
+        FeliCa = 3,
+
+        /// <summary>
+        /// MIFARE DESFire with PITreader data structure
+        /// </summary>
+        MifareDESFire = 16
     }
 }

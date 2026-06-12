@@ -188,5 +188,17 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("authenticationType")]
         public AuthenticationType AuthenticationType { get; set; }
+
+        /// <summary>
+        /// Two-factor authentication required for transponders.
+        /// </summary>
+        [JsonPropertyName("transponderSecondFactorRequired")]
+        public bool TransponderSecondFactorRequired { get; set; }
+
+        /// <summary>
+        /// Minimum required PIN length for two-factor authentication (4-6).
+        /// </summary>
+        [JsonPropertyName("transponderSecondFactorMinLength")]
+        public byte TransponderSecondFactorMinLength { get; set; }
     }
 }

@@ -46,5 +46,11 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("codingLock")]
         public bool CodingLock { get; set; }
+
+        /// <summary>
+        /// PIN for two-factor authentication. "0" or empty string to delete; 4-6 digits to set.
+        /// </summary>
+        [JsonPropertyName("pin"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Pin { get; set; }
     }
 }

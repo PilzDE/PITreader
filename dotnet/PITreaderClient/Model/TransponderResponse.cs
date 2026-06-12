@@ -38,5 +38,11 @@ namespace Pilz.PITreader.Client.Model
         /// </summary>
         [JsonPropertyName("lockedPermissions")]
         public bool LockedPermissions { get; set; }
+
+        /// <summary>
+        /// True if a PIN for two-factor authentication is stored on the transponder.
+        /// </summary>
+        [JsonPropertyName("pin")]
+        public new bool Pin { get; set; }
     }
 }

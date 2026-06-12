@@ -69,6 +69,26 @@ namespace Pilz.PITreader.Client.Model
         /// <summary>
         /// Authentication mode "permission list" is used but the transponder is not part of the permission list on the device.
         /// </summary>
-        NotInPermissionList = 9
+        NotInPermissionList = 9,
+
+        /// <summary>
+        /// Authentication locked because a synchronisation timeout occurred.
+        /// </summary>
+        SyncTimeoutLock = 10,
+
+        /// <summary>
+        /// The entered two-factor PIN is invalid.
+        /// </summary>
+        InvalidSecondFactorPin = 11,
+
+        /// <summary>
+        /// The transponder has no PIN or the PIN is shorter than the configured minimum length.
+        /// </summary>
+        NoSufficientSecondFactorPin = 12,
+
+        /// <summary>
+        /// Two-factor authentication locked due to too many failed PIN attempts.
+        /// </summary>
+        LockedSecondFactorAttempts = 13
     }
 }

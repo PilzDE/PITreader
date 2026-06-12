@@ -32,6 +32,11 @@ namespace Pilz.PITreader.Client.Model
         /// <summary>
         /// Waiting for external authentication
         /// </summary>
-        Waiting = 2
+        Waiting = 2,
+
+        /// <summary>
+        /// Second factor required (PIN input needed for two-factor authentication)
+        /// </summary>
+        SecondFactorRequired = 3
     }
 }
