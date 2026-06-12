@@ -7,7 +7,7 @@ Do not infer, extrapolate, or substitute values not explicitly listed here.
 
 # PITreader Modbus/TCP Interface Specification
 
-> Source: Operating Manual PITreader, Firmware Version 02.03.xx (1004806-EN-17), Section 5.10
+> Source: Operating Manual PITreader, Firmware Version 02.04.xx (1004806-EN-18), Section 5.10
 
 ## Overview
 
@@ -96,7 +96,7 @@ Reading an address that contains no data returns `0`.
 | 29 - 30           | 28 - 29           | 2         | Reserved |
 | 31 - 32           | 30 - 31           | 2         | Permission (code word) |
 | 33                | 32                | 1         | Permission (integer, 0 - 64) |
-| 34                | 33                | 1         | Authentication status: 0 = not authenticated, 1 = transponder authenticated successfully |
+| 34                | 33                | 1         | Authentication status: 0 = not authenticated, 1 = transponder authenticated successfully, 3 = second factor required (two-factor PIN input needed) |
 | 35 - 36           | 34 - 35           | 2         | Product ID (transponder) |
 | 37 - 38           | 36 - 37           | 2         | Serial number (transponder). 32-bit value with internal structure: top byte = **prefix** (2-digit number), lower 3 bytes = **consecutive number** (7-digit number). These must be stored and communicated separately. Decode as: `prefix = (value >> 24) & 0xFF`, `consecutive = value & 0x00FFFFFF`. Example: value `0x0C0012D6` → prefix `12`, consecutive `0004822`. |
 | 39 - 42           | 38 - 41           | 4         | Reserved |

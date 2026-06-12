@@ -27,7 +27,7 @@ Additionally the offical documentation about the features of the device and publ
 
 ## .NET Library
 
-[Pilz.PITreader.Client](dotnet/PITreaderClient) is a .NET Standard 2.0 library for accessing the REST API of PITreader devices with firmware version 2.0.
+[Pilz.PITreader.Client](dotnet/PITreaderClient) is a .NET Standard 2.0 library for accessing the REST API of PITreader devices with firmware version 2.x.
 
 In [dotnet/PITreaderTool](dotnet/PITreaderTool) you can find an example application using this library for a number of typical use cases:
 

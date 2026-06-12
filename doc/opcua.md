@@ -9,7 +9,7 @@ The OPC UA information model is defined in the NodeSet files under opcua/.
 
 # PITreader OPC UA Server
 
-> Source: Operating Manual PITreader OPC Server UA, PITreader Firmware V2.2.x (1005480-EN-06), Pilz GmbH & Co. KG
+> Source: Operating Manual PITreader OPC Server UA, PITreader Firmware V2.4.x (1005480-EN-07), Pilz GmbH & Co. KG
 > NodeSet files: [opcua/](opcua/)
 
 ---
@@ -191,6 +191,9 @@ Top-level object: `PITreader` (i=1001)
 | UserDataConfigVersion | 2023 | UInt32 | R | Version of the user data configuration |
 | UserDataConfigComment | 2024 | String | R | Comment on user data configuration version |
 | AuthenticationType | 2059 | UInt32 | R | See table below |
+| AllowExternalOverride | 2069 | Boolean | R | `true` = external override of authentication result via REST API is allowed; `false` = not allowed |
+| TransponderSecondFactorRequired | 2070 | Boolean | R | `true` = two-factor PIN authentication is required for every transponder; `false` = disabled |
+| TransponderSecondFactorMinLength | 2071 | Byte | R | Minimum PIN length for two-factor authentication (4–6) |
 
 **AuthenticationMode values:**
 
@@ -225,6 +228,7 @@ Top-level object: `PITreader` (i=1001)
 |------------|---------|------|--------|---------|
 | Authenticated | 2013 | Boolean | R | `false` = not authenticated, `true` = authenticated |
 | AuthenticationStatus | 2016 | UInt32 | R | See table below |
+| PinStatus | 2067 | Boolean | R | `true` if the transponder has a stored two-factor PIN |
 | Permission | 2017 | UInt32 | R | Current authenticated permission (Hamming-coded) |
 | LockedPermissions | 2050 | Boolean | R | `true` = permission changes locked |
 | PermissionDisplay | 2063 | Byte | R | Current permission as integer (0–64) |
@@ -238,6 +242,7 @@ Top-level object: `PITreader` (i=1001)
 | 0 | No transponder |
 | 1 | Authentication process completed |
 | 2 | Waiting for external authentication |
+| 3 | Second factor required (PIN input needed for two-factor authentication) |
 
 **FailureReason values:**
 
@@ -254,6 +259,9 @@ Top-level object: `PITreader` (i=1001)
 | 8 | 2-person rule configured - a second transponder is required |
 | 9 | No entry for this security ID in the permission list (Permission list mode) |
 | 10 | Authentication locked due to synchronisation timeout |
+| 11 | Entered two-factor PIN is invalid |
+| 12 | Transponder has no PIN or PIN is shorter than the configured minimum length |
+| 13 | Two-factor authentication locked due to too many failed attempts |
 
 ---
 
@@ -275,6 +283,7 @@ Top-level object: `PITreader` (i=1001)
 | TimeLimitationStart | 2051 | DateTime | R | Transponder validity start date (UTC); `2000-01-01` if not configured |
 | TimeLimitationEnd | 2052 | DateTime | R | Transponder validity end date (UTC); `9999-12-31T23:59:59` if not configured |
 | Permissions | 2058 | UInt32[32] | R | Permission code words for device groups 0–31 (Hamming-coded) |
+| Pin | 2066 | String | R/W | Write a PIN (4–6 digits) or `"0"`/`""` to delete. Read always returns empty string. Writing requires prior 2FA auth if a PIN already exists. Successfully writing a PIN triggers immediate authentication. |
 
 ---
 
@@ -312,6 +321,7 @@ Top-level object: `PITreader` (i=1001)
 | BrowseName | Node ID | Type | Access | Content |
 |------------|---------|------|--------|---------|
 | SEUStatus | 2001 | Boolean | R | `false` = no active PIT m4SEU connection, `true` = active |
+| SEUStatusSI | 2072 | Byte | R | SEU status information byte (same encoding as Modbus input register 19, reset value is `0xF0` / `240`) |
 | IOPortMode | 2025 | String | R | `"Input"` or `"Output"` |
 | IOPortValue | 2026 | UInt32 | R | `0` = off/low, `1` = on/high |
 | CodingChecksumBasic | 2060 | Byte[16] | R | Checksum for basic coding |
@@ -329,6 +339,22 @@ Used when the device is in **External** authentication mode (`AuthenticationMode
 | Permission | 2019 | UInt32 | R/W | Read: current authenticated permission (Hamming-coded). Write: permission to grant the transponder |
 | SecurityId | 2020 | String | R/W | Read: current security ID. Write: security ID for which to grant the permission |
 | Apply | 2021 | Boolean | R/W | Write `true` to apply the configured permission and security ID |
+| Pin | 2068 | String | R/W | Submit a PIN (4–6 digits) for two-factor authentication. Read always returns empty string. |
+
+**OPC UA error codes for `ExternalAuth/Pin` writes:**
+
+| StatusCode | Meaning |
+|------------|---------|
+| `BadInvalidState` | No transponder present |
+| `BadUserAccessDenied` | PIN does not match transponder PIN |
+| `BadTooManyOperations` | Brute-force protection active (max attempts exceeded) |
+| `BadOutOfRange` | Invalid input (e.g., PIN=0 or invalid length) |
+
+**OPC UA error codes for `Transponder/Data/Pin` writes:**
+
+| StatusCode | Meaning |
+|------------|---------|
+| `BadUserAccessDenied` | A PIN already exists on the transponder and no prior 2FA authentication via `ExternalAuth/Pin` was performed |
 
 ---
 
@@ -455,6 +481,37 @@ Used when `AuthenticationMode = 0` (External). Monitor `Transponder/State/Authen
 5. Write `true` to `ExternalAuth/Apply`.
 
 The device only accepts a permission for the transponder currently held on the reader. If the security ID does not match, the write is rejected.
+
+#### When to act on the transponder identity
+
+An OPC UA client that performs RFID-based logon against an external user management system should only use the transponder identity (and write back a permission) when the device signals that an external decision is appropriate. Use the following whitelist:
+
+> Proceed only when `AuthenticationStatus == 2` **or** (`AuthenticationStatus == 1` **and** `FailureReason` ∈ {0, 2, 5, 9}).
+
+Any other `FailureReason` value — including codes that may be added in future firmware versions — means the device has already rejected the transponder. The client should respect that verdict and not perform a login.
+
+Write back to the device (`ExternalAuth/SecurityId`, `Permission`, `Apply`) only when `AuthenticationStatus == 2` or `AllowExternalOverride` (NodeID 2069) is `true`.
+
+| FailureReason | Meaning | Perform external auth? |
+|---|---|---|
+| 0 | No error (transponder authenticated) | **yes** |
+| 2 | Permission 0 (no permissions for device group) | **yes** |
+| 5 | No permission assigned yet (External mode) | **yes** |
+| 9 | No entry in permission list (Permission list mode) | **yes** |
+| any other value | Device-side rejection (block list, time limitation, I/O lock, 2FA lock, etc.) | no — respect device verdict |
+
+> **Important:** This whitelist is designed so that future FailureReason codes are implicitly treated as rejections. Do not invert the check.
+
+### Two-Factor PIN Entry via OPC UA
+
+When `TransponderSecondFactorRequired` (NodeID 2070) is `true`, the device may enter `AuthenticationStatus == 3` (SecondFactorRequired) after a transponder is presented. The client must handle this PIN gate before the external decision logic above applies.
+
+1. Show a PIN dialog (length: `TransponderSecondFactorMinLength` … 6 digits).
+2. Write the entered PIN to `ExternalAuth/Pin` (NodeID 2068) — no `SecurityId` or `Apply` needed.
+3. On `Good` → PIN accepted, status transitions out of 3. On `BadUserAccessDenied` → wrong PIN, keep dialog open for retry.
+4. After 3 wrong attempts the device transitions to `AuthenticationStatus = 1` with `FailureReason = 13` (locked). Further writes return `BadTooManyOperations` until the transponder is removed and re-presented.
+
+Note: `FailureReason == 12` (PIN missing or too short on transponder) does not produce `AuthenticationStatus == 3`; it is reported directly as `AuthenticationStatus == 1` and treated as a rejection (not in the whitelist).
 
 ### LED Override
 

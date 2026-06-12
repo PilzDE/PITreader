@@ -4,7 +4,7 @@ info:
   title: Pilz PITreader REST API
   description: |
     REST API for the Pilz PITreader transponder reader device.
-    Firmware Version: 02.03.00
+    Firmware Version: 02.04.00
 
     ## Authentication
     All requests must include a Bearer token in the `Authorization` header:
@@ -55,7 +55,7 @@ info:
     change, a firmware update is downward-compatible: all existing endpoints, request
     parameters and response fields remain available.
 
-  version: "02.03.00"
+  version: "02.04.00"
   contact:
     name: Pilz GmbH & Co. KG
     url: https://www.pilz.com
@@ -399,7 +399,6 @@ components:
             enum: [0, 2, 3, 16]
           description: >
             RFID protocol(s) used to detect third-party transponders.
-            Only one value may be set at a time.
             `0` = ISO/IEC 14443-A; `2` = ISO/IEC 15693; `3` = FeliCa (ISO 18092);
             `16` = MIFARE DESFire with PITreader data structure.
             If `supportThirdParty` is `false`, this array must contain `[0]`.
@@ -490,6 +489,17 @@ components:
             a second presentation of the same transponder unlocks it);
             `2` = 2-person rule (two different transponders must be presented within a
             defined time window for authentication to succeed).
+        transponderSecondFactorRequired:
+          type: boolean
+          description: >
+            Two-factor authentication for transponders.
+            `true` = a numeric PIN (second factor) is required from every transponder
+            to complete authentication; `false` = standard single-factor authentication.
+        transponderSecondFactorMinLength:
+          type: number
+          description: >
+            Minimum required PIN length for two-factor authentication.
+            Range: 4 … 6. Only relevant when `transponderSecondFactorRequired` is `true`.
 
     CodingResponse:
       description: >
@@ -697,16 +707,17 @@ components:
             successful authentication. `0` if not authenticated.
         authenticationStatus:
           type: number
-          enum: [0, 1, 2]
+          enum: [0, 1, 2, 3]
           description: >
             Current state of the authentication process.
             `0` = no transponder in the read area;
             `1` = authentication process completed (result in `authenticated`);
             `2` = waiting for external authentication
-            (authentication mode "External" and no POST to /api/status/authentication yet).
+            (authentication mode "External" and no POST to /api/status/authentication yet);
+            `3` = second factor required (two-factor authentication enabled, PIN needed).
         failureReason:
           type: number
-          enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+          enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
           description: >
             Reason code for a failed authentication. `0` if authentication succeeded.
             `1` = no transponder positioned in the read area;
@@ -718,7 +729,16 @@ components:
             `7` = Single authentication type active and authentication locked by another registered transponder;
             `8` = 2-person rule active and a second transponder is still required;
             `9` = no entry for this security ID in the permission list (Permission list mode);
-            `10` = authentication locked because a synchronisation timeout occurred.
+            `10` = authentication locked because a synchronisation timeout occurred;
+            `11` = entered two-factor PIN is invalid;
+            `12` = transponder has no PIN or PIN is shorter than the configured minimum length;
+            `13` = two-factor authentication locked due to too many failed attempts.
+        pin:
+          type: boolean
+          description: >
+            Two-factor PIN status of the transponder.
+            `true` = the transponder has a stored PIN for two-factor authentication;
+            `false` = no PIN stored on the transponder.
         securityId:
           type: string
           description: >
@@ -815,6 +835,11 @@ components:
             Coding lock status. `true` = the transponder is limited to PITreaders that
             carry the same basic coding identifier (the transponder will only authenticate
             on identically coded readers); `false` = no coding restriction (default).
+        pin:
+          type: boolean
+          description: >
+            Two-factor PIN status. `true` = a PIN for two-factor authentication
+            is stored on the transponder; `false` = no PIN stored.
 
     UserDataConfigResponse:
       description: >
@@ -1054,10 +1079,11 @@ components:
                 `false` = authentication failed or no transponder present.
             authenticationStatus:
               type: number
-              enum: [0, 1, 2]
+              enum: [0, 1, 2, 3]
               description: >
                 Current state of the authentication process.
-                `0` = no transponder; `1` = process completed; `2` = awaiting external authentication.
+                `0` = no transponder; `1` = process completed; `2` = awaiting external authentication;
+                `3` = second factor required (PIN input needed).
             permission:
               type: number
               description: >
@@ -1065,14 +1091,17 @@ components:
                 (Hamming-coded). `0` if not authenticated.
             failureReason:
               type: number
-              enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+              enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
               description: >
                 Reason for a failed authentication (same codes as in AuthStatusResponse).
                 `0` = no error; `1` = no transponder; `2` = permission 0;
                 `3` = outside validity period; `4` = in block list;
                 `5` = no permission stored (External mode); `6` = I/O port block;
                 `7` = Single authentication lock; `8` = 2-person rule pending;
-                `9` = not in permission list; `10` = sync timeout lock.
+                `9` = not in permission list; `10` = sync timeout lock;
+                `11` = entered two-factor PIN is invalid;
+                `12` = transponder has no PIN or PIN too short;
+                `13` = two-factor authentication locked (too many attempts).
             transponderUid:
               type: string
               description: UID of the transponder chip. Empty string if no transponder present.
@@ -2339,9 +2368,13 @@ paths:
         `API.errorInvalidSecurityId` (ID invalid or doesn't match current transponder),
         `API.errorInvalidState` (device not in External mode and override not allowed),
         `API.errorInvalidDataFormat` (userData structure invalid),
-        `API.errorInvalidGroupValue` (userData value out of range or string too long).
+        `API.errorInvalidGroupValue` (userData value out of range or string too long),
+        `API.errorPin` (incorrect PIN for two-factor authentication),
+        `API.errorInvalidTransponder` (PIN submitted but no transponder present),
+        `API.errorTooManyAttempts` (brute-force protection: too many failed PIN attempts).
 
-        Requires role ≥ 200 (Transponder manager).
+        Requires role ≥ 10 (Guest) for PIN-only submissions.
+        Requires role ≥ 200 (Transponder manager) when `permission` or `userData` are included.
       operationId: postAuthStatus
       tags: [External Authentication]
       requestBody:
@@ -2357,12 +2390,18 @@ paths:
                   description: >
                     Security ID of the transponder for which the authentication result
                     is being set. Must match the security ID of the transponder currently
-                    in the read area.
+                    in the read area. Required when `permission` or `userData` are included.
                 permission:
                   type: number
                   description: >
                     Permission to grant to the transponder. Hamming-coded (HD9).
                     Valid permission codes are listed in section 7 of the operating manual.
+                pin:
+                  type: string
+                  description: >
+                    PIN for two-factor authentication with the current transponder.
+                    4 to 6 digits. When only `pin` is submitted (without `permission`
+                    or `userData`), the `securityId` field is not required.
                 userData:
                   type: array
                   description: >
@@ -2485,6 +2524,12 @@ paths:
                     `true` = activate coding lock (transponder will only authenticate on
                     PITreaders with the same basic coding identifier);
                     `false` = no coding restriction (default).
+                pin:
+                  type: string
+                  description: >
+                    PIN for two-factor authentication. `"0"` or `""` (empty string) to
+                    delete the PIN; 4 to 6 digits to set a PIN.
+                    Successfully writing a PIN triggers immediate authentication with that PIN.
             example:
               permissions: [511, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

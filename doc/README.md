@@ -8,7 +8,7 @@ stated here or in the linked specification files.
 
 # PITreader Interface Specifications - Index
 
-> Source: Operating Manual PITreader, Firmware Version 02.03.xx (1004806-EN-17), Pilz GmbH & Co. KG
+> Source: Operating Manual PITreader, Firmware Version 02.04.xx (1004806-EN-18), Pilz GmbH & Co. KG
 
 ## Introduction
 
@@ -41,6 +41,7 @@ Transponder types: transponder keys, transponder cards, transponder stickers.
   - *Permission list* - transponder lookup against a stored permission list
   - *Fixed permission* - all authenticated transponders receive a configured fixed permission
 - **Authentication types:** Basic, Single authentication, 2-person rule
+- **Two-factor authentication (2FA)** - optional PIN (4–6 digits) as a second factor in addition to transponder possession; configurable per device with brute-force protection (3 attempts)
 - **User data** - up to 520 16-bit registers of custom data storable on the transponder and readable via Modbus/TCP or REST API
 - **Basic coding and OEM coding** - cryptographically bind transponders to a device or OEM fleet; prevents use of uncoded or foreign transponders
 - **Block list** - explicitly deny specific transponders regardless of their permission

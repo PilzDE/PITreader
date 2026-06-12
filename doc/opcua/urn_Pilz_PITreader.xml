@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UANodeSet LastModified="2021-07-15T06:23:08.009Z" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns:si="http://www.siemens.com/OPCUA/2017/SimaticNodeSetExtensions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<UANodeSet LastModified="2026-03-06T17:49:46.922Z" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns:si="http://www.siemens.com/OPCUA/2017/SimaticNodeSetExtensions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <NamespaceUris>
         <Uri>urn:Pilz:PITreader</Uri>
         <Uri>urn:Pilz:PITreader:UserData</Uri>
@@ -425,6 +425,17 @@
             <uax:Boolean>true</uax:Boolean>
         </Value>
     </UAVariable>
+    <UAVariable DataType="Byte" NodeId="ns=1;i=2072" BrowseName="1:SEUStatusSI" ParentNodeId="ns=1;i=1011">
+        <DisplayName>SEUStatusSI</DisplayName>
+        <Description>SEUStatusSI</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1011</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Byte>0</uax:Byte>
+        </Value>
+    </UAVariable>
     <UAVariable DataType="String" NodeId="ns=1;i=2002" BrowseName="1:TimeZone" ParentNodeId="ns=1;i=1005">
         <DisplayName>TimeZone</DisplayName>
         <Description>TimeZone</Description>
@@ -652,6 +663,63 @@
         </References>
         <Value>
             <uax:String>Null</uax:String>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2066" BrowseName="1:Pin" ParentNodeId="ns=1;i=1008" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Pin</DisplayName>
+        <Description>Pin</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1008</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2067" BrowseName="1:PinStatus" ParentNodeId="ns=1;i=1006">
+        <DisplayName>PinStatus</DisplayName>
+        <Description>PinStatus</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1006</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+    </UAVariable>
+    <UAVariable DataType="String" NodeId="ns=1;i=2068" BrowseName="1:Pin" ParentNodeId="ns=1;i=1012" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Pin</DisplayName>
+        <Description>Pin</Description>
+        <References>
+            <Reference ReferenceType="Organizes" IsForward="false">ns=1;i=1012</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2069" BrowseName="1:AllowExternalOverride" ParentNodeId="ns=1;i=1005">
+        <DisplayName>AllowExternalOverride</DisplayName>
+        <Description>AllowExternalOverride</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>false</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Boolean" NodeId="ns=1;i=2070" BrowseName="1:TransponderSecondFactorRequired" ParentNodeId="ns=1;i=1005">
+        <DisplayName>TransponderSecondFactorRequired</DisplayName>
+        <Description>TransponderSecondFactorRequired</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Boolean>false</uax:Boolean>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Byte" NodeId="ns=1;i=2071" BrowseName="1:TransponderSecondFactorMinLength" ParentNodeId="ns=1;i=1005">
+        <DisplayName>TransponderSecondFactorMinLength</DisplayName>
+        <Description>TransponderSecondFactorMinLength</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1005</Reference>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+        </References>
+        <Value>
+            <uax:Byte>4</uax:Byte>
         </Value>
     </UAVariable>
 </UANodeSet>

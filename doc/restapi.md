@@ -11,6 +11,7 @@ The complete endpoint reference is in restapi_openapi.yaml (OpenAPI 3.0.3).
 
 > Source: Operating Manual PITreader REST API (1005365), Pilz GmbH & Co. KG
 > Full endpoint reference: [restapi_openapi.yaml](restapi_openapi.yaml) (OpenAPI 3.0.3)
+> Firmware Version: 02.04.00
 
 ---
 
@@ -154,7 +155,35 @@ The update is a two-step process to prevent accidental activation.
 
 To abort after upload: `POST /api/firmware/update` with `action: "cancel"`.
 
-### 4. Efficient status polling with the monitor endpoint
+### 4. Two-factor authentication (PIN)
+
+Firmware 02.04.00 adds optional two-factor authentication for transponders. When enabled, a transponder must additionally provide a numeric PIN (4–6 digits) to complete authentication.
+
+**Configuration** (via `GET /api/config` / `POST /api/config`):
+- `transponderSecondFactorRequired` (boolean) — enables 2FA for all transponders.
+- `transponderSecondFactorMinLength` (number, 4–6) — minimum PIN length.
+
+**Authentication flow:**
+1. Transponder is placed → `authenticationStatus` = `3` (SecondFactorRequired) if 2FA is enabled and a PIN is expected.
+2. Submit PIN via `POST /api/status/authentication` with `{"pin": "1234"}` (no `securityId` required for PIN-only submission).
+3. On success, `authenticationStatus` transitions to `1` (Completed).
+
+**PIN management on transponder** (`POST /api/transponder`):
+- Write: `{"pin": "123456"}` — stores a 4–6 digit PIN.
+- Delete: `{"pin": "0"}` or `{"pin": ""}` — removes the PIN.
+- Writing a PIN triggers immediate authentication with that PIN.
+
+**Error responses for PIN submission** (`POST /api/status/authentication`):
+- `API.errorPin` — incorrect PIN.
+- `API.errorInvalidTransponder` — no transponder present.
+- `API.errorTooManyAttempts` — brute-force protection (3 failed attempts locks the transponder).
+
+**New `failureReason` codes** (in `GET /api/status/authentication` and `/api/status/monitor`):
+- `11` — entered PIN is invalid.
+- `12` — transponder has no PIN or PIN is shorter than the configured minimum length.
+- `13` — 2FA locked due to too many failed attempts.
+
+### 5. Efficient status polling with the monitor endpoint
 
 Polling individual endpoints (status, auth status, LED, etc.) at high frequency is wasteful. Use the monitor endpoint instead:
 
