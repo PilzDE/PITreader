@@ -3659,6 +3659,8 @@ paths:
       summary: Download OPC UA server certificate
       description: >
         Downloads the OPC UA server certificate of the device as a binary file.
+        The filename follows the pattern `<hostname>_opcua_YYYY-MM-DD_HHmmss.cer`.
+        Returns HTTP 404 if no OPC UA server certificate is configured.
         Requires role ≥ 400 (Device manager).
       operationId: getFilesOpcuaServer
       tags: [Files]
@@ -3670,6 +3672,40 @@ paths:
               schema:
                 type: string
                 format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Upload OPC UA server certificate
+      description: >
+        Uploads a new OPC UA server certificate to the device. The certificate
+        must be in DER or PEM format (RSA 2048-bit, SHA2-256).
+        Maximum file size: 5 KB.
+        Requires role ≥ 400 (Device manager).
+      operationId: postFilesOpcuaServer
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: OPC UA server certificate file (DER or PEM format).
+      responses:
+        '200':
+          description: OPC UA server certificate uploaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -3707,6 +3743,684 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
+
+  /api/config/reset:
+    post:
+      summary: Reset device to factory defaults
+      description: >
+        Resets the device configuration to factory defaults. Individual components
+        can be reset selectively by specifying the corresponding boolean fields.
+        If no fields are provided, all components are reset and the device reboots.
+
+        Requires role ≥ 500 (Administrator).
+      operationId: postConfigReset
+      tags: [General Device Information]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceConfig:
+                  type: boolean
+                  description: Reset device settings (including security keys).
+                diagnosticLog:
+                  type: boolean
+                  description: Reset the diagnostic log.
+                transponderBlocklist:
+                  type: boolean
+                  description: Reset the transponder block list.
+                deviceGroupNames:
+                  type: boolean
+                  description: Reset device group names.
+                userDataConfig:
+                  type: boolean
+                  description: Reset the user data configuration.
+                permissionList:
+                  type: boolean
+                  description: Reset the transponder permission list.
+      responses:
+        '200':
+          description: >
+            Reset successful. The `data.reboot` field indicates whether the device
+            rebooted. The `msg` field contains `API.resetSuccessNoRestart` if no
+            reboot was performed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/certificate:
+    get:
+      summary: Read TLS certificate information
+      description: >
+        Returns information about the currently active TLS certificate on the device,
+        including key type, fingerprints, and a verification code.
+        Requires role ≥ 10 (Guest).
+      operationId: getCertificate
+      tags: [Certificate Management]
+      responses:
+        '200':
+          description: Current TLS certificate information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [ecc, rsa]
+                    description: Key type of the certificate (`"ecc"` or `"rsa"`).
+                  fingerprintSha1:
+                    type: string
+                    description: >
+                      Hex-encoded SHA-1 fingerprint of the certificate.
+                  fingerprint:
+                    type: string
+                    description: >
+                      Hex-encoded SHA-256 fingerprint of the certificate.
+                  fingerprintVerification:
+                    type: number
+                    description: >
+                      Verification code for the certificate fingerprint. Use this
+                      to verify the server identity on first connection.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/opcua:
+    get:
+      summary: Read OPC UA server configuration
+      description: >
+        Returns the current configuration of the integrated OPC UA server, including
+        activation status, port, and server certificate information.
+        Only available on PITreader S variants and PIT gb with PITreader variants.
+        Requires role ≥ 400 (Device manager).
+      operationId: getOpcuaConfig
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: OPC UA server configuration.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activated:
+                    type: boolean
+                    description: >
+                      `true` = OPC UA server is activated; `false` = deactivated.
+                  port:
+                    type: number
+                    description: Current port number of the OPC UA server (default 4840).
+                  server_cn:
+                    type: string
+                    description: >
+                      Common Name (CN) from the OPC UA server certificate.
+                  server_fingerprint:
+                    type: string
+                    description: SHA-256 fingerprint of the OPC UA server certificate.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Update OPC UA server configuration
+      description: >
+        Activates or deactivates the OPC UA server. When the `activated` parameter
+        is set to `true`, or when the OPC UA server was previously activated,
+        the device reboots after a successful request.
+        Requires role ≥ 400 (Device manager).
+      operationId: postOpcuaConfig
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activated:
+                  type: boolean
+                  description: >
+                    `true` = activate OPC UA server; `false` = deactivate.
+      responses:
+        '200':
+          description: OPC UA configuration updated. Device may reboot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/transponder/lock:
+    post:
+      summary: Lock transponder permissions
+      description: >
+        Locks the permission area on the transponder currently in the read area.
+        After locking, permissions can only be modified via a teach-in procedure.
+        Both `permissions` and `lockPermissions` fields are required.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postTransponderLock
+      tags: [Transponder Data]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permissions, lockPermissions]
+              properties:
+                permissions:
+                  type: array
+                  items:
+                    type: number
+                  minItems: 32
+                  maxItems: 32
+                  description: >
+                    Array of exactly 32 Hamming-coded (HD9) permission values for
+                    device groups 0–31. That need to match the permission currently on the transponder.
+                lockPermissions:
+                  type: boolean
+                  description: >
+                    Must be `true` to lock all device group permissions on the transponder.
+      responses:
+        '200':
+          description: Transponder permissions locked successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/diag/list:
+    get:
+      summary: Read active diagnostic alarms
+      description: >
+        Returns the list of currently active diagnostic alarms from the device's
+        diagnostic module.
+        Requires role ≥ 10 (Guest).
+      operationId: getDiagList
+      tags: [Diagnostics]
+      responses:
+        '200':
+          description: Active diagnostic alarms.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Array of active diagnostic alarm entries.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: Diagnostic ID
+                        timestamp:
+                          type: string
+                          description: >
+                            Timestamp in UTC (RFC 3339, e.g. `2018-06-28T00:39:53Z`).
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/diag/log:
+    get:
+      summary: Read diagnostic log entries
+      description: >
+        Returns entries from the device's diagnostic log. Use query parameters
+        to control which entries and how many are returned.
+        Requires role ≥ 10 (Guest).
+      operationId: getDiagLog
+      tags: [Diagnostics]
+      parameters:
+        - name: number
+          in: query
+          required: false
+          schema:
+            type: number
+          description: >
+            Number of log entries to return. `0` = return all entries.
+            If omitted, a default number of recent entries is returned.
+        - name: scope
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [allTypes, auditTrail]
+          description: >
+            Filter scope. `allTypes` = return all event types;
+            `auditTrail` = return only audit trail entries (security-relevant events).
+      responses:
+        '200':
+          description: Diagnostic log entries.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logSize:
+                    type: number
+                    description: >
+                      Total number of entries in the diagnostic log (depends on `scope`
+                      parameter but is independent of `number`).
+                  items:
+                    type: array
+                    description: Array of diagnostic log entries.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: Diagnostic event ID (from the device error database).
+                        changeOfState:
+                          type: number
+                          enum: [1, 2, 3]
+                          description: >
+                            Entry type. `1` = arrived (new event);
+                            `2` = deactivated (alarm cleared);
+                            `3` = activated (alarm activated).
+                        timestamp:
+                          type: string
+                          description: >
+                            Timestamp in UTC (RFC 3339, e.g. `2018-06-28T00:39:53Z`).
+                        index:
+                          type: number
+                          description: >
+                            Incremental Lamport clock index. Monotonically increasing
+                            counter for ordering and change detection.
+                        params:
+                          type: array
+                          description: >
+                            Event parameters. Empty array if the event has no parameters.
+                          items:
+                            type: object
+                            properties:
+                              type:
+                                type: string
+                                enum: [uid, sid, ip, perm, opTime, oldTs]
+                                description: >
+                                  Parameter type. `uid` = User ID; `sid` = Security ID;
+                                  `ip` = IP address; `perm` = authenticated permission;
+                                  `opTime` = operating time; `oldTs` = old system time.
+                              value:
+                                type: string
+                                description: >
+                                  Parameter value (username, Security ID hex string,
+                                  IP address, etc.).
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/blocklist:
+    get:
+      summary: Download block list as CSV file
+      description: >
+        Downloads the current transponder block list as a CSV file.
+        The filename follows the pattern `<hostname>_blocklist_YYYY-MM-DD_HHmmss.csv`.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: getFilesBlocklist
+      tags: [Files]
+      responses:
+        '200':
+          description: Block list CSV file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Upload block list from CSV file
+      description: >
+        Uploads a CSV file to replace the current block list. The file must be
+        uploaded as `multipart/form-data`. Maximum file size: 90090 bytes.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postFilesBlocklist
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file containing the block list to import.
+      responses:
+        '200':
+          description: Block list imported successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/permissionList:
+    get:
+      summary: Download permission list as CSV file
+      description: >
+        Downloads the current transponder permission list as a CSV file.
+        The filename follows the pattern `<hostname>_permissions_YYYY-MM-DD_HHmmss.csv`.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: getFilesPermissionList
+      tags: [Files]
+      responses:
+        '200':
+          description: Permission list CSV file.
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Upload permission list from CSV file
+      description: >
+        Uploads a CSV file to replace the current permission list. The file must be
+        uploaded as `multipart/form-data`. Maximum file size: 40040 bytes.
+        Requires role ≥ 200 (Transponder manager).
+      operationId: postFilesPermissionList
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file containing the permission list to import.
+      responses:
+        '200':
+          description: Permission list imported successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/files/csr:
+    get:
+      summary: Download Certificate Signing Request (CSR)
+      description: >
+        Downloads a Certificate Signing Request (CSR) generated by the device.
+        The CSR can be submitted to a Certificate Authority to obtain a signed
+        certificate, which can then be uploaded via POST /api/files/certificate.
+        The filename follows the pattern `<hostname>_YYYY-MM-DD_HHmmss.csr`.
+        Requires role ≥ 500 (Administrator).
+      operationId: getFilesCsr
+      tags: [Certificate Management]
+      responses:
+        '200':
+          description: CSR file (PEM-encoded).
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/users/changePassword:
+    post:
+      summary: Change current user's password
+      description: >
+        Allows the currently authenticated user to change their own password.
+        The current password must be provided for verification.
+        This endpoint is for password-type users (authType=1) only.
+
+        Error codes returned in `msg` on HTTP 400:
+        `API.errorBruteForce` (too many failed attempts, temporarily locked).
+
+        Requires role ≥ 10 (Guest).
+      operationId: postChangePassword
+      tags: [Device User Management]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [old, new]
+              properties:
+                old:
+                  type: string
+                  description: >
+                    The current password of the logged-in user. Must match the
+                    stored password; failed validations count towards brute-force
+                    protection.
+                new:
+                  type: string
+                  description: >
+                    The new password to set for the current user.
+      responses:
+        '200':
+          description: Password changed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+
+  /api/files/opcua/client:
+    get:
+      summary: Download OPC UA client certificate
+      description: >
+        Downloads the certificate of a registered OPC UA client by its internal ID.
+        The `id` query parameter is required and must match one of the IDs returned
+        by GET /api/config/opcua/clients.
+        The filename follows the pattern `<hostname>_opcua_client_<id>_YYYY-MM-DD_HHmmss.cer`.
+        Requires role ≥ 400 (Device manager).
+      operationId: getFilesOpcuaClient
+      tags: [Files]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: number
+          description: Internal ID of the OPC UA client whose certificate to download.
+      responses:
+        '200':
+          description: OPC UA client certificate (binary).
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Upload OPC UA client certificate
+      description: >
+        Uploads a new OPC UA client certificate to authenticate an OPC UA client
+        against the PITreader's OPC UA server. The certificate must be in DER or
+        PEM format (RSA 2048-bit, SHA2-256). Maximum file size: 2 KB.
+        Requires role ≥ 400 (Device manager).
+      operationId: postFilesOpcuaClient
+      tags: [Files]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: OPC UA client certificate file (DER or PEM format).
+      responses:
+        '200':
+          description: OPC UA client certificate uploaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/config/opcua/clients:
+    get:
+      summary: List registered OPC UA clients
+      description: >
+        Returns a list of all registered OPC UA client certificates on the device,
+        including their internal ID, Common Name (CN), and SHA-256 fingerprint.
+        The CN is truncated to the first 50 characters.
+        Returns an empty list if no client certificates are registered.
+        Requires role ≥ 400 (Device manager).
+      operationId: getOpcuaClients
+      tags: [General Device Information]
+      responses:
+        '200':
+          description: List of registered OPC UA clients.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Array of registered OPC UA client entries.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: Internal ID of the OPC UA client.
+                        cn:
+                          type: string
+                          description: >
+                            Common Name (CN) from the client certificate
+                            (max 50 characters).
+                        fingerprint:
+                          type: string
+                          description: SHA-256 fingerprint of the client certificate.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Delete a registered OPC UA client
+      description: >
+        Deletes a registered OPC UA client certificate from the device.
+        The `action` must be `"delete"` and the `id` field must contain the
+        internal ID of the client to remove (as returned by GET /api/config/opcua/clients).
+        Requires role ≥ 400 (Device manager).
+      operationId: postOpcuaClients
+      tags: [General Device Information]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, id]
+              properties:
+                action:
+                  type: string
+                  enum: [delete]
+                  description: Action to perform. Currently only `"delete"` is supported.
+                id:
+                  type: number
+                  description: >
+                    Internal ID of the OPC UA client to `"delete"`. Obtain from
+                    GET /api/config/opcua/clients.
+      responses:
+        '200':
+          description: OPC UA client deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 
 tags:
   - name: General Device Information
@@ -3751,3 +4465,6 @@ tags:
     description: >
       Firmware update workflow: upload a firmware package and then confirm
       or cancel the update.
+  - name: Diagnostics
+    description: >
+      Read active diagnostic alarms and diagnostic log entries from the device.

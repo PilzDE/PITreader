@@ -109,18 +109,19 @@ Same wrapper with `"success": false` and an optional `msg` field containing a ma
 
 | Group | What it covers | Min. role |
 |-------|---------------|-----------|
-| General Device Information | Device status, configuration, coding, blocklist, permission list, device groups, custom keys | 10 (Guest) |
+| General Device Information | Device status, configuration, coding, blocklist, permission list, device groups, custom keys, OPC UA server config | 10 (Guest) |
 | Authentication Status | Transponder authentication status, single-auth lock | 10 (Guest) |
 | External Authentication | Set permission and user data for the currently held transponder | 200 (Transponder manager) |
-| Transponder Data | Read/write permissions, validity dates, teach-in, transponder crypto key management | 10 / 200 for writes |
+| Transponder Data | Read/write permissions, validity dates, teach-in, lock, transponder crypto key management | 10 / 200 for writes |
 | User Data | Config parameters, RAM operations (read/write/clear user data from transponder) | 10 / 200–400 for writes |
-| Device User Management | CRUD device users, API token renewal | 400 / 500 for admin operations |
-| Certificate Management | Regenerate device certificate, upload custom certificate | 500 (Administrator) |
-| Files | Configuration backup/restore, firmware upload, OPC UA server certificate | 400 / 500 for full backup |
+| Device User Management | CRUD device users, API token renewal, password change | 400 / 500 for admin operations |
+| Certificate Management | Read certificate info, regenerate device certificate, upload custom certificate, download CSR | 10 / 500 for writes |
+| Files | Configuration backup/restore, firmware upload, OPC UA certificates, blocklist/permission list CSV import/export | 200–500 depending on operation |
 | Firmware | Confirm or cancel a pending firmware update | 400 (Device manager) |
 | LED Control | Read/write LED colour and flash mode | 10 / 200 for writes |
 | Current User | Read own identity and role | 10 (Guest) |
 | PITreader Status | Comprehensive status monitor with change counters for efficient polling | 10 (Guest) |
+| Diagnostics | Active alarm list, diagnostic log with event parameters | 10 (Guest) |
 
 ---
 
@@ -215,6 +216,108 @@ Use this file with tools such as Swagger UI, Redoc, Postman, or any OpenAPI-comp
 - Backup/restore via `GET /api/files/backup` and `POST /api/files/restore` returns a subset of configuration fields for Device manager (role 400). Full backup including all settings requires Administrator (role 500).
 
 ---
+
+
+## Diagnostic Event IDs
+
+The following table lists the diagnostic event IDs returned by `GET /api/diag/list` and `GET /api/diag/log`.
+
+| ID | Severity | Message |
+|------|----------|---------|
+| 20526 | Info | PIT m4SEU: Pushbutton operated incorrectly (0x0E) |
+| 20527 | Info | PIT m4SEU: Device error (0x0D) |
+| 20528 | Info | PIT m4SEU: Transponder 1 was positioned (0x04). |
+| 20529 | Info | PIT m4SEU: Transponder 2 was positioned (0x05). |
+| 20530 | Info | PIT m4SEU: Transponder 3 was positioned (0x06). |
+| 20531 | Info | PIT m4SEU: Transponder 4 was positioned (0x07). |
+| 20532 | Info | PIT m4SEU: Transponder 5 was positioned (0x02). |
+| 20533 | Info | PIT m4SEU: Transponder was removed (0x0F). |
+| 20534 | Info | PIT m4SEU: Operating mode 1 selected (0x08) |
+| 20535 | Info | PIT m4SEU: Operating mode 2 selected (0x09) |
+| 20536 | Info | PIT m4SEU: Operating mode 3 selected (0x0A) |
+| 20537 | Info | PIT m4SEU: Operating mode 4 selected (0x0B) |
+| 20538 | Info | PIT m4SEU: Operating mode 5 selected (0x03) |
+| 20539 | Info | PIT m4SEU: No permission (0x0C) |
+| 20540 | Info | PIT m4SEU: Operating mode preselection switched (0x00) |
+| 20544 | Warning | The configured SNTP server is not accessible. |
+| 20545 | Error | Internal fault. Please swap device. |
+| 20546 | Error | Internal fault. Please swap device. |
+| 20547 | Info | The reset to factory settings was triggered via hardware. |
+| 20548 | Info | The reset to factory settings was triggered by the user (via the web application). |
+| 20549 | Error | Internal fault. Please contact Pilz. |
+| 20550 | Error | Internal fault. Please contact Pilz. |
+| 20551 | Error | The network configuration is faulty. Change the configuration. |
+| 20552 | Error | Cannot read the transponder. Make sure that the transponder was positioned correctly. |
+| 20553 | Error | Cannot read the transponder. Teach in the transponder again. |
+| 20554 | Info | The time was adjusted through synchronisation with the SNTP server. |
+| 20555 | Warning | Login attempt failed due to unknown user. |
+| 20556 | Warning | Login attempt failed due to incorrect password. |
+| 20557 | Warning | Login attempt was blocked (user blocked). |
+| 20558 | Warning | Login attempt was blocked (IP address blocked). |
+| 20559 | Info | Login successful |
+| 20560 | Warning | The default password has not been changed. |
+| 20561 | Error | Internal fault. Please swap device. |
+| 20562 | Error | Cannot read the transponder. Teach in the transponder again. |
+| 20565 | Error | No connection to the card top. Check the connection or replace the card top. |
+| 20566 | Info | A new key was generated for TLS connections. |
+| 20567 | Info | A new key was uploaded for TLS connections. |
+| 20568 | Info | A new certificate was generated for TLS connections. |
+| 20569 | Info | A new certificate was uploaded for TLS connections. |
+| 20570 | Info | Transponder successfully authenticated. |
+| 20571 | Info | Could not authenticate the positioned transponder. |
+| 20572 | Info | The firmware update was started. |
+| 20573 | Info | The configuration was changed. |
+| 20574 | Info | The time was set/changed manually by a user. |
+| 20575 | Info | The basic coding was set. |
+| 20576 | Info | The basic coding was changed. |
+| 20577 | Info | The basic coding was deleted. |
+| 20578 | Info | A new entry was added to the block list. |
+| 20579 | Info | A entry was removed from the block list. |
+| 20580 | Info | The block list was imported from a file. |
+| 20581 | Info | The user has changed his password. |
+| 20582 | Info | The configuration was imported from a file. |
+| 20583 | Info | The firmware was updated successfully. |
+| 20584 | Error | The firmware update terminated with an error. |
+| 20585 | Info | The bootloader was updated successfully. |
+| 20586 | Error | The bootloader update terminated with an error. |
+| 20587 | Error | Could not update the firmware. Please download the current firmware update file from the Pilz website and try again. |
+| 20588 | Info | The OEM coding was changed. |
+| 20589 | Info | The OEM coding was deleted. |
+| 20590 | Info | The OEM coding was set. |
+| 20591 | Info | The user data were completely deleted on the PITreader. |
+| 20592 | Info | One parameter was added to or changed in the user data on the PITreader. |
+| 20593 | Error | An error occurred while starting the OPC UA Server. Please check the configuration. |
+| 20594 | Info | A new OPC UA Server certificate was uploaded. |
+| 20595 | Info | A new OPC UA Client certificate was uploaded. |
+| 20596 | Info | An OPC UA Client certificate was deleted. |
+| 20597 | Info | The configuration was deleted. |
+| 20598 | Info | Standard designations will be used for the device groups because the user-defined names were deleted. |
+| 20599 | Info | All transponders were deleted from the block list. |
+| 20600 | Info | The diagnostic log was deleted. |
+| 20601 | Info | The lock as a result of the authentication type "single authentication" was reset. |
+| 20602 | Info | The user data was restored on the PITreader. |
+| 20603 | Info | The names of the device groups were restored. |
+| 20604 | Info | 2-man rule was started with the first transponder. |
+| 20605 | Info | The transponder was removed. |
+| 20606 | Info | The device was started/switched on. |
+| 20607 | Info | The connection to PIT m4SEU was established. |
+| 20608 | Info | The connection to PIT m4SEU was interrupted. |
+| 20609 | Info | The permission list was imported. |
+| 20610 | Info | The permission list was deleted. |
+| 20613 | Info | The permission list was changed. |
+| 20614 | Info | The list of device users was changed. |
+| 20615 | Info | The device users were imported. |
+| 20616 | Warning | Login failed because the IP address of the remote device is unknown. |
+| 20617 | Error | A synchronisation timeout occurred. Check the connection to the external service (e.g. PIT UAS). |
+| 20618 | Warning | The connection to the PIT m4SEU was reset. |
+| 20619 | Info | The firmware update to an older version was started. |
+| 20620 | Info | Cryptographic keys were set. |
+| 20621 | Info | Cryptographic keys were deleted. |
+| 20622 | Error | The transponder can only be read on a PITreader with support for third-party transponders. |
+| 20623 | Error | The data on the transponder cannot be read with the current device configuration. |
+| 20624 | Info | The configuration (LEGIC) was changed. |
+| 20625 | Error | Communication error with the card top. Check the connection or replace the card top. |
+
 
 ## Related Documents
 
